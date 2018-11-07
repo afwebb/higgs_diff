@@ -1,0 +1,7 @@
+python create_csv.py /data_ceph/afwebb/datasets/v7_05/mc16a/345873.root &
+python create_csv.py /data_ceph/afwebb/datasets/v7_05/mc16a/345875.root &
+python create_csv.py /data_ceph/afwebb/datasets/v7_05/mc16a/345874.root &
+
+python create_csv.py /data_ceph/afwebb/datasets/v7_05/mc16d/345873.root &
+python create_csv.py /data_ceph/afwebb/datasets/v7_05/mc16d/345875.root &
+python create_csv.py /data_ceph/afwebb/datasets/v7_05/mc16d/345874.root &

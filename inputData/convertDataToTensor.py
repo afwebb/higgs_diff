@@ -13,8 +13,8 @@ from sklearn.model_selection import train_test_split
 import pickle
 import sys
 import torch
-#import h2o
-#h2o.init()
+import h2o
+h2o.init()
 
 dsid = sys.argv[1]
 njet = sys.argv[2]
@@ -26,35 +26,44 @@ if njet=='GN2':
 train, test = train_test_split(inDF, test_size=0.3)
 
 #Convert to h2o frames
-'''
+
 h2o_train = h2o.H2OFrame(train)
 h2o_test = h2o.H2OFrame(test)
 
-h2o.export_file(h2o_train, 'tensors/h2o_train'+dsid+'_'+njet+'.csv')
-h2o.export_file(h2o_test, 'tensors/h2o_test'+dsid+'_'+njet+'.csv')
-'''
+h2o.export_file(h2o_train, '/data_ceph/afwebb/higgs_diff/inputData/tensors/h2o_train_'+dsid+'_'+njet+'.csv', force=True)
+h2o.export_file(h2o_test, '/data_ceph/afwebb/higgs_diff/inputData/tensors/h2o_test_'+dsid+'_'+njet+'.csv', force=True)
 
 y_train = train['higgs_pt']
 y_test = test['higgs_pt']
 
+#nBin_train = train['nBin']
+#nBin_test = test['nBin']
+
 train = train.drop(['higgs_pt'],axis=1)
 test = test.drop(['higgs_pt'],axis=1)
 
+#train = train.drop(['nBin'],axis=1)
+#test = test.drop(['nBin'],axis=1)
+
 #Convert to xgb matrices
-xgb_train = xgb.DMatrix(train, label=y_train)
-xgb_test = xgb.DMatrix(test, label=y_test)
+xgb_train = xgb.DMatrix(train, label=y_train, feature_names=list(train))
+xgb_test = xgb.DMatrix(test, label=y_test, feature_names=list(train))
 
 xgb_train.save_binary('tensors/xgb_train_'+dsid+'_'+njet+'.buffer')
-xgb_test.save_binary('tensors/xgb_test'+dsid+'_'+njet+'.buffer')
+xgb_test.save_binary('tensors/xgb_test_'+dsid+'_'+njet+'.buffer')
 
 #Convert data to pytorch tensors
 x_train = torch.tensor(train.values, dtype=torch.float32)
 x_test = torch.tensor(test.values, dtype=torch.float32)
 y_train = torch.FloatTensor(y_train.values)
 y_test = torch.FloatTensor(y_test.values)
+#nBin_train = torch.FloatTensor(nBin_train.values)
+#nBin_test = torch.FloatTensor(nBin_test.values)
 
-torch.save(x_train, 'tensors/torch_x_train'+dsid+'_'+njet+'.pt')
-torch.save(y_train, 'tensors/torch_y_train'+dsid+'_'+njet+'.pt')
-torch.save(x_test, 'tensors/torch_x_test'+dsid+'_'+njet+'.pt')
-torch.save(y_test, 'tensors/torch_y_test'+dsid+'_'+njet+'.pt')
+torch.save(x_train, 'tensors/torch_x_train_'+dsid+'_'+njet+'.pt')
+torch.save(y_train, 'tensors/torch_y_train_'+dsid+'_'+njet+'.pt')
+torch.save(x_test, 'tensors/torch_x_test_'+dsid+'_'+njet+'.pt')
+torch.save(y_test, 'tensors/torch_y_test_'+dsid+'_'+njet+'.pt')
 
+#torch.save(nBin_train, 'tensors/torch_nBin_train_'+dsid+'_'+njet+'.pt')
+#torch.save(nBin_test, 'tensors/torch_nBin_test_'+dsid+'_'+njet+'.pt')
