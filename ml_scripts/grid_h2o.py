@@ -4,7 +4,7 @@ import re
 import sklearn
 import h2o
 h2o.init()
-from h2o.estimators.deeplearning import H2ODeepWaterEstimator
+from h2o.estimators.deeplearning import H2ODeepLearningEstimator
 from h2o.grid import H2OGridSearch
 #import seaborn as sns
 import matplotlib
@@ -51,7 +51,7 @@ h2o_test = h2o.import_file(path='/data_ceph/afwebb/higgs_diff/inputData/tensors/
 #h2o_train[3] = h2o_train[3].asfactor()
 
 layers = [4, 6, 9, 12]
-nodes = [150, 250, 350]
+nodes = [150, 250, 350, 450]
 hidden_grid = []
 
 for i in layers:
@@ -62,18 +62,18 @@ param_grid = {
     'hidden':hidden_grid,
     'epochs':[500],
     'train_samples_per_iteration':[500],
-    'rate':[0.1],
+    'rate':[0.01],
     'l1':[1e-5],
     'l2':[1e-5],
     'max_w2':[10],
-    #'stopping_tolerance':[1e-4],
+    'stopping_tolerance':[1e-4],
     #'loss':'mse'
 }
 
 nn_grid = H2OGridSearch(
-    model = H2ODeepWaterEstimator,
+    model = H2ODeepLearningEstimator,
     hyper_params=param_grid,
-    grid_id = 'nn_result_4j_87' #str(njet)+'j_'+str(dsid),
+    grid_id = 'h2o_grid_4j_87' #str(njet)+'j_'+str(dsid),
 )
 
 #nn_grid#.set_params(hidden=[150,150,150,150,150,150,150,150], epochs=1000, train_samples_per_iteration=10000)
@@ -81,13 +81,13 @@ nn_grid.train(x=h2o_train.names[1:], y = h2o_train.names[3],
               training_frame = h2o_train, 
               validation_frame = h2o_test)
 
-print(nn_grid.get_grid(sort_by='mse', decreasing=True))
+print(nn_grid.get_grid(sort_by='mae', decreasing=True))
 best_model = nn_grid.models[0]
 
 #model_path = h2o.save_model(nn_grid, path = 'nn_grid_results', force=True)
 
 for mod in nn_grid.models:
-    model_path = h2o.save_model(mod, path = 'nn_grid_results/'+njet+'j_'+dsid+'/', force=True)
+    model_path = h2o.save_model(mod, path = 'h2o_models/new_4j_87/', force=True)
     print(model_path)
 
 plt.figure()

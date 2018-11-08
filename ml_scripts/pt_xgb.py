@@ -64,7 +64,7 @@ params = {
     'scale_pos_weight':1
 }
 
-gbm = xgb.cv(params, xgb_train, num_boost_round=200, verbose_eval=True)
+gbm = xgb.cv(params, xgb_train, num_boost_round=250, verbose_eval=True)
 
 best_nrounds = pd.Series.idxmin(gbm['test-mae-mean'])
 print( best_nrounds)
@@ -118,7 +118,7 @@ plt.legend(loc='upper right')
 plt.title("XGBoost Train Data")
 plt.xlabel('Higgs Pt')
 plt.ylabel('NEvents')
-plt.savefig('plots/'+njet+'_'+dsid+'/xgb_train_pt_spectrum.png')
+#plt.savefig('plots/'+njet+'_'+dsid+'/xgb_train_pt_spectrum.png')
 
 plt.figure()
 plt.hist(y_test, 20, log=False, range=(0,800000), alpha=0.5, label='truth')
@@ -127,12 +127,13 @@ plt.legend(loc='upper right')
 plt.title("XGBoost Test Data")
 plt.xlabel('Higgs Pt')
 plt.ylabel('NEvents')
-plt.savefig('plots/'+njet+'_'+dsid+'/xgb_test_pt_spectrum.png')
+#plt.savefig('plots/'+njet+'_'+dsid+'/xgb_test_pt_spectrum.png')
 
-
-# Calculate the point density                                                                                 xy = np.vstack([y_test, y_test_pred])
-#z = scipy.stats.gaussian_kde(xy)(xy)
-z = scipy.stats.gaussian_kde(np.vstack([y_test, y_test_pred]))(np.vstack([y_test, y_test_pred]))
+'''
+# Calculate the point density                    
+xy = np.vstack([y_test, y_test_pred])
+z = scipy.stats.gaussian_kde(xy)(xy)
+#z = scipy.stats.gaussian_kde(np.vstack([y_test, y_test_pred]))(np.vstack([y_test, y_test_pred]))
 
 plt.figure()
 plt.scatter(y_test, y_test_pred, c=z, edgecolor='')
@@ -140,3 +141,4 @@ plt.title("XGBoost Test Data")
 plt.xlabel('Truth Pt')
 plt.ylabel('Predicted Pt')
 plt.savefig('plots/'+njet+'_'+dsid+'/xgb_test_pt_scatter.png')
+'''
