@@ -60,24 +60,25 @@ for i in layers:
 
 param_grid = {
     'hidden':hidden_grid,
-    'epochs':[500],
-    'train_samples_per_iteration':[500],
+    'epochs':[2000],
+    'train_samples_per_iteration':[2000],
     'rate':[0.01],
     'l1':[1e-5],
     'l2':[1e-5],
     'max_w2':[10],
-    'stopping_tolerance':[1e-4],
+    'stopping_tolerance':[1e-5],
     #'loss':'mse'
 }
 
 nn_grid = H2OGridSearch(
     model = H2ODeepLearningEstimator,
     hyper_params=param_grid,
-    grid_id = 'h2o_grid_4j_87' #str(njet)+'j_'+str(dsid),
+    grid_id = 'h2o_grid_'+str(njet)+'_'+str(dsid),
 )
 
 #nn_grid#.set_params(hidden=[150,150,150,150,150,150,150,150], epochs=1000, train_samples_per_iteration=10000)
-nn_grid.train(x=h2o_train.names[1:], y = h2o_train.names[3], 
+nn_grid.train(x=h2o_train.names.remove('higgs_pt'), y = 'higgs_pt',
+              #x=h2o_train.names[1:], y = h2o_train.names[0], 
               training_frame = h2o_train, 
               validation_frame = h2o_test)
 
@@ -87,7 +88,7 @@ best_model = nn_grid.models[0]
 #model_path = h2o.save_model(nn_grid, path = 'nn_grid_results', force=True)
 
 for mod in nn_grid.models:
-    model_path = h2o.save_model(mod, path = 'h2o_models/new_4j_87/', force=True)
+    model_path = h2o.save_model(mod, path = 'h2o_models/'+str(njet)+'_'+str(dsid), force=True)
     print(model_path)
 
 plt.figure()

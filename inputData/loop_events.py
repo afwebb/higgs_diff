@@ -34,13 +34,13 @@ for e in oldTree:
     if e.total_leptons!=2: continue
     if abs(e.total_charge)!=2: continue
     if e.nJets_OR_T_MV2c10_70<1: continue
+    if e.nJets_OR_T<4: continue
 
     k = {}
     k['higgs_pt'] = e.higgs_pt
 
     k['lep_Pt_0'] = e.lep_Pt_0
     k['lep_Eta_0'] = e.lep_Eta_0
-    k['lep_Phi_0'] = e.lep_Phi_0
     phi_0 = e.lep_Phi_0
     k['lep_E_0'] = e.lep_E_0
 
@@ -52,8 +52,10 @@ for e in oldTree:
     k['MET'] = e.MET_RefFinal_et
     k['MET_phi'] = calc_phi(phi_0, e.MET_RefFinal_phi)
 
+    k['DRlj00'] = e.DRlj00
+    k['DRjj01'] = e.DRjj01
+    
     if e.nJets_OR_T==int(njet):
-        print("here")
         n = 0
 
         for i in e.selected_jets_T:
