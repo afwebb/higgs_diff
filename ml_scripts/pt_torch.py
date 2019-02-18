@@ -98,7 +98,7 @@ class Net(nn.Module):
         super().__init__()
         self.fc1 = nn.Linear(D_in, nodes)
         self.relu1 = nn.LeakyReLU()
-        self.dout = nn.Dropout(0.2)
+        self.dout = nn.Dropout(0.25)
         #self.fc2 = nn.Linear(50, 100)                                                                                                           
         self.fc = nn.Linear(nodes, nodes)
         self.prelu = nn.PReLU(1)
@@ -166,9 +166,9 @@ class param:
         self.net = None
     
 
-num_epochs = [1200]
-nLayers = [5] #[4, 6, 9]
-nNodes = [100] #[50, 75, 125, 200]#, 100, 175, 250]#[250, 350, 450, 600]
+num_epochs = [500]
+nLayers = [6] #[4, 6, 9]
+nNodes = [75] #[50, 75, 125, 200]#, 100, 175, 250]#[250, 350, 450, 600]
 
 param_grid = []
 for ep in num_epochs:

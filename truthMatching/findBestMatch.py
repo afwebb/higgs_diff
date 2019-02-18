@@ -51,7 +51,7 @@ for e in oldTree:
     if e.dilep_type==0: continue
     if abs(e.total_charge)!=2: continue
     #if e.nJets_OR_T<nj: continue
-    if e.higgsDecayMode != 3: continue
+    #if e.higgsDecayMode != 3: continue
 
     lepPts = [e.lep_Pt_0, e.lep_Pt_1]
     lepEtas = [e.lep_Eta_0, e.lep_Eta_1]
@@ -129,6 +129,7 @@ for e in oldTree:
 
     k = {}
     k['higgs_pt'] = e.higgs_pt
+    k['comboScore'] = pred[best]
 
     if lepMatch == 0:
         k['lep_Pt_H'] = e.lep_Pt_0

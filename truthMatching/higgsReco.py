@@ -106,11 +106,11 @@ for idx in range(len(la[b'nJets_OR_T']) ):
     if idx%10000==0:
         print(idx)                                                                                                                                  
 
-    if la[b'higgsDecayMode'][idx] != 3: continue
+    #if la[b'higgsDecayMode'][idx] != 3: continue
     if la[b'total_leptons'][idx] < 1: continue
     if la[b'dilep_type'][idx] < 1: continue
     if la[b'total_charge'][idx] == 0: continue
-    if la[b'nJets_OR_T'][idx] <4: continue
+    #if la[b'nJets_OR_T'][idx] <4: continue
         
     higgCand = LorentzVector()
     
@@ -141,6 +141,7 @@ for idx in range(len(la[b'nJets_OR_T']) ):
         for a in truth_dict:
             if abs(truth_dict[a].pdgid) == abs(lepIDs[i]):
                 if drCheck(lepEtas[i], lepPhis[i], truth_dict[a].eta, truth_dict[a].phi, 0.01):
+
                     p = truth_dict[a].parents[0]
                     terminal = False
                     while not terminal:
@@ -151,7 +152,9 @@ for idx in range(len(la[b'nJets_OR_T']) ):
                             except:
                                 terminal = True
                         else: terminal = True
+                    print(truth_dict[a].pdgid)
                     if truth_dict[a].pdgid == 25: 
+                        print('foundHiggs')
                         higgCand+=lepH
                         lepMatch = i
                         fourVecs['higgsLep'] = lepH
@@ -160,6 +163,8 @@ for idx in range(len(la[b'nJets_OR_T']) ):
 
     if lepMatch == -1:
         continue
+
+    print('here')
 
     c = make_partdict(la,idx)
     higgsID = 0

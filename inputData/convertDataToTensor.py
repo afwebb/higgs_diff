@@ -27,7 +27,11 @@ inDF = pd.read_csv(inFile)#, nrows=600000)
 #    inDF = inDF[inDF['is2LSS0Tau']==1]
 #    inDF = inDF.drop(['is2LSS0Tau'],axis=1)
 
-train, test = train_test_split(inDF, test_size=0.3)
+if not inDF['comboScore'].empty:
+    inDF = inDF[inDF['comboScore'] > 0.4]
+    inDF.drop('comboScore', axis=1)
+
+train, test = train_test_split(inDF, test_size=0.25)
 
 #Convert to h2o frames
 '''
