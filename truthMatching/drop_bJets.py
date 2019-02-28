@@ -6,7 +6,7 @@ outputFile = sys.argv[2]
 
 inDF = pd.read_csv(inputFile)
 
-inDF = inDF[inDF['comboScore'] > 0.3]
+inDF = inDF[inDF['comboScore'] > 0.15]
 inDF.drop('comboScore', axis=1)
 
 inDF = inDF.drop('jet_Pt_b0', axis=1)

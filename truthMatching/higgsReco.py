@@ -58,7 +58,71 @@ def make_partdict(la, idx):
     return rv
 
 
-# In[6]:
+def flatDict(match, lep, jet1, jet2, met, jet1_MV2c10, jet2_MV2c10):
+    k = {}
+
+    k['match'] = match
+
+    k['lep_Pt'] = lep.Pt()
+    k['jet_Pt_0'] = jet1.Pt()
+    k['jet_Pt_1'] = jet2.Pt()
+
+    k['dRjj'] = jet1.DeltaR(jet2)
+    k['Ptjj'] = (jet1+jet2).Pt()
+    k['Mjj'] = (jet1+jet2).M()
+
+    k['dRlj0'] = lep.DeltaR(jet1)
+    k['Ptlj0'] = (lep+jet1).Pt()
+    k['Mlj0'] = (lep+jet1).M()
+
+    k['dRlj1'] = lep.DeltaR(jet2)
+    k['Ptlj1'] = (lep+jet2).Pt()
+    k['Mlj1'] = (lep+jet2).M()
+
+    #k['MlepMet'] = (lep+met).M()
+    #k['dRlepMet'] = lep.DeltaR(met)
+
+    #k['Mj0Met'] = (jet1+met).M()
+    #k['dRj0Met'] = jet1.DeltaR(met)
+
+    #k['Mj1Met'] = (jet2+met).M()
+    #k['dRj1Met'] = jet2.DeltaR(met)
+
+    k['dR(jj)(l)'] = (jet1 + jet2).DeltaR(lep + met)
+
+    k['MhiggsCand'] = (jet1+jet2+lep).M()
+    
+    k['jet_MV2c10_0'] =jet1_MV2c10
+    k['jet_MV2c10_1'] =jet2_MV2c10
+
+    return k
+
+def vecDict(match, lep, jet1, jet2, met, jet1_MV2c10, jet2_MV2c10):
+    q = {}
+
+    q['match'] = match
+
+    q['lep_Pt_0'] = lep.Pt()
+    q['lep_Eta_0'] = lep.Eta()
+    phi_0 = lep.Phi()
+    q['lep_E_0'] = lep.E()
+
+    q['jet_Pt_0'] = jet1.Pt()
+    q['jet_Eta_0'] = jet1.Eta()
+    q['jet_Phi_0'] = calc_phi(phi_0, jet1.Phi())
+    q['jet_E_0'] = jet1.E()
+    q['jet_MV2c10_0'] = jet1_MV2c10
+
+    q['jet_Pt_1'] = jet2.Pt()
+    q['jet_Eta_1'] = jet2.Eta()
+    q['jet_Phi_1'] = calc_phi(phi_0, jet2.Phi())
+    q['jet_E_1'] = jet2.E()
+    q['jet_MV2c10_1'] =jet2_MV2c10
+
+    q['MET'] = met.Pt()
+    q['MET_phi'] = calc_phi(phi_0, met.Phi())
+
+    return q
 
 
 from collections import namedtuple
@@ -104,9 +168,11 @@ fourVecDicts = []
 for idx in range(len(la[b'nJets_OR_T']) ):
     #current+=1
     if idx%10000==0:
-        print(idx)                                                                                                                                  
+        print(idx)                                                                                                                              
+    #if idx==10000:
+    #    break
 
-    #if la[b'higgsDecayMode'][idx] != 3: continue
+    if la[b'higgsDecayMode'][idx] != 3: continue
     if la[b'total_leptons'][idx] < 1: continue
     if la[b'dilep_type'][idx] < 1: continue
     if la[b'total_charge'][idx] == 0: continue
@@ -131,7 +197,7 @@ for idx in range(len(la[b'nJets_OR_T']) ):
     lepPhis = [la[b'lep_Phi_0'][idx], la[b'lep_Phi_1'][idx]]
     lepEs = [la[b'lep_E_0'][idx], la[b'lep_E_1'][idx]]
     lepIDs = [la[b'lep_ID_0'][idx], la[b'lep_ID_1'][idx]]
-    
+
     lepMatch = -1
     for i in range(2):
         
@@ -152,9 +218,7 @@ for idx in range(len(la[b'nJets_OR_T']) ):
                             except:
                                 terminal = True
                         else: terminal = True
-                    print(truth_dict[a].pdgid)
                     if truth_dict[a].pdgid == 25: 
-                        print('foundHiggs')
                         higgCand+=lepH
                         lepMatch = i
                         fourVecs['higgsLep'] = lepH
@@ -164,31 +228,76 @@ for idx in range(len(la[b'nJets_OR_T']) ):
     if lepMatch == -1:
         continue
 
-    print('here')
 
     c = make_partdict(la,idx)
     higgsID = 0
     for x in c:
-        if c[x].pdgid==25: higgsID = x
+        if c[x].pdgid==25: 
+            higgsID = x
 
     jetCands = []
     jetTest = []
     Ws = c[higgsID].children
     for w in Ws:
-        for child in c[w].children:
-            if child in c: ch = c[child]
-            else: continue
-            if abs(ch.pdgid) in range(1,5): jetTest.append(child)
-            #elif abs(ch.pdgid)==24: 
-        jetCands=[*jetCands, *c[w].children]
-        
+        try:
+            if 24 in [abs(c[x].pdgid) for x in c[w].children]:
+                childCand = []
+                for wChild in c[w].children:
+                    if c[wChild].pdgid in [-24, 24]:
+                        for x in c[wChild].children:
+                            childCand.append(x)
+            else:
+                childCand = c[w].children
+        except:
+            childCand = c[w].children
+
+        for child in childCand:
+            if child in c: 
+                ch = c[child]
+            else: 
+                continue
+            if abs(ch.pdgid) in range(1,5): 
+                jetTest.append(child)
+
+        jetCands=[*jetCands, *childCand]
+
     if len(jetTest)!=2:
         continue
-        
+    ''''
+    lepMatch = -1
+    
+    for i in range(2):
+
+        lepH = LorentzVector()
+        lepH.SetPtEtaPhiE(lepPts[i], lepEtas[i], lepPhis[i], lepEs[i])
+
+        for l in jetCands:
+            if l not in c:
+                print('not found')
+                continue
+            if abs(c[l].pdgid) not in [11, 13]:
+                continue
+            
+            if abs(c[l].pdgid) == abs(lepIDs[i]):
+                if drCheck(lepEtas[i], lepPhis[i], c[l].eta, c[l].phi, 0.1): 
+                    higgCand+=lepH
+                    lepMatch = i
+                    fourVecs['higgsLep'] = lepH
+        if lepMatch!=i: 
+            fourVecs['badLep'] = lepH
+
+    if lepMatch == -1:
+        continue
+    '''
     match=0  
     truthJets = []
+
     higgsJets=[]
+    higgsJetsMV2c10=[]
+
     badJets=[]
+    badJetsMV2c10=[]
+
     for j in jetCands:
         if j not in c:
             print('not found')
@@ -204,6 +313,7 @@ for idx in range(len(la[b'nJets_OR_T']) ):
                 jet_phi = la[b'm_jet_phi'][idx][i]
                 jet_E = la[b'm_jet_E'][idx][i]
                 jet_flav = la[b'm_jet_flavor_truth_label_ghost'][idx][i]
+                jet_MV2c10 = la[b'm_jet_flavor_weight_MV2c10'][idx][i]
 
                 jetVec = LorentzVector()
                 jetVec.SetPtEtaPhiE(jet_pt, jet_eta, jet_phi, jet_E)
@@ -213,16 +323,21 @@ for idx in range(len(la[b'nJets_OR_T']) ):
                     truthJets.append(i)
                     higgCand+=jetVec
                     higgsJets.append(jetVec)
+                    higgsJetsMV2c10.append(jet_MV2c10)
                     match+=1
-                else:
-                    badJets.append(jetVec)
+                #else:
+                badJets.append(jetVec)
+                badJetsMV2c10.append(jet_MV2c10)
                
     if match!=2: continue
 
+    fourVecs['truthJets'] = truthJets
     fourVecs['higgsJets'] = higgsJets
     fourVecs['badJets'] = badJets
     fourVecs['higgsCand'] = higgCand
-    
+    fourVecs['higgsJetsMV2c10'] = higgsJetsMV2c10
+    fourVecs['badJetsMV2c10'] = badJetsMV2c10
+
     fourVecDicts.append(fourVecs)
     
     higgVecs.append(higgCand)
@@ -233,110 +348,47 @@ eventsFlat = []
 eventsVec = []
 
 for f in fourVecDicts:
-    k = {}
     
-    k['match'] = 1
-    
-    k['dRjj'] = f['higgsJets'][0].DeltaR(f['higgsJets'][1])
-    k['Ptjj'] = (f['higgsJets'][0]+f['higgsJets'][1]).Pt()
-    k['Mjj'] = (f['higgsJets'][0]+f['higgsJets'][1]).M()
-    
-    k['dRlj0'] = f['higgsLep'].DeltaR(f['higgsJets'][0])
-    k['Ptlj0'] = (f['higgsLep']+f['higgsJets'][0]).Pt()
-    k['Mlj0'] = (f['higgsLep']+f['higgsJets'][0]).M()
-
-    k['dRlj1'] = f['higgsLep'].DeltaR(f['higgsJets'][1])
-    k['Ptlj1'] = (f['higgsLep']+f['higgsJets'][1]).Pt()
-    k['Mlj1'] = (f['higgsLep']+f['higgsJets'][1]).M()
-    
-    k['MlepMet'] = (f['higgsLep']+f['met']).M()
-    k['dRlepMet'] = f['higgsLep'].DeltaR(f['met'])
-
-    k['dRj0Met'] = f['higgsJets'][0].DeltaR(f['met'])
-    k['dRj1Met'] = f['higgsJets'][1].DeltaR(f['met'])
-
-    k['MhiggsCand'] = (f['higgsJets'][0]+f['higgsJets'][1]+f['higgsLep']+f['met']).M()
-    
+    k = flatDict( 1, f['higgsLep'], f['higgsJets'][0], f['higgsJets'][1], f['met'], f['higgsJetsMV2c10'][0], f['higgsJetsMV2c10'][1])
     eventsFlat.append(k)
 
-    q = {}
-    
-    q['match'] = 1
-    
-    q['lep_Pt_0'] = f['higgsLep'].Pt()
-    q['lep_Eta_0'] = f['higgsLep'].Eta()
-    phi_0 = f['higgsLep'].Phi()
-    q['lep_E_0'] = f['higgsLep'].E()
-    
-    q['jet_Pt_0'] = f['higgsJets'][0].Pt()
-    q['jet_Eta_0'] = f['higgsJets'][0].Eta()
-    q['jet_Phi_0'] = calc_phi(phi_0, f['higgsJets'][0].Phi())
-    q['jet_E_0'] = f['higgsJets'][0].E()
-    
-    q['jet_Pt_1'] = f['higgsJets'][1].Pt()
-    q['jet_Eta_1'] = f['higgsJets'][1].Eta()
-    q['jet_Phi_1'] = calc_phi(phi_0, f['higgsJets'][1].Phi())
-    q['jet_E_1'] = f['higgsJets'][1].E()
-    
-    q['MET'] = f['met'].Pt()
-    q['MET_phi'] = calc_phi(phi_0, f['met'].Phi())
-    
+    q = vecDict( 1, f['higgsLep'], f['higgsJets'][0], f['higgsJets'][1], f['met'], f['higgsJetsMV2c10'][0], f['higgsJetsMV2c10'][1])
     eventsVec.append(q)
 
 for f in fourVecDicts:
+    '''
+    i,j = random.sample(range(len(f['badJets'])),2)
 
-    for q in range(3):
+    k = flatDict( 0, f['higgsLep'], f['badJets'][i], f['badJets'][j], f['met'], f['badJetsMV2c10'][i], f['badJetsMV2c10'][j] )
+    eventsFlat.append(k)
+
+    q = vecDict( 0, f['higgsLep'], f['badJets'][i], f['badJets'][j], f['met'], f['badJetsMV2c10'][i], f['badJetsMV2c10'][j] )
+    eventsVec.append(q)
+
+    if j%2==0:
+        k = flatDict( 0, f['badLep'], f['higgsJets'][i%2], f['badJets'][j], f['met'], f['higgsJetsMV2c10'][i%2], f['badJetsMV2c10'][j] )
+        eventsFlat.append(k)
         
-        k = {}
-    
-        k['match'] = 0
+        q = vecDict( 0, f['badLep'], f['higgsJets'][i%2], f['badJets'][j], f['met'], f['higgsJetsMV2c10'][i%2], f['badJetsMV2c10'][j] )
+        eventsVec.append(q)
+
+    else:
+        k = flatDict( 0, f['badLep'], f['badJets'][i], f['higgsJets'][i%2], f['met'], f['badJetsMV2c10'][i], f['higgsJetsMV2c10'][i%2] )
+        eventsFlat.append(k)
+        
+        q = vecDict( 0, f['badLep'], f['badJets'][i], f['higgsJets'][i%2], f['met'], f['badJetsMV2c10'][i], f['higgsJetsMV2c10'][i%2] )
+        eventsVec.append(q)
+    '''
+    for q in range(4):
         
         i,j = random.sample(range(len(f['badJets'])),2)
-    
-        k['dRjj'] = f['badJets'][i].DeltaR(f['badJets'][j])
-        k['Ptjj'] = (f['badJets'][i]+f['badJets'][j]).Pt()
-        k['Mjj'] = (f['badJets'][i]+f['badJets'][j]).M()
 
-        k['dRlj0'] = f['badLep'].DeltaR(f['badJets'][i])
-        k['Ptlj0'] = (f['badLep']+f['badJets'][i]).Pt()
-        k['Mlj0'] = (f['badLep']+f['badJets'][i]).M()
+        
 
-        k['dRlj1'] = f['badLep'].DeltaR(f['badJets'][j])
-        k['Ptlj1'] = (f['badLep']+f['badJets'][j]).Pt()
-        k['Mlj1'] = (f['badLep']+f['badJets'][j]).M()
-
-        k['MlepMet'] = (f['badLep']+f['met']).M()
-        k['dRlepMet'] = f['badLep'].DeltaR(f['met'])
-
-        k['dRj0Met'] = f['badJets'][i].DeltaR(f['met'])
-        k['dRj1Met'] = f['badJets'][j].DeltaR(f['met'])
-
-        k['MhiggsCand'] = (f['badJets'][i]+f['badJets'][j]+f['badLep']+f['met']).M()
-
+        k = flatDict( 0, f['badLep'], f['badJets'][i], f['badJets'][j], f['met'], f['badJetsMV2c10'][i], f['badJetsMV2c10'][j] )
         eventsFlat.append(k)
 
-        q = {}
-        
-        q['match'] = 0
-        
-        q['lep_Pt_0'] = f['badLep'].Pt()
-        q['lep_Eta_0'] = f['badLep'].Eta()
-        phi_0 = f['badLep'].Phi()
-        q['lep_E_0'] = f['badLep'].E()
-        
-        q['jet_Pt_0'] = f['badJets'][i].Pt()
-        q['jet_Eta_0'] = f['badJets'][i].Eta()
-        q['jet_Phi_0'] = calc_phi(phi_0, f['badJets'][i].Phi())
-        q['jet_E_0'] = f['badJets'][i].E()
-
-        q['jet_Pt_1'] = f['badJets'][j].Pt()
-        q['jet_Eta_1'] = f['badJets'][j].Eta()
-        q['jet_Phi_1'] = calc_phi(phi_0, f['badJets'][j].Phi())
-        q['jet_E_1'] = f['badJets'][j].E()
-        
-        q['MET'] = f['met'].Pt()
-        q['MET_phi'] = calc_phi(phi_0, f['met'].Phi())
-        
+        q = vecDict( 0, f['badLep'], f['badJets'][i], f['badJets'][j], f['met'], f['badJetsMV2c10'][i], f['badJetsMV2c10'][j] )
         eventsVec.append(q)
 
 import pandas as pd

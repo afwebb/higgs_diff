@@ -62,19 +62,19 @@ y_train = y_train.float().detach().numpy()
 
 params = {
     'learning_rate' : 0.05,
-    'max_depth': 20,
+    'max_depth': 15,
     'min_child_weight': 2,
     'gamma': 0.9,
     'subsample' : 0.8,
     'colsample_bytree' : 0.8,
-    'eval_metric': 'mae',
+    'eval_metric': 'rmse',
     'nthread': -1,
     'scale_pos_weight':1
 }
 
 gbm = xgb.cv(params, xgb_train, num_boost_round=500, verbose_eval=True)
 
-best_nrounds = pd.Series.idxmin(gbm['test-mae-mean'])
+best_nrounds = pd.Series.idxmin(gbm['test-rmse-mean'])
 print( best_nrounds)
 
 bst = xgb.train(params, xgb_train, num_boost_round=best_nrounds, verbose_eval=True)

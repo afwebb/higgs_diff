@@ -37,6 +37,34 @@ def calc_phi(phi_0, new_phi):
         new_phi = new_phi + 2*math.pi
     return new_phi
 
+def flatDict(lep, jet1, jet2, met, jet1_MV2c10, jet2_MV2c10):
+    k = {}
+
+    k['lep_Pt'] = lep.Pt()
+    k['jet_Pt_0'] = jet1.Pt()
+    k['jet_Pt_1'] = jet2.Pt()
+
+    k['dRjj'] = jet1.DeltaR(jet2)
+    k['Ptjj'] = (jet1+jet2).Pt()
+    k['Mjj'] = (jet1+jet2).M()
+
+    k['dRlj0'] = lep.DeltaR(jet1)
+    k['Ptlj0'] = (lep+jet1).Pt()
+    k['Mlj0'] = (lep+jet1).M()
+
+    k['dRlj1'] = lep.DeltaR(jet2)
+    k['Ptlj1'] = (lep+jet2).Pt()
+    k['Mlj1'] = (lep+jet2).M()
+
+    k['dR(jj)(l)'] = (jet1 + jet2).DeltaR(lep + met)
+
+    k['MhiggsCand'] = (jet1+jet2+lep).M()
+
+    k['jet_MV2c10_0'] =jet1_MV2c10
+    k['jet_MV2c10_1'] =jet2_MV2c10
+
+    return k
+
 current = 0
 nMatch = 0
 
@@ -88,28 +116,8 @@ for e in oldTree:
             for j in range(i+1, len(jet4Vecs)):
                 comb = [l,i,j]
                 
-                k = {}
+                k = flatDict( lep4Vecs[l], jet4Vecs[i], jet4Vecs[j], met, btags[i], btags[j] )
                 
-                k['dRjj'] = jet4Vecs[i].DeltaR(jet4Vecs[j])
-                k['Ptjj'] = (jet4Vecs[i]+jet4Vecs[j]).Pt()
-                k['Mjj'] = (jet4Vecs[i]+jet4Vecs[j]).M()
-                
-                k['dRlj0'] = lep4Vecs[l].DeltaR(jet4Vecs[i])
-                k['Ptlj0'] = (lep4Vecs[l]+jet4Vecs[i]).Pt()
-                k['Mlj0'] = (lep4Vecs[l]+jet4Vecs[i]).M()
-                
-                k['dRlj1'] = lep4Vecs[l].DeltaR(jet4Vecs[j])
-                k['Ptlj1'] = (lep4Vecs[l]+jet4Vecs[j]).Pt()
-                k['Mlj1'] = (lep4Vecs[l]+jet4Vecs[j]).M()
-                
-                k['MlepMet'] = (lep4Vecs[l]+met).M()
-                k['dRlepMet'] = lep4Vecs[l].DeltaR(met)
-                
-                k['dRj0Met'] = jet4Vecs[i].DeltaR(met)
-                k['dRj1Met'] = jet4Vecs[j].DeltaR(met)
-                
-                k['MhiggsCand'] = (jet4Vecs[i]+jet4Vecs[j]+lep4Vecs[l]+met).M()
-
                 combos.append([k, comb])
 
     #loop over combinations, score them in the BDT, figure out the best result
@@ -160,6 +168,7 @@ for e in oldTree:
         k['jet_Eta_h'+str(n)] = e.m_jet_eta[i]
         k['jet_E_h'+str(n)] = e.m_jet_E[i]
         k['jet_Phi_h'+str(n)] = calc_phi(phi_0, e.m_jet_phi[i])
+        k['jet_MV2c10_h'+str(n)] = e.m_jet_flavor_weight_MV2c10[i]
         
         n+=1
 
@@ -176,6 +185,7 @@ for e in oldTree:
         k['jet_Eta_b'+str(n)] = e.m_jet_eta[i]
         k['jet_E_b'+str(n)] = e.m_jet_E[i]
         k['jet_Phi_b'+str(n)] = calc_phi(phi_0, e.m_jet_phi[i])
+        k['jet_MV2c10_b'+str(n)] = e.m_jet_flavor_weight_MV2c10[i]
 
         n+=1
 

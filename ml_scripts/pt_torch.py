@@ -166,9 +166,9 @@ class param:
         self.net = None
     
 
-num_epochs = [500]
-nLayers = [6] #[4, 6, 9]
-nNodes = [75] #[50, 75, 125, 200]#, 100, 175, 250]#[250, 350, 450, 600]
+num_epochs = [200]
+nLayers = [8]
+nNodes = [75]#[50, 75, 125]#, 100, 175, 250]#[250, 350, 450, 600]
 
 param_grid = []
 for ep in num_epochs:
@@ -184,7 +184,7 @@ for p in param_grid:
     net = Net(X.size()[1], p.nodes, p.layers)
     opt = optim.Adam(net.parameters(), lr=0.001, betas=(0.9, 0.999))
     #opt = optim.SGD(net.parameters(), lr=0.01, momentum=0.9)
-    criterion = nn.L1Loss()
+    criterion = nn.MSELoss()
     y_pred = []
     y_test_pred=[]
     e_losses = []
@@ -251,11 +251,11 @@ for p in param_grid:
     plt.savefig('plots/'+outDir+'/torch_test_pt_spectrum_'+str(p.layers)+'l_'+str(p.nodes)+'n.png')
 
     # Calculate the point density
-    xy = np.vstack([Y_test, p.y_pred_test])
+    xy = np.vstack([Y_test[:100000], p.y_pred_test[:100000]])
     z = scipy.stats.gaussian_kde(xy)(xy)
 
     plt.figure()
-    plt.scatter(Y_test, p.y_pred_test, c=np.log(z), edgecolor='')
+    plt.scatter(Y_test[:100000], p.y_pred_test[:100000], c=np.log(z), edgecolor='')
     plt.title("pyTorch Test Data, layers=%i, nodes=%i, loss=%0.4f" %(p.layers, p.nodes, p.test_loss))
     plt.xlabel('Truth Pt')
     plt.ylabel('Predicted Pt')
@@ -263,11 +263,11 @@ for p in param_grid:
     plt.savefig('plots/'+outDir+'/torch_test_pt_scatter_'+str(p.layers)+'l_'+str(p.nodes)+'n.png')
 
     # Calculate the point density                                                                                      
-    xy_train = np.vstack([Y, p.y_pred])
+    xy_train = np.vstack([Y[:100000], p.y_pred[:100000] ])
     z_train = scipy.stats.gaussian_kde(xy_train)(xy_train)
 
     plt.figure()
-    plt.scatter(Y, p.y_pred, c=np.log(z_train), edgecolor='')
+    plt.scatter(Y[:100000], p.y_pred[:100000], c=np.log(z_train), edgecolor='')
     plt.title("pyTorch Train Data, layers=%i, nodes=%i, loss=%0.4f" %(p.layers, p.nodes, p.train_loss))
     plt.xlabel('Truth Pt')
     plt.ylabel('Predicted Pt')
