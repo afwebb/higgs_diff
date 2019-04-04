@@ -31,7 +31,7 @@ la=f['nominal'].lazyarrays(['m_truth*','dilep_type','higgs*','lep_Pt*','lep_Eta_
                            'lep_Phi*','lep_ID*','lep_Index*',
                             #'electron_eta','electron_phi','electron_pt',
                             #'muon_eta','muon_phi','muon_pt',
-                           'm_jet*','selected_jets', 'm_truth_jet_pt', 'm_truth_jet_eta', 
+                            'm_track_jet*', 'm_jet*','selected_jets', 'm_truth_jet_pt', 'm_truth_jet_eta', 
                             'm_truth_jet_phi', 'm_truth_jet_m', 'm_truth_jet_Hcount', 'm_truth_jet_Tcount','nJets_OR_T',
                             'MET_RefFinal_et', 'MET_RefFinal_phi'])
 
@@ -162,6 +162,8 @@ current = 0
 nMatch = 0
 higgVecs = []
 
+goodMatches = 0
+badMatches = 0
 
 fourVecDicts = []
 
@@ -174,7 +176,7 @@ for idx in range(len(la[b'nJets_OR_T']) ):
 
     if la[b'higgsDecayMode'][idx] != 3: continue
     if la[b'total_leptons'][idx] < 1: continue
-    if la[b'dilep_type'][idx] < 1: continue
+    if la[b'dilep_type'][idx]==0: continue
     if la[b'total_charge'][idx] == 0: continue
     #if la[b'nJets_OR_T'][idx] <4: continue
         
@@ -328,8 +330,12 @@ for idx in range(len(la[b'nJets_OR_T']) ):
                 #else:
                 badJets.append(jetVec)
                 badJetsMV2c10.append(jet_MV2c10)
-               
-    if match!=2: continue
+
+    if match==2:
+        goodMatches+=1
+    else:
+        badMatches+=1
+        continue
 
     fourVecs['truthJets'] = truthJets
     fourVecs['higgsJets'] = higgsJets
@@ -405,3 +411,9 @@ dfVec = pd.DataFrame.from_dict(eventsVec)
 dfVec = shuffle(dfVec)
 
 dfVec.to_csv(outputFile+'Vec.csv', index=False)
+
+
+totM = goodMatches+badMatches
+print('Good Matches', goodMatches/totM)
+print('Bad Matches', badMatches/totM)
+
