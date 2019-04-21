@@ -6,17 +6,11 @@ outputFile = sys.argv[2]
 
 inDF = pd.read_csv(inputFile)
 
-inDF = inDF[inDF['comboScore'] > 0.15]
-inDF.drop('comboScore', axis=1)
+#inDF = inDF[inDF['comboScore'] > 0.2]
 
-inDF = inDF.drop('jet_Pt_b0', axis=1)
-inDF = inDF.drop('jet_Eta_b0', axis=1)
-inDF = inDF.drop('jet_Phi_b0', axis=1)
-inDF = inDF.drop('jet_E_b0', axis=1)
+dropCol = ['top_E_0','top_E_1','top_Eta_0','top_Eta_1','top_MV2c10_0','top_MV2c10_1','top_Phi_0','top_Phi_1','top_Pt_0','top_Pt_1']
 
-inDF = inDF.drop('jet_Pt_b1', axis=1)
-inDF = inDF.drop('jet_Eta_b1', axis=1)
-inDF = inDF.drop('jet_Phi_b1', axis=1)
-inDF = inDF.drop('jet_E_b1', axis=1)
+for d in dropCol:
+    inDF = inDF.drop(d, axis=1)
 
 inDF.to_csv(outputFile, index=False)

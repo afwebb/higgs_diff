@@ -167,7 +167,7 @@ class param:
     
 
 num_epochs = [200]
-nLayers = [8]
+nLayers = [6]
 nNodes = [75]#[50, 75, 125]#, 100, 175, 250]#[250, 350, 450, 600]
 
 param_grid = []

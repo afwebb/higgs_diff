@@ -191,10 +191,10 @@ tree = Tree('nominal', model=Model)
 
 for idx in range( len(la[b'nJets_OR_T']) ):
 
-    if idx%1000==0:
+    if idx%10000==0:
         print(idx)
-    if idx==5000:                                                                                                                              
-        break                                                                                                                                   
+    #if idx==5000:                                                                                                             
+    #    break                                                                                                                 
 
     #Event selection
     if la[b'higgsDecayMode'][idx] != 3: continue

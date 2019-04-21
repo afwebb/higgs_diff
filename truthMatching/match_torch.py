@@ -19,11 +19,11 @@ import matplotlib.pyplot as plt
 
 device = torch.device("cuda:0")
 
-inFile = sys.argv[1]
-#outDir = sys.argv[2]
+#inFile = sys.argv[1]
+outDir = sys.argv[1]
 #njet = sys.argv[2]
 
-
+'''
 inDF = pd.read_csv(inFile)
 
 inDF = sk.utils.shuffle(inDF)
@@ -48,6 +48,13 @@ Y = y_train
 
 X_test = x_test
 Y_test = y_test
+'''
+
+X = torch.load('tensors/torch_x_train_'+outDir+'.pt')
+X_test = torch.load('tensors/torch_x_test_'+outDir+'.pt')
+
+Y = torch.load('tensors/torch_y_train_'+outDir+'.pt')
+Y_test = torch.load('tensors/torch_y_test_'+outDir+'.pt')
 
 def normalize(x):
     x_normed = x / x.max(0, keepdim=True)[0]
@@ -58,6 +65,8 @@ Y = normalize(Y)
 
 X_test = normalize(X_test)
 Y_test = normalize(Y_test)
+
+print('past normal')
 
 class OldNet(nn.Module):
     
@@ -107,9 +116,10 @@ class Net(nn.Module):
         y = self.out_act(a1)
         return y
 
-def train_epoch_batch(model, opt, criterion, batch_size=5000):
+def train_epoch_batch(model, opt, criterion, batch_size=80000):
     model.train()
     #losses = []
+    y_hat = torch.empty(1, 2)
     for beg_i in range(0, X.size(0), batch_size):
         x_batch = X[beg_i:beg_i + batch_size, :]
         y_batch = Y[beg_i:beg_i + batch_size]
@@ -118,19 +128,20 @@ def train_epoch_batch(model, opt, criterion, batch_size=5000):
 
         opt.zero_grad()
         # (1) Forward
-        y_hat = net(x_batch)
+        y_hat_batch = net(x_batch)
+        #y_hat = torch.cat((y_hat, y_hat_batch), 0)
         # (2) Compute diff
         #print(y_hat[:,0],y_hat[:,1])
-        loss = criterion(y_hat, y_batch)
+        loss = criterion(y_hat_batch, y_batch.long())
         # (3) Compute gradients
         loss.backward()
         # (4) update weights
         opt.step()        
         #losses.append(loss.data.numpy())
     
-    y_hat = net(X)
-    loss = criterion(y_hat, Y)
-    return loss, y_hat
+    #y_hat = net(X)
+    #loss = criterion(y_hat, Y.long())
+    return loss
 
 def train_epoch(model, opt, criterion, batch_size=5000):
     model.train()
@@ -161,7 +172,7 @@ class param:
         self.net = None
     
 
-num_epochs = [200]
+num_epochs = [500]
 nLayers = [4]#, 6, 9]
 nNodes = [50]#, 75, 125]#, 100, 175, 250]#[250, 350, 450, 600]
 
@@ -186,11 +197,11 @@ for p in param_grid:
     test_losses = []
     
     for e in range(p.epochs):
-        e_loss, y_pred = train_epoch_batch(net, opt, criterion) 
+        e_loss = train_epoch_batch(net, opt, criterion) 
         #e_losses.append(loss)
         if e%5==0:
             y_pred_test = net(X_test)
-            test_loss = criterion(y_pred_test, Y_test).float().detach().numpy()
+            test_loss = criterion(y_pred_test, Y_test.long()).float().detach().numpy()
             test_losses.append(test_loss)
             e_losses.append(e_loss.float().detach().numpy())
             print("[Epoch]: %i, [Train Loss]: %.4f, [Test Loss]: %.4f" % (e, e_loss, test_loss))
@@ -202,9 +213,11 @@ for p in param_grid:
     p.train_loss = e_loss.float().detach().numpy()
     p.test_loss = test_loss
     p.y_pred_test = y_pred_test.float().detach().numpy()
-    p.y_pred = y_pred.float().detach().numpy()
+    p.y_pred = net(X).float().detach().numpy()
     #p.auc = sk.metrics.roc_auc_score(y_train,y_predicted)
     
+    print('test pred: ', y_pred_test[:,1])
+
     print("Nodes: "+str(p.nodes))
     print("Layers: "+str(p.layers))
     print("Train Loss: "+str(p.train_loss))
@@ -239,7 +252,7 @@ for p in param_grid:
     
     plt.title("pyTorch Train ROC, layers=%i, nodes=%i" %(p.layers, p.nodes))
     plt.legend(loc='lower right')    
-    plt.savefig('plots/torch_train_roc_'+str(p.layers)+'l_'+str(p.nodes)+'n.png')
+    plt.savefig('plots/torch_train_roc_'+outDir+'.png')
 
     plt.figure()
     yTest = np.where(Y_test > 0.5, 1, 0)
@@ -252,8 +265,32 @@ for p in param_grid:
     
     plt.title("pyTorch Test ROC, layers=%i, nodes=%i" %(p.layers, p.nodes))
     plt.legend(loc='lower right')    
-    plt.savefig('plots/torch_test_roc_'+str(p.layers)+'l_'+str(p.nodes)+'n.png')
+    plt.savefig('plots/torch_test_roc_'+outDir+'.png')
 
+    testPredTrue = p.y_pred_test[yTest==1][:,1]
+    testPredFalse = p.y_pred_test[yTest==0][:,1]
+    
+    trainPredTrue = p.y_pred[yTrain==1][:,1]
+    trainPredFalse = p.y_pred[yTrain==0][:,1]
+
+    plt.figure()
+    plt.hist(testPredTrue, 30, log=False, alpha=0.5, label='Correct')
+    plt.hist(testPredFalse[:len(testPredTrue)], 30, log=False, alpha=0.5, label='Incorrect')
+    plt.title("DNN Output, Test Data")
+    plt.xlabel('DNN Score')
+    plt.ylabel('NEvents')
+    plt.legend(loc='upper right')
+    plt.savefig('plots/torch_'+outDir+'_test_score.png')
+    
+    plt.figure()
+    plt.hist(trainPredTrue, 30, log=False, alpha=0.5, label='Correct')
+    plt.hist(trainPredFalse[:len(trainPredTrue)], 30, log=False, alpha=0.5, label='Incorrect')
+    plt.title("DNN Output, Train Data")
+    plt.xlabel('DNN Score')
+    plt.ylabel('NEvents')
+    plt.legend(loc='upper right')
+    plt.savefig('plots/torch_'+outDir+'_train_score.png')
+    
     y_test_bin = np.where(ypTest > 0.5, 1, 0)
     print(y_test_bin)
     print('Confusion Matrix:', sklearn.metrics.confusion_matrix(yTest, y_test_bin[:,1]))
