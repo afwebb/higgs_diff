@@ -28,8 +28,10 @@ inDF = pd.read_csv(inFile)#, nrows=600000)
 #    inDF = inDF.drop(['is2LSS0Tau'],axis=1)
 
 #if not inDF['comboScore'].empty:
-#    inDF = inDF[inDF['comboScore'] > 0.15]
-#    inDF.drop('comboScore', axis=1)
+inDF = inDF[inDF['comboScore'] > 0.3]
+inDF.drop('comboScore', axis=1)
+
+inDF = sk.utils.shuffle(inDF)
 
 train, test = train_test_split(inDF, test_size=0.2)
 
@@ -54,6 +56,7 @@ test = test.drop(['higgs_pt'],axis=1)
 #test = test.drop(['nBin'],axis=1)
 
 #Convert to xgb matrices
+print(list(train))
 xgb_train = xgb.DMatrix(train, label=y_train, feature_names=list(train))
 xgb_test = xgb.DMatrix(test, label=y_test, feature_names=list(train))
 

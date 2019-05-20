@@ -17,7 +17,7 @@ outputFile = sys.argv[2]
 inF = uproot.open(inputFile)
 nom=inF.get('nominal')
 
-la=inF['nominal'].lazyarrays(['m_truth*','dilep_type','higgs*','lep_Pt*','lep_Eta_*', 'lep_E_*','total_charge',
+la=inF['nominal'].lazyarrays(['m_truth*','dilep_type','trilep_type','quadlep_type','higgs*','lep_Pt*','lep_Eta_*', 'lep_E_*','total_charge',
                             'total_leptons', 'lep_Phi*','lep_ID*','lep_Index*', 'm_track_jet*', 'm_jet*','selected_jets', 
                             'm_truth_jet_pt', 'm_truth_jet_eta', 'm_truth_jet_phi', 'm_truth_jet_m','nJets_OR_T','nJets_OR_T_MV2c10_70',
                             'MET_RefFinal_et', 'MET_RefFinal_phi'])
@@ -142,6 +142,17 @@ outF = root_open(outputFile, 'recreate')
 
 class Model(TreeModel):
 
+    #Selection branches
+    higgsDecayMode = FloatCol()
+    total_leptons = FloatCol()
+    total_charge = FloatCol()
+    dilep_type = FloatCol()
+    trilep_type = FloatCol()
+    quadlep_type = FloatCol()
+
+    nJets = FloatCol()
+    nJets_MV2c10_70 = FloatCol()
+
     higgs_pt = FloatCol()
 
     #Jet Branches
@@ -152,6 +163,9 @@ class Model(TreeModel):
     jet_MV2c10 = stl.vector('float')
     jet_parent = stl.vector('float')
     jet_flavor = stl.vector('float')
+
+    jet_jvt = stl.vector('float')
+    jet_numTrk = stl.vector('float')
 
     track_jet_pt = stl.vector('float')
     track_jet_eta = stl.vector('float')
@@ -197,12 +211,12 @@ for idx in range( len(la[b'nJets_OR_T']) ):
     #    break                                                                                                                 
 
     #Event selection
-    if la[b'higgsDecayMode'][idx] != 3: continue
-    if la[b'total_leptons'][idx] != 2: continue
-    if la[b'dilep_type'][idx] < 1: continue
-    if la[b'total_charge'][idx] == 0: continue
+    #if la[b'higgsDecayMode'][idx] != 3: continue
+    if la[b'total_leptons'][idx] < 2: continue
+    #if la[b'dilep_type'][idx] < 1: continue
+    #if la[b'total_charge'][idx] == 0: continue
     if la[b'nJets_OR_T_MV2c10_70'][idx] < 1: continue
-    if la[b'nJets_OR_T'][idx] < 4: continue 
+    if la[b'nJets_OR_T'][idx] < 2: continue 
 
     #Clear vectors
     tree.jet_pt.clear()
@@ -213,13 +227,16 @@ for idx in range( len(la[b'nJets_OR_T']) ):
     tree.jet_parent.clear()
     tree.jet_flavor.clear()
 
+    tree.jet_jvt.clear()
+    tree.jet_numTrk.clear()
+
     tree.lep_pt.clear()
     tree.lep_eta.clear()
     tree.lep_phi.clear()
     tree.lep_E.clear()
     tree.lep_parent.clear()
     tree.lep_flavor.clear()
-
+    '''
     tree.track_jet_pt.clear()
     tree.track_jet_eta.clear()
     tree.track_jet_phi.clear()
@@ -227,7 +244,7 @@ for idx in range( len(la[b'nJets_OR_T']) ):
     tree.track_jet_MV2c10.clear()
     tree.track_jet_parent.clear()
     tree.track_jet_flavor.clear()
-
+    '''
     tree.truth_jet_pt.clear()
     tree.truth_jet_eta.clear()
     tree.truth_jet_phi.clear()
@@ -244,6 +261,16 @@ for idx in range( len(la[b'nJets_OR_T']) ):
 
     #Add Flat Branches
     tree.higgs_pt = la[b'higgs_pt'][idx]
+
+    tree.higgsDecayMode = la[b'higgsDecayMode'][idx] 
+    tree.total_leptons = la[b'total_leptons'][idx]
+    tree.total_charge = la[b'total_charge'][idx]
+    tree.dilep_type = la[b'dilep_type'][idx]
+    tree.trilep_type = la[b'trilep_type'][idx]
+    tree.quadlep_type = la[b'quadlep_type'][idx]
+    
+    tree.nJets = la[b'nJets_OR_T'][idx]
+    tree.nJets_MV2c10_70 = la[b'nJets_OR_T_MV2c10_70'][idx]
 
     tree.met = la[b'MET_RefFinal_et'][idx]
     tree.met_phi = la[b'MET_RefFinal_phi'][idx]
@@ -304,22 +331,59 @@ for idx in range( len(la[b'nJets_OR_T']) ):
 
     tree.lep_parent.push_back( lepPar0 )
 
-    tree.lep_pt.push_back( la[b'lep_Pt_1'][idx] )
-    tree.lep_eta.push_back( la[b'lep_Eta_1'][idx] )
-    tree.lep_phi.push_back( la[b'lep_Phi_1'][idx] )
-    tree.lep_E.push_back( la[b'lep_E_1'][idx] )
-    tree.lep_flavor.push_back( la[b'lep_ID_1'][idx] )
+    if la[b'total_leptons'][idx]>1:
+        tree.lep_pt.push_back( la[b'lep_Pt_1'][idx] )
+        tree.lep_eta.push_back( la[b'lep_Eta_1'][idx] )
+        tree.lep_phi.push_back( la[b'lep_Phi_1'][idx] )
+        tree.lep_E.push_back( la[b'lep_E_1'][idx] )
+        tree.lep_flavor.push_back( la[b'lep_ID_1'][idx] )
     #tree.lep_parent.push_back( lepMatch(la[b'lep_Eta_1'][idx], la[b'lep_Phi_1'][idx], la[b'lep_ID_1'][idx], truth_dict) )
-    lepPar1 = 0
-    for j in hLep:
-        dr = sqrt(unwrap([ la[b'lep_Phi_1'][idx] - truth_dict[j].phi])**2+( la[b'lep_Eta_1'][idx] - truth_dict[j].eta)**2)
-        if dr<0.1 and abs(la[b'lep_ID_1'][idx])==abs(truth_dict[j].pdgid):
-            lepPar1 = 25
-    for j in tLep:
-        dr = sqrt(unwrap([ la[b'lep_Phi_1'][idx] - truth_dict[j].phi])**2+( la[b'lep_Eta_1'][idx] - truth_dict[j].eta)**2)
-        if dr<0.1 and abs(la[b'lep_ID_1'][idx])==abs(truth_dict[j].pdgid):
-            lepPar1 = 6
-    tree.lep_parent.push_back( lepPar1 )
+        lepPar1 = 0
+        for j in hLep:
+            dr = sqrt(unwrap([ la[b'lep_Phi_1'][idx] - truth_dict[j].phi])**2+( la[b'lep_Eta_1'][idx] - truth_dict[j].eta)**2)
+            if dr<0.1 and abs(la[b'lep_ID_1'][idx])==abs(truth_dict[j].pdgid):
+                lepPar1 = 25
+        for j in tLep:
+            dr = sqrt(unwrap([ la[b'lep_Phi_1'][idx] - truth_dict[j].phi])**2+( la[b'lep_Eta_1'][idx] - truth_dict[j].eta)**2)
+            if dr<0.1 and abs(la[b'lep_ID_1'][idx])==abs(truth_dict[j].pdgid):
+                lepPar1 = 6
+        tree.lep_parent.push_back( lepPar1 )
+
+    if la[b'total_leptons'][idx]>2:
+        tree.lep_pt.push_back( la[b'lep_Pt_2'][idx] )
+        tree.lep_eta.push_back( la[b'lep_Eta_2'][idx] )
+        tree.lep_phi.push_back( la[b'lep_Phi_2'][idx] )
+        tree.lep_E.push_back( la[b'lep_E_2'][idx] )
+        tree.lep_flavor.push_back( la[b'lep_ID_2'][idx] )
+
+        lepPar2 = 0
+        for j in hLep:
+            dr = sqrt(unwrap([ la[b'lep_Phi_2'][idx] - truth_dict[j].phi])**2+( la[b'lep_Eta_2'][idx] - truth_dict[j].eta)**2)
+            if dr<0.1 and abs(la[b'lep_ID_2'][idx])==abs(truth_dict[j].pdgid):
+                    lepPar2 = 25
+        for j in tLep:
+            dr = sqrt(unwrap([ la[b'lep_Phi_2'][idx] - truth_dict[j].phi])**2+( la[b'lep_Eta_2'][idx] - truth_dict[j].eta)**2)
+            if dr<0.1 and abs(la[b'lep_ID_2'][idx])==abs(truth_dict[j].pdgid):
+                lepPar2 = 6
+        tree.lep_parent.push_back( lepPar2 )
+
+    if la[b'total_leptons'][idx]>3:
+        tree.lep_pt.push_back( la[b'lep_Pt_3'][idx] )
+        tree.lep_eta.push_back( la[b'lep_Eta_3'][idx] )
+        tree.lep_phi.push_back( la[b'lep_Phi_3'][idx] )
+        tree.lep_E.push_back( la[b'lep_E_3'][idx] )
+        tree.lep_flavor.push_back( la[b'lep_ID_3'][idx] )
+
+        lepPar3 = 0
+        for j in hLep:
+            dr = sqrt(unwrap([ la[b'lep_Phi_3'][idx] - truth_dict[j].phi])**2+( la[b'lep_Eta_3'][idx] - truth_dict[j].eta)**2)
+            if dr<0.1 and abs(la[b'lep_ID_3'][idx])==abs(truth_dict[j].pdgid):
+                lepPar3 = 25
+        for j in tLep:
+            dr = sqrt(unwrap([ la[b'lep_Phi_3'][idx] - truth_dict[j].phi])**2+( la[b'lep_Eta_3'][idx] - truth_dict[j].eta)**2)
+            if dr<0.1 and abs(la[b'lep_ID_3'][idx])==abs(truth_dict[j].pdgid):
+                lepPar3 = 6
+        tree.lep_parent.push_back( lepPar3 )
 
     #Fill Jet Branches
     for i in range(len(la[b'm_jet_pt'][idx])):
@@ -329,6 +393,10 @@ for idx in range( len(la[b'nJets_OR_T']) ):
         tree.jet_E.push_back( la[b'm_jet_E'][idx][i] )
         tree.jet_flavor.push_back( la[b'm_jet_flavor_truth_label_ghost'][idx][i] )
         tree.jet_MV2c10.push_back( la[b'm_jet_flavor_weight_MV2c10'][idx][i] )
+        
+        tree.jet_jvt.push_back( la[b'm_jet_jvt'][idx][i] )
+        tree.jet_numTrk.push_back( la[b'm_jet_numTrk'][idx][i] )
+        
         jet_flav = la[b'm_jet_flavor_truth_label_ghost'][idx][i] 
 
         jetPar = 0
@@ -344,6 +412,7 @@ for idx in range( len(la[b'nJets_OR_T']) ):
         tree.jet_parent.push_back( jetPar )
 
         #Fill Jet Branches                                                                                                          
+    '''
     for i in range(len(la[b'm_track_jet_pt'][idx])):
         tree.track_jet_pt.push_back( la[b'm_track_jet_pt'][idx][i] )
         tree.track_jet_eta.push_back( la[b'm_track_jet_eta'][idx][i] )
@@ -364,7 +433,7 @@ for idx in range( len(la[b'nJets_OR_T']) ):
                 track_jetPar = 6
 
         tree.track_jet_parent.push_back( track_jetPar )
-            
+    '''
     tree.fill()
 
 tree.write()

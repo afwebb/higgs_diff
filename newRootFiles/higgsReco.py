@@ -8,10 +8,11 @@ from numpy import unwrap
 from numpy import arange
 from rootpy.vector import LorentzVector
 import random
+from dict_higgs import higgsDict
 #import matplotlib.pyplot as plt
 
 inf = sys.argv[1]
-#outputFile = sys.argv[2]
+outDir = sys.argv[2]
 
 f = rootpy.io.root_open(inf)
 dsid = inf.split('/')[-1]
@@ -28,36 +29,6 @@ def calc_phi(phi_0, new_phi):
     if new_phi<-math.pi:
         new_phi = new_phi + 2*math.pi
     return new_phi
-
-
-def flatDict(match, jet1, jet2, lep, met, jet1_MV2c10, jet2_MV2c10):
-    k = {}
-
-    k['match'] = match
-
-    k['lep_Pt'] = lep.Pt()
-    k['jet_Pt_0'] = jet1.Pt()
-    k['jet_Pt_1'] = jet2.Pt()
-
-    k['dRjj'] = jet1.DeltaR(jet2)
-    k['Ptjj'] = (jet1+jet2).Pt()
-    k['Mjj'] = (jet1+jet2).M()
-
-    k['dRlj0'] = lep.DeltaR(jet1)
-    k['Ptlj0'] = (lep+jet1).Pt()
-    k['Mlj0'] = (lep+jet1).M()
-
-    k['dRlj1'] = lep.DeltaR(jet2)
-    k['Ptlj1'] = (lep+jet2).Pt()
-    k['Mlj1'] = (lep+jet2).M()
-
-    k['dR(jj)(l)'] = (jet1 + jet2).DeltaR(lep + met)
-    k['MhiggsCand'] = (jet1+jet2+lep).M()
-
-    k['jet_MV2c10_0'] =jet1_MV2c10
-    k['jet_MV2c10_1'] =jet2_MV2c10
-
-    return k
 
 current = 0
 nMatch = 0
@@ -108,21 +79,27 @@ for e in nom:
         
     if len(lepH)!=1 or len(higgsJets)!=2: continue
 
-    k = flatDict( 1, jets[ higgsJets[0] ], jets[ higgsJets[1] ], lepH[0], met, e.jet_MV2c10[ higgsJets[0] ], e.jet_MV2c10[ higgsJets[0] ] )
+    k = higgsDict( jets[ higgsJets[0] ], jets[ higgsJets[1] ], lepH[0], met, e.jet_MV2c10[ higgsJets[0] ], e.jet_MV2c10[ higgsJets[1] ], lepB[0], 1 )
     eventsFlat.append(k)
 
     for l in range(2):
-        k = flatDict( 0, jets[ higgsJets[0] ], jets[ higgsJets[1] ], lepB[0], met, e.jet_MV2c10[ higgsJets[0] ], e.jet_MV2c10[ higgsJets[0] ] )
+        k = higgsDict( jets[ higgsJets[0] ], jets[ higgsJets[1] ], lepB[0], met, e.jet_MV2c10[ higgsJets[0] ], e.jet_MV2c10[ higgsJets[1] ], lepH[0], 0 )
         eventsFlat.append(k)
 
     for l in range(2):
         i,j = random.sample(badJets,2)
-        k = flatDict( 0, jets[i], jets[j], lepH[0], met, e.jet_MV2c10[i], e.jet_MV2c10[j] )
+        k = higgsDict( jets[i], jets[j], lepH[0], met, e.jet_MV2c10[i], e.jet_MV2c10[j], lepB[0], 0 )
         eventsFlat.append(k)
 
-    for l in range(8):
+        k = higgsDict( jets[i], jets[ higgsJets[1] ], lepH[0], met, e.jet_MV2c10[i], e.jet_MV2c10[ higgsJets[1]], lepB[0], 0 )
+        eventsFlat.append(k)
+        
+        k = higgsDict( jets[ higgsJets[0] ], jets[j], lepH[0], met, e.jet_MV2c10[ higgsJets[0] ], e.jet_MV2c10[j], lepB[0], 0 )
+        eventsFlat.append(k)
+
+    for l in range(min([6, len(badJets)])):
         i,j = random.sample(badJets,2)
-        k = flatDict( 0, jets[i], jets[j], lepB[0], met, e.jet_MV2c10[i], e.jet_MV2c10[j] )
+        k = higgsDict( jets[i], jets[j], lepB[0], met, e.jet_MV2c10[i], e.jet_MV2c10[j], lepH[0], 0 )
         eventsFlat.append(k)
 
 import pandas as pd
@@ -132,4 +109,4 @@ dfFlat = pd.DataFrame.from_dict(eventsFlat)
 from sklearn.utils import shuffle
 dfFlat = shuffle(dfFlat)
 
-dfFlat.to_csv('higgsFiles/'+dsid+'Flat.csv', index=False)
+dfFlat.to_csv(outDir+'/'+dsid+'Flat.csv', index=False)

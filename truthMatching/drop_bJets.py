@@ -1,5 +1,6 @@
 import pandas as pd
 import sys
+import sklearn as sk
 
 inputFile = sys.argv[1]
 outputFile = sys.argv[2]
@@ -13,4 +14,5 @@ dropCol = ['top_E_0','top_E_1','top_Eta_0','top_Eta_1','top_MV2c10_0','top_MV2c1
 for d in dropCol:
     inDF = inDF.drop(d, axis=1)
 
+inDF = sk.utils.shuffle(inDF)
 inDF.to_csv(outputFile, index=False)

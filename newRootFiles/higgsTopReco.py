@@ -1,6 +1,8 @@
-#import ROOT
+import ROOT
+import pandas as pd
 import numpy as np
-import rootpy.io
+import uproot
+#import rootpy.io
 import sys
 import math
 from math import sqrt
@@ -8,12 +10,13 @@ from numpy import unwrap
 from numpy import arange
 from rootpy.vector import LorentzVector
 import random
+from dict_higgsTop import higgsTopDict
 #import matplotlib.pyplot as plt
 
 inf = sys.argv[1]
 #outputFile = sys.argv[2]
 
-f = rootpy.io.root_open(inf)
+f = uproot.open(inf)
 dsid = inf.split('/')[-1]
 dsid = dsid.replace('.root', '')
 print(dsid)
@@ -29,76 +32,7 @@ def calc_phi(phi_0, new_phi):
         new_phi = new_phi + 2*math.pi
     return new_phi
 
-
-def flatDict(match, jet1, jet2, lep, met, jet1_MV2c10, jet2_MV2c10, topJet1, topJet2, lepO):
-    k = {}
-
-    k['match'] = match
-
-    k['lep_Pt'] = lep.Pt()
-    k['jet_Pt_0'] = jet1.Pt()
-    k['jet_Pt_1'] = jet2.Pt()
-
-    k['lep_Pt_Other'] = lepO.Pt()
-
-    k['dRjj'] = jet1.DeltaR(jet2)
-    k['Ptjj'] = (jet1+jet2).Pt()
-    k['Mjj'] = (jet1+jet2).M()
-
-    k['dRlj0'] = lep.DeltaR(jet1)
-    k['Ptlj0'] = (lep+jet1).Pt()
-    k['Mlj0'] = (lep+jet1).M()
-
-    k['dRlj1'] = lep.DeltaR(jet2)
-    k['Ptlj1'] = (lep+jet2).Pt()
-    k['Mlj1'] = (lep+jet2).M()
-
-    k['dRlt0'] = lep.DeltaR(topJet1)
-    k['Ptlt0'] = (lep+topJet1).Pt()
-    k['Mlt0'] = (lep+topJet1).M()
-
-    k['dRlt1'] = lep.DeltaR(topJet2)
-    k['Ptlj1'] = (lep+topJet2).Pt()
-    k['Mlj1'] = (lep+topJet2).M()
-
-    k['dRjt00'] = jet1.DeltaR(topJet1)
-    k['Ptjt00'] = (jet1+topJet1).Pt()
-    k['Mljt00'] = (jet1+topJet1).M()
-
-    k['dRjt01'] = jet1.DeltaR(topJet2)
-    k['Ptjt01'] = (jet1+topJet2).Pt()
-    k['Mljt01'] = (jet1+topJet2).M()
-
-    k['dRjt10'] = jet2.DeltaR(topJet1)
-    k['Ptjt10'] = (jet2+topJet1).Pt()
-    k['Mljt10'] = (jet2+topJet1).M()
-
-    k['dRjt11'] = jet2.DeltaR(topJet2)
-    k['Ptjt11'] = (jet2+topJet2).Pt()
-    k['Mljt11'] = (jet2+topJet2).M()
-
-    k['Mttl'] = (topJet1+topJet2+lep).M()
-
-    k['dR(jj)(lepOther)'] = (jet1+jet2).DeltaR(lepO)
-
-    k['MtlOther0'] = (topJet1+lepO).M()
-    k['MtlOther1'] = (topJet2+lepO).M()
-
-    k['dRtlOther0'] = topJet1.DeltaR(lepO)
-    k['dRtlOther1'] = topJet2.DeltaR(lepO)
-
-    k['dR(jj)(l)'] = (jet1 + jet2).DeltaR(lep + met)
-    k['MhiggsCand'] = (jet1+jet2+lep).M()
-
-    higgsCand = jet1+jet2+lep
-
-    k['dRht0'] = higgsCand.DeltaR(topJet1)
-    k['dRht1'] = higgsCand.DeltaR(topJet2)
-
-    k['jet_MV2c10_0'] =jet1_MV2c10
-    k['jet_MV2c10_1'] =jet2_MV2c10
-
-    return k
+la=f['nominal'].lazyarrays(['jet_*', 'lep_*', 'met', 'met_phi', 'truth_jet_*', 'track_jet_*'])
 
 current = 0
 nMatch = 0
@@ -111,7 +45,7 @@ fourVecDicts = []
 eventsFlat = []
 current = 0
 
-for e in nom:
+for idx in range(len(la[b'met']) ):
     current+=1
     if current%10000==0:
         print(current)
@@ -119,17 +53,17 @@ for e in nom:
     fourVecs = {}
     
     met = LorentzVector()
-    met.SetPtEtaPhiE(e.met, 0, e.met_phi, e.met)
+    met.SetPtEtaPhiE(la[b'met'][idx], 0, la[b'met_phi'][idx], la[b'met'][idx])
     
-    if len(e.lep_pt)!=2: continue
+    if len(la[b'lep_pt'][idx])!=2: continue
 
     lepH = []
     lepB = []
 
     for i in range(2):
         lep = LorentzVector()
-        lep.SetPtEtaPhiE(e.lep_pt[i], e.lep_eta[i], e.lep_phi[i], e.lep_E[i])
-        if e.lep_parent[i]==25:
+        lep.SetPtEtaPhiE(la[b'lep_pt'][idx][i], la[b'lep_eta'][idx][i], la[b'lep_phi'][idx][i], la[b'lep_E'][idx][i])
+        if la[b'lep_parent'][idx][i]==25:
             lepH.append(lep)
         else:
             lepB.append(lep)
@@ -138,43 +72,41 @@ for e in nom:
     higgsJets = []
     topJets = []
     badJets = []
-    for i in range(len(e.jet_pt)):
+    for i in range(len(la[b'jet_pt'][idx])):
         jet = LorentzVector()
-        jet.SetPtEtaPhiE(e.jet_pt[i], e.jet_eta[i], e.jet_phi[i], e.jet_E[i])
+        jet.SetPtEtaPhiE(la[b'jet_pt'][idx][i], la[b'jet_eta'][idx][i], la[b'jet_phi'][idx][i], la[b'jet_E'][idx][i])
         jets.append(jet)
         
-        if e.jet_parent[i]==25:
+        if la[b'jet_parent'][idx][i]==25:
             higgsJets.append(i)
-        elif abs(e.jet_parent[i])==6:
+        elif abs(la[b'jet_parent'][idx][i])==6:
             topJets.append(i)
         else:
             badJets.append(i)
         
     if len(lepH)!=1 or len(higgsJets)!=2 or len(topJets)!=2: continue
 
-    k = flatDict( 1, jets[ higgsJets[0] ], jets[ higgsJets[1] ], lepH[0], met, e.jet_MV2c10[ higgsJets[0] ], e.jet_MV2c10[ higgsJets[0] ], jets[ topJets[0] ], jets[ topJets[1] ], lepB[0] )
+    k = higgsTopDict( jets[ higgsJets[0] ], jets[ higgsJets[1] ], lepH[0], met, la[b'jet_MV2c10'][idx][ higgsJets[0] ], la[b'jet_MV2c10'][idx][ higgsJets[1] ], jets[ topJets[0] ], jets[ topJets[1] ], lepB[0], 1 )
     eventsFlat.append(k)
 
     for l in range(2):
-        k = flatDict( 0, jets[ higgsJets[0] ], jets[ higgsJets[1] ], lepB[0], met, e.jet_MV2c10[ higgsJets[0] ], e.jet_MV2c10[ higgsJets[0] ], jets[ topJets[0] ], jets[ topJets[1] ], lepH[0] )
+        k = higgsTopDict( jets[ higgsJets[0] ], jets[ higgsJets[1] ], lepB[0], met, la[b'jet_MV2c10'][idx][ higgsJets[0] ], la[b'jet_MV2c10'][idx][ higgsJets[1] ], jets[ topJets[0] ], jets[ topJets[1] ], lepH[0], 0 )
         eventsFlat.append(k)
 
     if len(badJets) > 2:
         for l in range(2):
             i,j = random.sample(badJets,2)
-            k = flatDict( 0, jets[i], jets[j], lepH[0], met, e.jet_MV2c10[i], e.jet_MV2c10[j], jets[ topJets[0] ], jets[ topJets[1] ], lepB[0] )
+            k = higgsTopDict( jets[i], jets[j], lepH[0], met, la[b'jet_MV2c10'][idx][i], la[b'jet_MV2c10'][idx][j], jets[ topJets[0] ], jets[ topJets[1] ], lepB[0], 0 )
             eventsFlat.append(k)
 
-        for l in range(min([10, len(badJets)])):
+        for l in range(min([8, len(badJets)])):
             i,j = random.sample(badJets,2)
-            k = flatDict( 0, jets[i], jets[j], lepB[0], met, e.jet_MV2c10[i], e.jet_MV2c10[j], jets[ topJets[0] ], jets[ topJets[1] ], lepH[0] )
+            k = higgsTopDict( jets[i], jets[j], lepB[0], met, la[b'jet_MV2c10'][idx][i], la[b'jet_MV2c10'][idx][j], jets[ topJets[0] ], jets[ topJets[1] ], lepH[0], 0 )
             eventsFlat.append(k)
-
-import pandas as pd
 
 dfFlat = pd.DataFrame.from_dict(eventsFlat)
 
 from sklearn.utils import shuffle
 dfFlat = shuffle(dfFlat)
 
-dfFlat.to_csv('higgsTopFiles/'+dsid+'Flat.csv', index=False)
+dfFlat.to_csv('higgsTopPflowFiles/'+dsid+'Flat.csv', index=False)

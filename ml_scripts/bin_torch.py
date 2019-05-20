@@ -38,8 +38,8 @@ def normalize(x):
 X = normalize(X)
 Y = normalize(Y)
 
-X_test = X_test / xMax#X.max(0, keepdim=True)[0]#normalize(X_test)
-Y_test = Y_test / yMax#normalize(Y_test)
+X_test = X_test / xMax#X.max(0, keepdim=True)[0]#normalize(X_test)                                                   
+Y_test = Y_test / yMax#normalize(Y_test)  
 
 class OldNet(nn.Module):
     
@@ -65,7 +65,7 @@ class OldNet(nn.Module):
     
 oldNet = OldNet()
 #opt = optim.Adam(net.parameters(), lr=0.001, betas=(0.9, 0.999))
-#criterion = nn.BCELoss()
+criterion = nn.BCELoss()
 
 class Net(nn.Module):
     
@@ -89,9 +89,10 @@ class Net(nn.Module):
         y = self.out_act(a1)
         return y
 
-def train_epoch_batch(model, opt, criterion, batch_size=2000):
+def train_epoch_batch(model, opt, criterion, batch_size=5000):
     model.train()
     #losses = []
+    #y_hat = torch.empty(1, 2)
     for beg_i in range(0, X.size(0), batch_size):
         x_batch = X[beg_i:beg_i + batch_size, :]
         y_batch = Y[beg_i:beg_i + batch_size]
@@ -102,7 +103,7 @@ def train_epoch_batch(model, opt, criterion, batch_size=2000):
         # (1) Forward
         y_hat = net(x_batch)
         # (2) Compute diff
-        loss = criterion(y_hat[:,0], y_batch)
+        loss = criterion(y_hat, y_batch)
         # (3) Compute gradients
         loss.backward()
         # (4) update weights
@@ -110,8 +111,8 @@ def train_epoch_batch(model, opt, criterion, batch_size=2000):
         #losses.append(loss.data.numpy())
     
     y_hat = net(X)
-    loss = criterion(y_hat[:,0], Y)
-    return loss, y_hat[:,0]
+    loss = criterion(y_hat, Y)
+    return loss, y_hat
 
 def train_epoch(model, opt, criterion, batch_size=5000):
     model.train()
@@ -120,7 +121,7 @@ def train_epoch(model, opt, criterion, batch_size=5000):
     # (1) Forward
     y_hat = net(X)
     # (2) Compute diff
-    loss = criterion(y_hat[:,0], Y)
+    loss = criterion(y_hat, Y)
     # (3) Compute gradients
     loss.backward()
     # (4) update weights
@@ -142,11 +143,11 @@ class param:
         self.net = None
     
 
-num_epochs = [500]
+num_epochs = [750]
 nLayers = [6]#[2, 3, 4, 6, 8]
 nNodes = [75]#[25, 50, 75, 100]#[50, 75, 125]#, 100, 175, 250]#[250, 350, 450, 600]
 
-lnPairs = [[6,75]]#,[5,100],[6,75],[6,100],[8,50],[8,75]]
+lnPairs = [[5,75],[5,100],[6,75],[6,100],[8,50],[8,75]]#,[5,100],[6,75],[6,100],[8,50],[8,75]]
 
 param_grid = []
 for ep in num_epochs:
@@ -163,9 +164,9 @@ def scale_pt(y_predicted):
 
 for p in param_grid:
     net = Net(X.size()[1], p.nodes, p.layers)
-    opt = optim.Adam(net.parameters(), lr=0.0005, betas=(0.9, 0.999))
+    opt = optim.Adam(net.parameters(), lr=0.001, betas=(0.9, 0.999))
     #opt = optim.SGD(net.parameters(), lr=0.01, momentum=0.9)
-    criterion = nn.MSELoss()
+    criterion = nn.BCELoss()
     y_pred = []
     y_test_pred=[]
     e_losses = []
@@ -175,7 +176,7 @@ for p in param_grid:
         e_loss, y_pred = train_epoch_batch(net, opt, criterion) 
         #e_losses.append(loss)
         if e%5==0:
-            y_pred_test = net(X_test)[:,0]
+            y_pred_test = net(X_test)
             test_loss = criterion(y_pred_test, Y_test).float().detach().numpy()
             test_losses.append(test_loss)
             e_losses.append(e_loss.float().detach().numpy())
@@ -185,14 +186,11 @@ for p in param_grid:
             #    break
     
     p.net = net
-    p.train_loss = np.sqrt(e_loss.float().detach().numpy())*yMax
-    p.test_loss = np.sqrt(test_loss)*yMax
-    p.y_pred_test = y_pred_test.float().detach().numpy()*yMax
-    p.y_pred = y_pred.float().detach().numpy()*yMax
+    p.train_loss = e_loss.float().detach().numpy()
+    p.test_loss = test_loss
+    p.y_pred_test = y_pred_test[:,0].float().detach().numpy()
+    p.y_pred = y_pred[:,0].float().detach().numpy()
     #p.auc = sk.metrics.roc_auc_score(y_train,y_predicted)
-
-    Y = Y*yMax
-    Y_test = Y_test*yMax
     
     print("Nodes: "+str(p.nodes))
     print("Layers: "+str(p.layers))
@@ -212,83 +210,66 @@ for p in param_grid:
     plt.title("pyTorch Loss, layers=%i, nodes=%i, loss=%0.4f" %(p.layers, p.nodes, p.test_loss))
     plt.yscale('log')
     plt.xlabel('Epoch')
-    plt.ylabel('RMSE')
+    plt.ylabel('MAE')
     plt.legend(loc='upper right')
     plt.savefig('plots/'+outDir+'/torch_loss_'+str(p.layers)+'l_'+str(p.nodes)+'n.png')
 
+    trainPredTrue = p.y_pred[Y==1]
+    trainPredFalse = p.y_pred[Y==0]
+
+    testPredTrue = p.y_pred_test[Y_test==1]
+    testPredFalse = p.y_pred_test[Y_test==0]
+
     plt.figure()
-    plt.hist(Y, 30, log=True, range=(0,800000), alpha=0.5, label='truth')
-    plt.hist(p.y_pred, 30, log=True, range=(0,800000), alpha=0.5, label='train')
-    plt.title("pyTorch Train Data, layers=%i, nodes=%i, loss=%0.4f" %(p.layers, p.nodes, p.train_loss))
-    plt.xlabel('Higgs Pt')
+    plt.hist(testPredTrue, 30, log=False, alpha=0.5, label='High Pt')
+    plt.hist(testPredFalse[:len(testPredTrue)], 30, log=False, alpha=0.5, label='Low Pt')
+    plt.title("DNN Output, Test Data")
+    plt.xlabel('DNN Score')
     plt.ylabel('NEvents')
     plt.legend(loc='upper right')
-    plt.savefig('plots/'+outDir+'/torch_train_pt_spectrum_'+str(p.layers)+'l_'+str(p.nodes)+'n.png')
+    plt.savefig('plots/'+outDir+'/torch_test_score_'+str(p.layers)+'l_'+str(p.nodes)+'n.png')
 
     plt.figure()
-    plt.hist(Y_test, 30, log=True, range=(0,800000), alpha=0.5, label='truth')
-    plt.hist(p.y_pred_test,30, log=True, range=(0,800000), alpha=0.5, label='test')
-    plt.title("pyTorch Test Data, layers=%i, nodes=%i, loss=%0.4f" %(p.layers, p.nodes, p.test_loss))
-    plt.xlabel('Higgs Pt')
+    plt.hist(trainPredTrue, 30, log=False, alpha=0.5, label='High Pt')
+    plt.hist(trainPredFalse[:len(trainPredTrue)], 30, log=False, alpha=0.5, label='Low Pt')
+    plt.title("DNN Output, Train Data")
+    plt.xlabel('DNN Score')
     plt.ylabel('NEvents')
     plt.legend(loc='upper right')
-    plt.savefig('plots/'+outDir+'/torch_test_pt_spectrum_'+str(p.layers)+'l_'+str(p.nodes)+'n.png')
+    plt.savefig('plots/'+outDir+'/torch_train_score_'+str(p.layers)+'l_'+str(p.nodes)+'n.png')
 
-    #ROC
-    cutoff = [150000, 200000, 250000]
+    y_test_bin = np.where(p.y_pred_test > 0.5, 1, 0)
+    print(y_test_bin)
+    print('Confusion Matrix:', sklearn.metrics.confusion_matrix(Y_test, y_test_bin))
 
+    #y_predicted = y_pred.float().detach().numpy()
+    #train roc
     plt.figure()
-    for c in cutoff:
-        yTrain = np.where(Y > c, 1, 0)
-        ypTrain = p.y_pred
 
-        auc = sk.metrics.roc_auc_score(yTrain,ypTrain)
-        fpr, tpr, _ = sk.metrics.roc_curve(yTrain,ypTrain)
-
-        plt.plot(fpr, tpr, label='AUC = %.3f, cutoff = %0.2f' %(auc, c))
-
-        plt.title("pyTorch Train ROC, layers=%i, nodes=%i" %(p.layers, p.nodes))
-        plt.legend(loc='lower right')
+    yTrain = Y
+    ypTrain = p.y_pred
+    
+    auc = sk.metrics.roc_auc_score(yTrain,ypTrain)
+    fpr, tpr, _ = sk.metrics.roc_curve(yTrain,ypTrain)
+    
+    plt.plot(fpr, tpr, label='AUC = %.3f' %(auc))
+    
+    plt.title("pyTorch Train ROC, layers=%i, nodes=%i" %(p.layers, p.nodes))
+    plt.legend(loc='lower right')    
     plt.savefig('plots/'+outDir+'/torch_train_roc_'+str(p.layers)+'l_'+str(p.nodes)+'n.png')
 
+    #test roc
     plt.figure()
-    for c in cutoff:
-        yTest = np.where(Y_test > c, 1, 0)
-        ypTest = p.y_pred_test
-
-        auc = sk.metrics.roc_auc_score(yTest,ypTest)
-        fpr, tpr, _ = sk.metrics.roc_curve(yTest,ypTest)
-
-        plt.plot(fpr, tpr, label='AUC = %.3f, cutoff = %0.2f' %(auc, c))
-
-        plt.title("pyTorch Test ROC, layers=%i, nodes=%i" %(p.layers, p.nodes))
-        plt.legend(loc='lower right')
+    yTest = Y_test
+    ypTest = p.y_pred_test
+    
+    auc = sk.metrics.roc_auc_score(yTest,ypTest)
+    fpr, tpr, _ = sk.metrics.roc_curve(yTest,ypTest)
+    
+    plt.plot(fpr, tpr, label='AUC = %.3f' %(auc))
+    
+    plt.title("pyTorch Test ROC, layers=%i, nodes=%i" %(p.layers, p.nodes))
+    plt.legend(loc='lower right')    
     plt.savefig('plots/'+outDir+'/torch_test_roc_'+str(p.layers)+'l_'+str(p.nodes)+'n.png')
 
 
-    # Calculate the point density
-    xy = np.vstack([Y_test[:100000], p.y_pred_test[:100000]])
-    z = scipy.stats.gaussian_kde(xy)(xy)
-
-    plt.figure()
-    plt.scatter(Y_test[:100000], p.y_pred_test[:100000], c=np.log(z), edgecolor='')
-    plt.title("pyTorch Test Data, layers=%i, nodes=%i, loss=%0.4f" %(p.layers, p.nodes, p.test_loss))
-    plt.xlabel('Truth Pt')
-    plt.ylabel('Predicted Pt')
-    plt.plot([0,800000],[0,800000], zorder=10)
-    plt.savefig('plots/'+outDir+'/torch_test_pt_scatter_'+str(p.layers)+'l_'+str(p.nodes)+'n.png')
-
-    # Calculate the point density                                                                                      
-    xy_train = np.vstack([Y[:100000], p.y_pred[:100000] ])
-    z_train = scipy.stats.gaussian_kde(xy_train)(xy_train)
-
-    plt.figure()
-    plt.scatter(Y[:100000], p.y_pred[:100000], c=np.log(z_train), edgecolor='')
-    plt.title("pyTorch Train Data, layers=%i, nodes=%i, loss=%0.4f" %(p.layers, p.nodes, p.train_loss))
-    plt.xlabel('Truth Pt')
-    plt.ylabel('Predicted Pt')
-    plt.plot([0,800000],[0,800000], zorder=10)
-    plt.savefig('plots/'+outDir+'/torch_train_pt_scatter_'+str(p.layers)+'l_'+str(p.nodes)+'n.png')
-
-    #y_predicted = y_pred.float().detach().numpy()
-    

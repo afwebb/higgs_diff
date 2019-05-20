@@ -35,7 +35,7 @@ xgb_train = xgb.DMatrix(train, label=y_train, feature_names=list(train))
 xgb_test = xgb.DMatrix(test, label=y_test, feature_names=list(train))
 
 params = {
-    'learning_rate' : 0.01,
+    'learning_rate' : 0.005,
     'max_depth': 12,
     'min_child_weight': 2,
     'gamma': 0.9,
@@ -46,13 +46,14 @@ params = {
     'scale_pos_weight':1
 }
 
-gbm = xgb.cv(params, xgb_train, num_boost_round=1000, verbose_eval=True)
+gbm = xgb.cv(params, xgb_train, num_boost_round=200, verbose_eval=True)
 
 best_nrounds = pd.Series.idxmax(gbm['test-auc-mean'])
 print( best_nrounds)
 
 bst = xgb.train(params, xgb_train, num_boost_round=best_nrounds, verbose_eval=True)
 pickle.dump(bst, open('models/xgb_match_'+outStr+'.dat', "wb"), protocol=2)
+#bst.save_model('models/xgb_match_test.model')
 
 y_test_pred = bst.predict(xgb_test)
 y_train_pred = bst.predict(xgb_train)
@@ -103,3 +104,4 @@ plt.savefig('plots/match_xgb_'+outStr+'_roc.png')
 y_test_bin = np.where(y_test_pred > 0.5, 1, 0)
 print(y_test_bin)
 print('Confusion Matrix:', sklearn.metrics.confusion_matrix(y_test, y_test_bin))
+
