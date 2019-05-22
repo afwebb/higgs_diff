@@ -1,3 +1,4 @@
+#Script for seperating high pt and low pt events using PyTorch
 import pandas as pd
 import numpy as np
 import sklearn

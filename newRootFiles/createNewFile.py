@@ -394,7 +394,7 @@ for idx in range( len(la[b'nJets_OR_T']) ):
         tree.jet_flavor.push_back( la[b'm_jet_flavor_truth_label_ghost'][idx][i] )
         tree.jet_MV2c10.push_back( la[b'm_jet_flavor_weight_MV2c10'][idx][i] )
         
-        tree.jet_jvt.push_back( la[b'm_jet_jvt'][idx][i] )
+        tree.jet_jvt.push_back( la[b'm_jet_passjvt'][idx][i] )
         tree.jet_numTrk.push_back( la[b'm_jet_numTrk'][idx][i] )
         
         jet_flav = la[b'm_jet_flavor_truth_label_ghost'][idx][i] 
