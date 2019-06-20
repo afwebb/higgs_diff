@@ -35,11 +35,17 @@ def normalize(x):
     x_normed = x / x.max(0, keepdim=True)[0]
     return x_normed
 
-X = normalize(X)
-Y = normalize(Y)
+X = X / xMax #normalize(X)
+Y = Y / yMax #normalize(Y)
 
 X_test = X_test / xMax#X.max(0, keepdim=True)[0]#normalize(X_test)
 Y_test = Y_test / yMax#normalize(Y_test)
+
+normFactors = xMax.float().detach()#.numpy() #[*yMax.float().detach().numpy(), *xMax.float().detach().numpy()]
+normFactors = np.insert(normFactors, 0, yMax.float().detach())#.numpy())
+print(normFactors)
+normFactors = np.asarray(normFactors)
+np.save('torch_models/'+outDir+'/normFactors.npy', normFactors)
 
 class OldNet(nn.Module):
     
@@ -142,11 +148,11 @@ class param:
         self.net = None
     
 
-num_epochs = [500]
+num_epochs = [300]
 nLayers = [6]#[2, 3, 4, 6, 8]
 nNodes = [75]#[25, 50, 75, 100]#[50, 75, 125]#, 100, 175, 250]#[250, 350, 450, 600]
 
-lnPairs = [[6,75]]#,[5,100],[6,75],[6,100],[8,50],[8,75]]
+lnPairs = [[6,100], [7,100]]#[[5,100],[6,75],[6,100],[8,50],[8,75]]
 
 param_grid = []
 for ep in num_epochs:
@@ -191,8 +197,8 @@ for p in param_grid:
     p.y_pred = y_pred.float().detach().numpy()*yMax
     #p.auc = sk.metrics.roc_auc_score(y_train,y_predicted)
 
-    Y = Y*yMax
-    Y_test = Y_test*yMax
+    Y_full = Y*yMax
+    Y_full_test = Y_test*yMax
     
     print("Nodes: "+str(p.nodes))
     print("Layers: "+str(p.layers))
@@ -203,7 +209,7 @@ for p in param_grid:
     torch.save(net.state_dict(), 'torch_models/'+outDir+'/model_'+str(p.layers)+'l_'+str(p.nodes)+'n.pt')
     torch.save(p.y_pred_test, 'torch_models/'+outDir+'/y_test_pred_'+str(p.layers)+'l_'+str(p.nodes)+'n.pt')
     torch.save(p.y_pred, 'torch_models/'+outDir+'/y_train_pred_'+str(p.layers)+'l_'+str(p.nodes)+'n.pt')
-    
+
     del net, opt, criterion, y_pred, y_pred_test
 
     plt.figure()
@@ -217,7 +223,7 @@ for p in param_grid:
     plt.savefig('plots/'+outDir+'/torch_loss_'+str(p.layers)+'l_'+str(p.nodes)+'n.png')
 
     plt.figure()
-    plt.hist(Y, 30, log=True, range=(0,800000), alpha=0.5, label='truth')
+    plt.hist(Y_full, 30, log=True, range=(0,800000), alpha=0.5, label='truth')
     plt.hist(p.y_pred, 30, log=True, range=(0,800000), alpha=0.5, label='train')
     plt.title("pyTorch Train Data, layers=%i, nodes=%i, loss=%0.4f" %(p.layers, p.nodes, p.train_loss))
     plt.xlabel('Higgs Pt')
@@ -226,7 +232,7 @@ for p in param_grid:
     plt.savefig('plots/'+outDir+'/torch_train_pt_spectrum_'+str(p.layers)+'l_'+str(p.nodes)+'n.png')
 
     plt.figure()
-    plt.hist(Y_test, 30, log=True, range=(0,800000), alpha=0.5, label='truth')
+    plt.hist(Y_full_test, 30, log=True, range=(0,800000), alpha=0.5, label='truth')
     plt.hist(p.y_pred_test,30, log=True, range=(0,800000), alpha=0.5, label='test')
     plt.title("pyTorch Test Data, layers=%i, nodes=%i, loss=%0.4f" %(p.layers, p.nodes, p.test_loss))
     plt.xlabel('Higgs Pt')
@@ -235,25 +241,33 @@ for p in param_grid:
     plt.savefig('plots/'+outDir+'/torch_test_pt_spectrum_'+str(p.layers)+'l_'+str(p.nodes)+'n.png')
 
     #ROC
-    cutoff = [150000, 200000, 250000]
+    cutoff = [150000]
 
     plt.figure()
     for c in cutoff:
-        yTrain = np.where(Y > c, 1, 0)
+        yTrain = np.where(Y_full > c, 1, 0)
         ypTrain = p.y_pred
 
         auc = sk.metrics.roc_auc_score(yTrain,ypTrain)
         fpr, tpr, _ = sk.metrics.roc_curve(yTrain,ypTrain)
 
-        plt.plot(fpr, tpr, label='AUC = %.3f, cutoff = %0.2f' %(auc, c))
+        plt.plot(fpr, tpr, label='Train AUC = %.3f' %(auc))
+
+        yTest = np.where(Y_full_test > c, 1, 0)
+        ypTest = p.y_pred_test
+
+        auc = sk.metrics.roc_auc_score(yTest,ypTest)
+        fpr, tpr, _ = sk.metrics.roc_curve(yTest,ypTest)
+
+        plt.plot(fpr, tpr, label='Test AUC = %.3f' %(auc))
 
         plt.title("pyTorch Train ROC, layers=%i, nodes=%i" %(p.layers, p.nodes))
         plt.legend(loc='lower right')
-    plt.savefig('plots/'+outDir+'/torch_train_roc_'+str(p.layers)+'l_'+str(p.nodes)+'n.png')
-
+    plt.savefig('plots/'+outDir+'/torch_roc_'+str(p.layers)+'l_'+str(p.nodes)+'n.png')
+    '''
     plt.figure()
     for c in cutoff:
-        yTest = np.where(Y_test > c, 1, 0)
+        yTest = np.where(Y_full_test > c, 1, 0)
         ypTest = p.y_pred_test
 
         auc = sk.metrics.roc_auc_score(yTest,ypTest)
@@ -264,14 +278,14 @@ for p in param_grid:
         plt.title("pyTorch Test ROC, layers=%i, nodes=%i" %(p.layers, p.nodes))
         plt.legend(loc='lower right')
     plt.savefig('plots/'+outDir+'/torch_test_roc_'+str(p.layers)+'l_'+str(p.nodes)+'n.png')
-
+    '''
 
     # Calculate the point density
-    xy = np.vstack([Y_test[:100000], p.y_pred_test[:100000]])
+    xy = np.vstack([Y_full_test[:100000], p.y_pred_test[:100000]])
     z = scipy.stats.gaussian_kde(xy)(xy)
 
     plt.figure()
-    plt.scatter(Y_test[:100000], p.y_pred_test[:100000], c=np.log(z), edgecolor='')
+    plt.scatter(Y_full_test[:100000], p.y_pred_test[:100000], c=np.log(z), edgecolor='')
     plt.title("pyTorch Test Data, layers=%i, nodes=%i, loss=%0.4f" %(p.layers, p.nodes, p.test_loss))
     plt.xlabel('Truth Pt')
     plt.ylabel('Predicted Pt')
@@ -279,11 +293,11 @@ for p in param_grid:
     plt.savefig('plots/'+outDir+'/torch_test_pt_scatter_'+str(p.layers)+'l_'+str(p.nodes)+'n.png')
 
     # Calculate the point density                                                                                      
-    xy_train = np.vstack([Y[:100000], p.y_pred[:100000] ])
+    xy_train = np.vstack([Y_full[:100000], p.y_pred[:100000] ])
     z_train = scipy.stats.gaussian_kde(xy_train)(xy_train)
 
     plt.figure()
-    plt.scatter(Y[:100000], p.y_pred[:100000], c=np.log(z_train), edgecolor='')
+    plt.scatter(Y_full[:100000], p.y_pred[:100000], c=np.log(z_train), edgecolor='')
     plt.title("pyTorch Train Data, layers=%i, nodes=%i, loss=%0.4f" %(p.layers, p.nodes, p.train_loss))
     plt.xlabel('Truth Pt')
     plt.ylabel('Predicted Pt')

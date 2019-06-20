@@ -57,6 +57,9 @@ for index, k in inDF.iterrows():
 
     q['comboScore'] = k['comboScore']
 
+    q['nJets'] = k['nJets'] 
+    q['nJets_MV2c10_70'] = k['nJets_MV2c10_70']
+
     q['jet_MV2c10_h0'] = k['jet_MV2c10_h0']
     q['jet_MV2c10_h1'] = k['jet_MV2c10_h1']
     

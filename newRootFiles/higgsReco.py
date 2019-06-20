@@ -46,6 +46,11 @@ for e in nom:
     if current%10000==0:
         print(current)
 
+    if e.total_leptons!=2: continue
+    if e.total_charge==0: continue
+    if e.nJets<4: continue
+    if e.nJets_MV2c10_70<1: continue
+
     fourVecs = {}
     
     met = LorentzVector()
@@ -79,27 +84,51 @@ for e in nom:
         
     if len(lepH)!=1 or len(higgsJets)!=2: continue
 
-    k = higgsDict( jets[ higgsJets[0] ], jets[ higgsJets[1] ], lepH[0], met, e.jet_MV2c10[ higgsJets[0] ], e.jet_MV2c10[ higgsJets[1] ], lepB[0], 1 )
+    k = higgsDict( jets[ higgsJets[0] ], jets[ higgsJets[1] ], lepH[0], met, 
+                   e.jet_MV2c10[ higgsJets[0] ], e.jet_MV2c10[ higgsJets[1] ], lepB[0], 
+                   e.jet_jvt[ higgsJets[0] ], e.jet_jvt[ higgsJets[1] ], 
+                   e.jet_numTrk[ higgsJets[0] ], e.jet_numTrk[ higgsJets[1] ], 
+                   1 )
     eventsFlat.append(k)
 
     for l in range(2):
-        k = higgsDict( jets[ higgsJets[0] ], jets[ higgsJets[1] ], lepB[0], met, e.jet_MV2c10[ higgsJets[0] ], e.jet_MV2c10[ higgsJets[1] ], lepH[0], 0 )
+        k = higgsDict( jets[ higgsJets[0] ], jets[ higgsJets[1] ], lepB[0], met, 
+                       e.jet_MV2c10[ higgsJets[0] ], e.jet_MV2c10[ higgsJets[1] ], lepH[0], 
+                       e.jet_jvt[ higgsJets[0] ], e.jet_jvt[ higgsJets[1] ], 
+                       e.jet_numTrk[ higgsJets[0] ], e.jet_numTrk[ higgsJets[1] ], 
+                       0 )
         eventsFlat.append(k)
 
     for l in range(2):
         i,j = random.sample(badJets,2)
-        k = higgsDict( jets[i], jets[j], lepH[0], met, e.jet_MV2c10[i], e.jet_MV2c10[j], lepB[0], 0 )
+        k = higgsDict( jets[i], jets[j], lepH[0], met, 
+                       e.jet_MV2c10[i], e.jet_MV2c10[j], lepB[0], 
+                       e.jet_jvt[i], e.jet_jvt[j],
+                       e.jet_numTrk[i], e.jet_numTrk[j],
+                       0 )
         eventsFlat.append(k)
 
-        k = higgsDict( jets[i], jets[ higgsJets[1] ], lepH[0], met, e.jet_MV2c10[i], e.jet_MV2c10[ higgsJets[1]], lepB[0], 0 )
+        k = higgsDict( jets[i], jets[ higgsJets[1] ], lepH[0], met, 
+                       e.jet_MV2c10[i], e.jet_MV2c10[ higgsJets[1]], lepB[0], 
+                       e.jet_jvt[i], e.jet_jvt[ higgsJets[1]],
+                       e.jet_numTrk[i], e.jet_numTrk[ higgsJets[1]],
+                       0 )
         eventsFlat.append(k)
         
-        k = higgsDict( jets[ higgsJets[0] ], jets[j], lepH[0], met, e.jet_MV2c10[ higgsJets[0] ], e.jet_MV2c10[j], lepB[0], 0 )
+        k = higgsDict( jets[ higgsJets[0] ], jets[j], lepH[0], met, 
+                       e.jet_MV2c10[ higgsJets[0] ], e.jet_MV2c10[j], lepB[0], 
+                       e.jet_jvt[ higgsJets[0] ], e.jet_jvt[j],
+                       e.jet_numTrk[ higgsJets[0] ], e.jet_numTrk[j],
+                       0 )
         eventsFlat.append(k)
 
     for l in range(min([6, len(badJets)])):
         i,j = random.sample(badJets,2)
-        k = higgsDict( jets[i], jets[j], lepB[0], met, e.jet_MV2c10[i], e.jet_MV2c10[j], lepH[0], 0 )
+        k = higgsDict( jets[i], jets[j], lepB[0], met, 
+                       e.jet_MV2c10[i], e.jet_MV2c10[j], lepH[0], 
+                       e.jet_jvt[i], e.jet_jvt[j],
+                       e.jet_numTrk[i], e.jet_numTrk[j],
+                       0 )
         eventsFlat.append(k)
 
 import pandas as pd

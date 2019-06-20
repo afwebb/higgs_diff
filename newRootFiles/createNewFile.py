@@ -203,10 +203,11 @@ class Model(TreeModel):
 
 tree = Tree('nominal', model=Model)
 
+totalEvt = len(la[b'nJets_OR_T'])
 for idx in range( len(la[b'nJets_OR_T']) ):
 
     if idx%10000==0:
-        print(idx)
+        print(str(idx)+'/'+str(totalEvt))
     #if idx==5000:                                                                                                             
     #    break                                                                                                                 
 
@@ -214,7 +215,7 @@ for idx in range( len(la[b'nJets_OR_T']) ):
     #if la[b'higgsDecayMode'][idx] != 3: continue
     if la[b'total_leptons'][idx] < 2: continue
     #if la[b'dilep_type'][idx] < 1: continue
-    #if la[b'total_charge'][idx] == 0: continue
+    if la[b'total_charge'][idx] == 0: continue
     if la[b'nJets_OR_T_MV2c10_70'][idx] < 1: continue
     if la[b'nJets_OR_T'][idx] < 2: continue 
 
@@ -319,7 +320,9 @@ for idx in range( len(la[b'nJets_OR_T']) ):
     tree.lep_E.push_back( la[b'lep_E_0'][idx] )
     tree.lep_flavor.push_back( la[b'lep_ID_0'][idx] )
     #tree.lep_parent.push_back( lepMatch(la[b'lep_Eta_0'][idx], la[b'lep_Phi_0'][idx], la[b'lep_ID_0'][idx], truth_dict) )
+    testPar0 = lepMatch(la[b'lep_Eta_0'][idx], la[b'lep_Phi_0'][idx], la[b'lep_ID_0'][idx], truth_dict)
     lepPar0 = 0
+    #testPar0 = 0
     for j in hLep:
         dr = sqrt(unwrap([ la[b'lep_Phi_0'][idx] - truth_dict[j].phi])**2+( la[b'lep_Eta_0'][idx] - truth_dict[j].eta)**2)
         if dr<0.1 and abs(la[b'lep_ID_0'][idx])==abs(truth_dict[j].pdgid):
@@ -328,6 +331,7 @@ for idx in range( len(la[b'nJets_OR_T']) ):
         dr = sqrt(unwrap([ la[b'lep_Phi_0'][idx] - truth_dict[j].phi])**2+( la[b'lep_Eta_0'][idx] - truth_dict[j].eta)**2)
         if dr<0.1 and abs(la[b'lep_ID_0'][idx])==abs(truth_dict[j].pdgid):
             lepPar0 = 6
+    print(lepPar0, testPar0)
 
     tree.lep_parent.push_back( lepPar0 )
 

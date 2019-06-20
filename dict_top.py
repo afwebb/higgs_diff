@@ -1,4 +1,4 @@
-def topDict(jet1, jet2, lep1, lep2, met, jet1_MV2c10, jet2_MV2c10, match=-1):
+def topDict(jet1, jet2, lep1, lep2, met, jet1_MV2c10, jet2_MV2c10, jet1_jvt, jet2_jvt, jet1_numTrk, jet2_numTrk, match=-1):
     k = {}
 
     if match!=-1:
@@ -31,5 +31,11 @@ def topDict(jet1, jet2, lep1, lep2, met, jet1_MV2c10, jet2_MV2c10, match=-1):
 
     k['Mjjl0'] = (jet1+jet2+lep1).M()
     k['Mjjl1'] = (jet1+jet2+lep2).M()
+
+    k['jet_jvt_0'] = jet1_jvt
+    k['jet_jvt_1'] = jet1_jvt
+    
+    k['jet_numTrk_0'] = jet1_numTrk
+    k['jet_numTrk_1'] = jet1_numTrk
 
     return k

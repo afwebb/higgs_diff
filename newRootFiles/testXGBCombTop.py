@@ -47,7 +47,9 @@ def calc_phi(phi_0, new_phi):
     return new_phi
 
 
-la=f['nominal'].lazyarrays(['jet_*', 'lep_*', 'met', 'met_phi', 'truth_jet_*', 'track_jet_*'])
+la=f['nominal'].lazyarrays(['jet_*', 'lep_*', 'met', 'met_phi', 'truth_jet_*', 'track_jet_*',
+                            'nJets*', 'total_*', 'dilep*', 'nJets_MV2c10_70' ])
+
 '''
 from collections import namedtuple
 parttype = namedtuple('parttype', ['barcode', 'pdgid', 'status', 'eta', 'phi', 'pt', 'parents', 'children'])
@@ -118,6 +120,12 @@ for idx in range(len(la[b'met']) ):
         print(idx)                                                                                                 
     if idx==1000:
         break
+
+    if la[b'total_leptons'][idx]!=2: continue
+    if la[b'total_charge'][idx]==0: continue
+    if la[b'dilep_type'][idx]<1: continue
+    if la[b'nJets'][idx]<4: continue
+    if la[b'nJets_MV2c10_70'][idx]<1: continue
 
     truthComb = []
 
@@ -209,9 +217,10 @@ for idx in range(len(la[b'met']) ):
             for j in range(i+1, len(jet4Vecs)):
                 comb = [l,i,j]
 
-                #k = topDict( lep4Vecs[l], jet4Vecs[i], jet4Vecs[j], met, jet4VecsMV2c10[i], jet4VecsMV2c10[j] )                                   
-                t = topDict( jet4Vecs[i], jet4Vecs[j], lep4Vecs[0], lep4Vecs[1], met, jet4VecsMV2c10[i], jet4VecsMV2c10[j] )
-
+                t = topDict( jet4Vecs[i], jet4Vecs[j], lep4Vecs[0], lep4Vecs[1], met, jet4VecsMV2c10[i], jet4VecsMV2c10[j],
+                             la[b'jet_jvt'][idx][ i ], la[b'jet_jvt'][idx][j],
+                             la[b'jet_numTrk'][idx][ i ], la[b'jet_numTrk'][idx][j]
+                             )
                 combosTop.append([t, comb])
 
     #loop over combinations, score them in the BDT, figure out the best result                                                    
@@ -248,7 +257,7 @@ for idx in range(len(la[b'met']) ):
 print('events passed', totalPast)
 print('percent correct', nCorrect/totalPast)
 #print('lep correct', lepCorrect/totalPast)
-print('lep and 1 jet correct', lep1jCorrect/totalPast)
+print('1 jet correct', lep1jCorrect/totalPast)
 '''
 rightTruthDF = pd.DataFrame(rightTruth)
 wrongTruthDF = pd.DataFrame(wrongTruth)

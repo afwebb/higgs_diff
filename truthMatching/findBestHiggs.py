@@ -34,7 +34,7 @@ xgbModel = pickle.load(open(modelPath, "rb"))
 
 topModel = pickle.load(open(topModelPath, "rb"))
 
-la=f['nominal'].lazyarrays(['higgs_pt', 'jet_*', 'lep_*', 'met', 'met_phi', 'truth_jet_*', 'track_jet_*'])
+la=f['nominal'].lazyarrays(['higgs_pt', 'jet_*', 'lep_*', 'met', 'met_phi', 'truth_jet_*', 'track_jet_*', 'nJets*', 'total_*', 'dilep*', 'nJets_MV2c10_70' ])
 
 def calc_phi(phi_0, new_phi):
     new_phi = new_phi-phi_0
@@ -46,11 +46,12 @@ def calc_phi(phi_0, new_phi):
 
 current = 0
 nMatch = 0
+totalEvt = len(la[b'met'])
 
 for idx in range(len(la[b'met']) ):
     current+=1
     if current%10000==0:
-        print(current)
+        print(str(current)+'/'+str(totalEvt))
         #if current%100000==0:
         #break
  
@@ -61,6 +62,12 @@ for idx in range(len(la[b'met']) ):
     #if e.nJets_OR_T_MV2c10_70 < 1: continue
     #if e.nJets_OR_T < 4: continue
     #if e.higgsDecayMode != 3: continue
+
+    if la[b'total_leptons'][idx]!=2: continue
+    if la[b'total_charge'][idx]==0: continue
+    if la[b'dilep_type'][idx]<1: continue
+    if la[b'nJets'][idx]<4: continue
+    if la[b'nJets_MV2c10_70'][idx]<1: continue
 
     #lepPts = [e.lep_Pt_0, e.lep_Pt_1]
     #lepEtas = [e.lep_Eta_0, e.lep_Eta_1]
@@ -104,14 +111,20 @@ for idx in range(len(la[b'met']) ):
                 comb = [l,i,j]
                 
                 if l==0:
-                    k = higgsDict( jet4Vecs[i], jet4Vecs[j], lep4Vecs[l], met, btags[i], btags[j], lep4Vecs[1] )
+                    k = higgsDict( jet4Vecs[i], jet4Vecs[j], lep4Vecs[l], met, btags[i], btags[j], lep4Vecs[1],
+                                   la[b'jet_jvt'][idx][i], la[b'jet_jvt'][idx][j],
+                                   la[b'jet_numTrk'][idx][i], la[b'jet_numTrk'][idx][j])
                 else:
-                    k = higgsDict( jet4Vecs[i], jet4Vecs[j], lep4Vecs[l], met, btags[i], btags[j], lep4Vecs[0] )
+                    k = higgsDict( jet4Vecs[i], jet4Vecs[j], lep4Vecs[l], met, btags[i], btags[j], lep4Vecs[0],
+                                   la[b'jet_jvt'][idx][i], la[b'jet_jvt'][idx][j],
+                                   la[b'jet_numTrk'][idx][i], la[b'jet_numTrk'][idx][j])
                 
                 combos.append([k, comb])
 
                 #k = flatDict( lep4Vecs[l], jet4Vecs[i], jet4Vecs[j], met, btags[i], btags[j] )
-                t = topDict( jet4Vecs[i], jet4Vecs[j], lep4Vecs[0], lep4Vecs[1], met, btags[i], btags[j] )
+                t = topDict( jet4Vecs[i], jet4Vecs[j], lep4Vecs[0], lep4Vecs[1], met, btags[i], btags[j],
+                             la[b'jet_jvt'][idx][i], la[b'jet_jvt'][idx][j],
+                             la[b'jet_numTrk'][idx][i], la[b'jet_numTrk'][idx][j])
 
                 combosTop.append([t, comb])
 
@@ -192,6 +205,9 @@ for idx in range(len(la[b'met']) ):
 
     k['MET'] = la[b'met'][idx]
     k['MET_phi'] = calc_phi(phi_0, la[b'met_phi'][idx])
+
+    k['nJets'] = la[b'nJets'][idx]
+    k['nJets_MV2c10_70'] = la[b'nJets_MV2c10_70'][idx]
 
     #k['rough_pt'], k['lepJetCat'] = higgsCandidate.calcHiggsCandidate(e)
     #_, k['lepJetCat'] = higgsCandidate.calcHiggsCandidate(e) 

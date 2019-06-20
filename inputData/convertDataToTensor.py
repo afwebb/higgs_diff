@@ -27,9 +27,9 @@ inDF = pd.read_csv(inFile)#, nrows=600000)
 #    inDF = inDF[inDF['is2LSS0Tau']==1]
 #    inDF = inDF.drop(['is2LSS0Tau'],axis=1)
 
-#if not inDF['comboScore'].empty:
-inDF = inDF[inDF['comboScore'] > 0.3]
-inDF.drop('comboScore', axis=1)
+if not inDF['comboScore'].empty:
+    inDF = inDF[inDF['comboScore'] > 0.3]
+    inDF.drop('comboScore', axis=1)
 
 inDF = sk.utils.shuffle(inDF)
 

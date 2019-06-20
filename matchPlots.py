@@ -14,6 +14,8 @@ inDF = pd.read_csv(inFile)
 good = inDF[inDF['decay']==1]
 bad = inDF[inDF['decay']==0]
 
+outDir = sys.argv[2]
+
 for c in inDF:
     if 'MV2c10' in c:
         r = (-1, 1)
@@ -27,4 +29,5 @@ for c in inDF:
     plt.hist(bad[c][:good.shape[0]], 30 ,range = r, alpha=0.5, label="fully leptonic")
     plt.legend()
     plt.xlabel(c)
-    plt.savefig("plots/decay_features/"+c+".png")
+    plt.savefig(outDir+c+".png")
+    plt.close()

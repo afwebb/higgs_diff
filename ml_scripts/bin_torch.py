@@ -42,6 +42,12 @@ Y = normalize(Y)
 X_test = X_test / xMax#X.max(0, keepdim=True)[0]#normalize(X_test)                                                   
 Y_test = Y_test / yMax#normalize(Y_test)  
 
+normFactors = xMax.float().detach()#.numpy() #[*yMax.float().detach().numpy(), *xMax.float().detach().numpy()]                                  
+normFactors = np.insert(normFactors, 0, yMax.float().detach())#.numpy())                                                                        
+print(normFactors)
+normFactors = np.asarray(normFactors)
+np.save('torch_models/'+outDir+'/normFactors.npy', normFactors)
+
 class OldNet(nn.Module):
     
     def __init__(self):
