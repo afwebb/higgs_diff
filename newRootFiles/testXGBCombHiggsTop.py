@@ -184,8 +184,10 @@ for idx in range(len(la[b'met']) ):
             for j in range(i+1, len(jet4Vecs)):
                 comb = [l,i,j]
 
-                #k = flatDict( lep4Vecs[l], jet4Vecs[i], jet4Vecs[j], met, jet4VecsMV2c10[i], jet4VecsMV2c10[j] )                                   
-                t = topDict( jet4Vecs[i], jet4Vecs[j], lep4Vecs[0], lep4Vecs[1], met, jet4VecsMV2c10[i], jet4VecsMV2c10[j] )
+                t = topDict( jet4Vecs[i], jet4Vecs[j], lep4Vecs[0], lep4Vecs[1], met, jet4VecsMV2c10[i], jet4VecsMV2c10[j],
+                             la[b'jet_jvt'][idx][i], la[b'jet_jvt'][idx][j],
+                             la[b'jet_numTrk'][idx][i], la[b'jet_numTrk'][idx][j]
+                         )
 
                 combosTop.append([t, comb])
 
@@ -208,10 +210,17 @@ for idx in range(len(la[b'met']) ):
 
                 if l==0:
                     k = higgsTopDict( jet4Vecs[i], jet4Vecs[j], lep4Vecs[0], met, jet4VecsMV2c10[i], jet4VecsMV2c10[j],
-                                  jet4Vecs[ topMatches[0] ], jet4Vecs[ topMatches[1] ], lep4Vecs[1] )
+                                      jet4Vecs[ topMatches[0] ], jet4Vecs[ topMatches[1] ], lep4Vecs[1],
+                                      la[b'jet_jvt'][idx][i], la[b'jet_jvt'][idx][j],
+                                      la[b'jet_numTrk'][idx][i], la[b'jet_numTrk'][idx][j]
+                                  )
                 else:
                     k = higgsTopDict( jet4Vecs[i], jet4Vecs[j], lep4Vecs[1], met, jet4VecsMV2c10[i], jet4VecsMV2c10[j],
-                                  jet4Vecs[ topMatches[0] ], jet4Vecs[ topMatches[1] ], lep4Vecs[0])
+                                      jet4Vecs[ topMatches[0] ], jet4Vecs[ topMatches[1] ], lep4Vecs[0],
+                                      la[b'jet_jvt'][idx][i], la[b'jet_jvt'][idx][j],
+                                      la[b'jet_numTrk'][idx][i], la[b'jet_numTrk'][idx][j]
+                                  )
+                k['topScore'] = topPred[topBest]
                 combos.append([k, comb])
 
     df = pd.DataFrame.from_dict([x[0] for x in combos])

@@ -23,7 +23,7 @@ inDF = pd.read_csv(inFile)
 outStr = sys.argv[2]
 
 #if outStr=='fullLep':
-inDF['decay'] = inDF['decay'].replace({0:1, 1:0})
+#inDF['decay'] = inDF['decay'].replace({0:1, 1:0})
 
 inDF = sk.utils.shuffle(inDF)
 inDF[abs(inDF) < 0.01] = 0
@@ -54,7 +54,7 @@ y_train = y_train.float().detach().numpy()
 '''
 params = {
     'learning_rate' : 0.01,
-    'max_depth': 10,
+    'max_depth': 12,
     'min_child_weight': 2,
     'gamma': 0.9,
     'subsample' : 0.7,

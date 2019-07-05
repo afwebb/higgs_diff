@@ -150,11 +150,11 @@ class param:
         self.net = None
     
 
-num_epochs = [750]
-nLayers = [6]#[2, 3, 4, 6, 8]
-nNodes = [75]#[25, 50, 75, 100]#[50, 75, 125]#, 100, 175, 250]#[250, 350, 450, 600]
+num_epochs = [185]
+nLayers = [6,7]#[2, 3, 4, 6, 8]
+nNodes = [75,100,125]#[25, 50, 75, 100]#[50, 75, 125]#, 100, 175, 250]#[250, 350, 450, 600]
 
-lnPairs = [[5,75],[5,100],[6,75],[6,100],[8,50],[8,75]]#,[5,100],[6,75],[6,100],[8,50],[8,75]]
+lnPairs = [[6,100]]#[[5,75],[5,100],[6,75],[6,100],[8,50],[8,75]]#,[5,100],[6,75],[6,100],[8,50],[8,75]]
 
 param_grid = []
 for ep in num_epochs:
@@ -221,11 +221,17 @@ for p in param_grid:
     plt.legend(loc='upper right')
     plt.savefig('plots/'+outDir+'/torch_loss_'+str(p.layers)+'l_'+str(p.nodes)+'n.png')
 
-    trainPredTrue = p.y_pred[Y==1]
-    trainPredFalse = p.y_pred[Y==0]
+    print('y_pred', p.y_pred)
+    Y_np = Y.detach().numpy()
+    Y_np_test = Y_test.detach().numpy()
 
-    testPredTrue = p.y_pred_test[Y_test==1]
-    testPredFalse = p.y_pred_test[Y_test==0]
+    trainPredTrue = p.y_pred[Y_np==1]
+    trainPredFalse = p.y_pred[Y_np==0]
+
+    testPredTrue = p.y_pred_test[Y_np_test==1]
+    testPredFalse = p.y_pred_test[Y_np_test==0]
+
+    print('y_pred_high', testPredTrue)
 
     plt.figure()
     plt.hist(testPredTrue, 30, log=False, alpha=0.5, label='High Pt')

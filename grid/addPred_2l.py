@@ -25,8 +25,8 @@ import torch.optim as optim
 
 inf = sys.argv[1]
 #outFile = sys.argv[2]
-higgsModelPath = "models/xgb_match_higgsPflowFlat.dat"
-topModelPath = "models/xgb_match_topPflow.dat"
+higgsModelPath = "models/2l/xgb_match_higgsPflowFlat_21.dat"
+topModelPath = "models/2l/xgb_match_topPflowJVT.dat"
 #outFile = sys.argv[4]
 
 #njet = sys.argv[3]
@@ -48,16 +48,16 @@ xgbModel = pickle.load(open(higgsModelPath, "rb"))
 
 topModel = pickle.load(open(topModelPath, "rb"))
 
-normFactors = np.load('models/normFactors.npy')
+normFactors = np.load('models/2l/normFactors.npy')
 normFactors = torch.from_numpy(normFactors).float()
 yMax = normFactors[0]#torch.from_numpy(normFactors[0]).float()#Y.max(0, keepdim=True)[0]
 xMax = normFactors[1:]#torch.from_numpy(normFactors[1:]).float()#X.max(0, keepdim=True)[0]
 
-#xgbPtModel = pickle.load(open('models/xgb_higgsPflowFlatBranch.dat
+#xgbPtModel = pickle.load(open('models/2l/xgb_higgsPflowFlatBranch.dat
 
 #la=f['nominal'].lazyarrays(['higgs_pt', 'jet_*', 'lep_*', 'met', 'met_phi', 'truth_jet_*', 'track_jet_*'])#, 'is2LSS0Tau', 'is2LSS1Tau',
 la=f['nominal'].lazyarrays(['m_truth*','dilep_type','trilep_type','quadlep_type','higgs*','lep_Pt*','lep_Eta_*', 'lep_E_*','total_charge',
-                            'total_leptons', 'lep_Phi*','lep_ID*','lep_Index*', 'm_track_jet*', 'm_jet*',
+                            'total_leptons', 'lep_Phi*','lep_ID*','lep_Index*', 'm_track_jet*', 'm_pflow_jet*',
                             'nJets_OR_T','nJets_OR_T_MV2c10_70',
                             'MET_RefFinal_et', 'MET_RefFinal_phi'])
 #'total_leptons', 'dilep_type', 'total_charge', 'nJets_OR_T_MV2c10_70', 'nJets_OR_T'])
@@ -116,12 +116,12 @@ def create_dict():
         lepVec_1.SetPtEtaPhiE(lep_Pt_1, lep_Eta_1, lep_Phi_1, lep_E_1)
         lep4Vecs.append(lepVec_1)
 
-        for j in range(len(la[b'm_jet_pt'][idx])):#la[b'selected_jets'][i]:
+        for j in range(len(la[b'm_pflow_jet_pt'][idx])):#la[b'selected_jets'][i]:
             jetVec = LorentzVector()
-            jetVec.SetPtEtaPhiE(la[b'm_jet_pt'][idx][j], la[b'm_jet_eta'][idx][j], la[b'm_jet_phi'][idx][j], la[b'm_jet_E'][idx][j])
+            jetVec.SetPtEtaPhiM(la[b'm_pflow_jet_pt'][idx][j], la[b'm_pflow_jet_eta'][idx][j], la[b'm_pflow_jet_phi'][idx][j], la[b'm_pflow_jet_m'][idx][j])
             jet4Vecs.append(jetVec)
             
-            btags.append(la[b'm_jet_flavor_weight_MV2c10'][idx][j])
+            btags.append(la[b'm_pflow_jet_flavor_weight_MV2c10'][idx][j])
 
         combos = []
         combosTop = []
@@ -131,8 +131,10 @@ def create_dict():
                 for j in range(i+1, len(jet4Vecs)):
                     comb = [l,i,j]
                 
-                    t = topDict( jet4Vecs[i], jet4Vecs[j], lep4Vecs[0], lep4Vecs[1], met, btags[i], btags[j] )
-
+                    t = topDict( jet4Vecs[i], jet4Vecs[j], lep4Vecs[0], lep4Vecs[1], met, btags[i], btags[j],
+                                 la[b'm_pflow_jet_jvt'][idx][i], la[b'm_pflow_jet_jvt'][idx][j],
+                                 la[b'm_pflow_jet_numTrk'][idx][i], la[b'm_pflow_jet_numTrk'][idx][j] )
+                    
                     combosTop.append([t, comb])
 
         #loop over combinations, score them in the BDT, figure out the best result
@@ -151,9 +153,13 @@ def create_dict():
                     comb = [l,i,j]
 
                     if l==0:
-                        k = higgsDict( jet4Vecs[i], jet4Vecs[j], lep4Vecs[l], met, btags[i], btags[j], lep4Vecs[1] )
+                        k = higgsDict( jet4Vecs[i], jet4Vecs[j], lep4Vecs[l], met, btags[i], btags[j], lep4Vecs[1],
+                                       la[b'm_pflow_jet_jvt'][idx][i], la[b'm_pflow_jet_jvt'][idx][j],
+                                       la[b'm_pflow_jet_numTrk'][idx][i], la[b'm_pflow_jet_numTrk'][idx][j])
                     else:
-                        k = higgsDict( jet4Vecs[i], jet4Vecs[j], lep4Vecs[l], met, btags[i], btags[j], lep4Vecs[0] )
+                        k = higgsDict( jet4Vecs[i], jet4Vecs[j], lep4Vecs[l], met, btags[i], btags[j], lep4Vecs[0],
+                                       la[b'm_pflow_jet_jvt'][idx][i], la[b'm_pflow_jet_jvt'][idx][j],
+                                       la[b'm_pflow_jet_numTrk'][idx][i], la[b'm_pflow_jet_numTrk'][idx][j])
 
                     combos.append([k, comb])
 
@@ -172,7 +178,7 @@ def create_dict():
         jetMatches = bestComb[1:]
         
         k = {}
-        k['higgs_pt'] = la[b'higgs_pt'][idx]
+        #k['higgs_pt'] = la[b'higgs_pt'][idx]
         k['comboScore'] = pred[best]
         
         if lepMatch == 0:
@@ -201,11 +207,11 @@ def create_dict():
         n = 0
         for i in jetMatches:#la[b'nJets_OR_T):
             
-            k['jet_Pt_h'+str(n)] = la[b'm_jet_pt'][idx][i]
-            k['jet_Eta_h'+str(n)] = la[b'm_jet_eta'][idx][i]
-            k['jet_E_h'+str(n)] = la[b'm_jet_E'][idx][i]
-            k['jet_Phi_h'+str(n)] = calc_phi(phi_0, la[b'm_jet_phi'][idx][i])
-            k['jet_MV2c10_h'+str(n)] = la[b'm_jet_flavor_weight_MV2c10'][idx][i]
+            k['jet_Pt_h'+str(n)] = la[b'm_pflow_jet_pt'][idx][i]
+            k['jet_Eta_h'+str(n)] = la[b'm_pflow_jet_eta'][idx][i]
+            k['jet_E_h'+str(n)] = jet4Vecs[i].E()#la[b'm_pflow_jet_E'][idx][i]
+            k['jet_Phi_h'+str(n)] = calc_phi(phi_0, la[b'm_pflow_jet_phi'][idx][i])
+            k['jet_MV2c10_h'+str(n)] = la[b'm_pflow_jet_flavor_weight_MV2c10'][idx][i]
             
             n+=1
 
@@ -217,11 +223,11 @@ def create_dict():
         
         n = 0
         for i in topMatches:#bestBtags:#la[b'nJets_OR_T):      
-            k['top_Pt_'+str(n)] = la[b'm_jet_pt'][idx][i]
-            k['top_Eta_'+str(n)] = la[b'm_jet_eta'][idx][i]
-            k['top_E_'+str(n)] = la[b'm_jet_E'][idx][i]
-            k['top_Phi_'+str(n)] = calc_phi(phi_0, la[b'm_jet_phi'][idx][i])
-            k['top_MV2c10_'+str(n)] = la[b'm_jet_flavor_weight_MV2c10'][idx][i]
+            k['top_Pt_'+str(n)] = la[b'm_pflow_jet_pt'][idx][i]
+            k['top_Eta_'+str(n)] = la[b'm_pflow_jet_eta'][idx][i]
+            k['top_E_'+str(n)] = jet4Vecs[i].E()#la[b'm_pflow_jet_E'][idx][i]
+            k['top_Phi_'+str(n)] = calc_phi(phi_0, la[b'm_pflow_jet_phi'][idx][i])
+            k['top_MV2c10_'+str(n)] = la[b'm_pflow_jet_flavor_weight_MV2c10'][idx][i]
             
             n+=1
 
@@ -256,30 +262,29 @@ class Net(nn.Module):
         return y
 
 
-def make_tensors(inDF, yMax, xMax):
+def make_tensors(inDF, xMax):
     
     #inDF['higgs_pt'] = pd.cut(inDF['higgs_pt'], bins=[0, 150000, 9999999999], labels=[0,1])
-    
-    Y = inDF['higgs_pt']
-    X = inDF.drop(['higgs_pt'],axis=1)
+    #Y = inDF['higgs_pt']
+    X = inDF #.drop(['higgs_pt'],axis=1)
     
     X = torch.tensor(X.values, dtype=torch.float32)
-    Y = torch.FloatTensor(Y.values)
+    #Y = torch.FloatTensor(Y.values)
     
     #yMax = torch.from_numpy(normFactors[0]).float()#Y.max(0, keepdim=True)[0]
     #xMax = torch.from_numpy(normFactors[1:]).float()#X.max(0, keepdim=True)[0]
     
     X = X / xMax
-    Y = Y / yMax
+    #Y = Y / yMax
     
-    return X, Y
+    return X #, Y
 
 
-def pred_pt(X, Y, yMax):
+def pred_pt(X, yMax):
 
-    print(X.shape[1])
+    #print(X.shape[1])
     net_pt = Net(X.size()[1],75,6)
-    net_pt.load_state_dict(torch.load('models/torch_pt_6l_75n.pt'))
+    net_pt.load_state_dict(torch.load('models/2l/torch_pt_6l_75n.pt'))
     net_pt.eval()
 
     Y_pred_pt = net_pt(X)[:,0]
@@ -287,10 +292,10 @@ def pred_pt(X, Y, yMax):
     return (Y_pred_pt*yMax).float().detach().numpy()
 
 
-def pred_bin(X, Y):
+def pred_bin(X):
 
     net_bin = Net(X.size()[1], 75, 5)
-    net_bin.load_state_dict(torch.load('models/torch_binned_5l_75n.pt'))
+    net_bin.load_state_dict(torch.load('models/2l/torch_binned_5l_75n.pt'))
     net_bin.eval()
     
     Y_pred_bin = net_bin(X)[:,0]
@@ -302,17 +307,16 @@ event_dict = create_dict()
 
 inDF = pd.DataFrame(event_dict)
 
-X, Y = make_tensors(inDF, yMax, xMax)
+X = make_tensors(inDF, xMax)
 
-y_pred_pt = pred_pt(X, Y, yMax)
-y_pred_bin = pred_bin(X, Y)
+y_pred_pt = pred_pt(X, yMax)
+y_pred_bin = pred_bin(X)
 
 inDF['y_pred_pt'] = y_pred_pt
 inDF['y_pred_bin'] = y_pred_bin
 
-inDF.to_csv('test.csv', index=False)
+#inDF.to_csv('test.csv', index=False)
 
-print(len(y_pred_pt), len(y_pred_bin))
 #f.Close()
 
 #y_pred_pt = y_pred_pt.float().detach().numpy()
@@ -320,8 +324,8 @@ print(len(y_pred_pt), len(y_pred_bin))
 
 with root_open(inf, mode='a') as myfile:
     dNN_pt_score = np.asarray(y_pred_pt)
-    dNN_pt_score.dtype = [('dNN_pt_score', 'float32')]
-    dNN_pt_score.dtype.names = ['dNN_pt_score']
+    dNN_pt_score.dtype = [('dNN_pt_score_2l', 'float32')]
+    dNN_pt_score.dtype.names = ['dNN_pt_score_2l']
     root_numpy.array2tree(dNN_pt_score, tree=myfile.nominal)
 
     myfile.write()
@@ -329,8 +333,8 @@ with root_open(inf, mode='a') as myfile:
 
 with root_open(inf, mode='a') as myfile:
     dNN_bin_score = np.asarray(y_pred_bin)
-    dNN_bin_score.dtype = [('dNN_bin_score', 'float32')]
-    dNN_bin_score.dtype.names = ['dNN_bin_score']
+    dNN_bin_score.dtype = [('dNN_bin_score_2l', 'float32')]
+    dNN_bin_score.dtype.names = ['dNN_bin_score_2l']
     root_numpy.array2tree(dNN_bin_score, tree=myfile.nominal)
 
     myfile.write()
