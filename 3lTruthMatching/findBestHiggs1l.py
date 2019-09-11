@@ -1,4 +1,4 @@
-import uproot
+import ROOT
 import pandas as pd
 from rootpy.tree import Tree
 from rootpy.vector import LorentzVector
@@ -8,7 +8,7 @@ import math
 import xgboost as xgb
 import numpy as np
 from dict_top3l import topDict
-from dict_higgs1l import higgsDict
+from dict_higgs1l import higgs1lDict
 #import matplotlib
 #matplotlib.use('agg')
 #import matplotlib.pyplot as plt
@@ -18,11 +18,11 @@ modelPath = sys.argv[2]
 topModelPath = sys.argv[3]
 outFile = sys.argv[4]
 #njet = sys.argv[3]
-f = uproot.open(inf)
+f = ROOT.TFile.Open(inf)
 dsid = inf.split('/')[-1]
 dsid = dsid.replace('.root', '')
 print(dsid)
-oldTree = f.get('nominal')
+nom = f.Get('nominal')
     #oldTree.SetBranchStatus("*",0)
     #for br in branch_list:
     #    oldTree.SetBranchStatus(br,1)
@@ -34,10 +34,6 @@ xgbModel = pickle.load(open(modelPath, "rb"))
 
 topModel = pickle.load(open(topModelPath, "rb"))
 
-la=f['nominal'].lazyarrays(['higgs_pt', 'jet_*', 'lep_*', 'met', 'met_phi', 'truth_jet_*', 'track_jet_*',
-                            'nJets*', 'total_*', 'dilep*', 'trilep*', 'nJets_MV2c10_70' ])
-
-
 def calc_phi(phi_0, new_phi):
     new_phi = new_phi-phi_0
     if new_phi>math.pi:
@@ -48,19 +44,21 @@ def calc_phi(phi_0, new_phi):
 
 current = 0
 nMatch = 0
-totalEvt = len(la[b'met'])
 
-for idx in range(len(la[b'met']) ):
-    current+=1
-    if current%10000==0:
-        print(str(current)+'/'+str(totalEvt))
-        #if current%100000==0:
-        #break
+nEntries = nom.GetEntries()
+for idx in range(nEntries):
+    if idx%10000==0:
+        print(str(idx)+'/'+str(nEntries))
+
+    nom.GetEntry(idx)
         
-    if la[b'trilep_type'][idx]==0: continue
-    if la[b'nJets'][idx]<2: continue
-    if la[b'nJets_MV2c10_70'][idx]==0: continue
-    if len(la[b'lep_pt'][idx])!=3: continue
+    if nom.trilep_type==0: continue
+    if nom.nJets<2: continue
+    if nom.nJets_MV2c10_70==0: continue
+    if len(nom.lep_pt)!=3: continue
+    if nom.lep_pt[0]<10000: continue
+    if nom.lep_pt[1]<20000: continue
+    if nom.lep_pt[2]<20000: continue
 
     higgCand = LorentzVector()
 
@@ -70,31 +68,31 @@ for idx in range(len(la[b'met']) ):
     btags = []
 
     met = LorentzVector()
-    met.SetPtEtaPhiE(la[b'met'][idx], 0, la[b'met_phi'][idx], la[b'met'][idx])
+    met.SetPtEtaPhiE(nom.met, 0, nom.met_phi, nom.met)
 
     lepH=[]
 
     for i in range(3):
-        lep_pt = la[b'lep_pt'][idx][i]
-        lep_eta = la[b'lep_eta'][idx][i]
-        lep_phi = la[b'lep_phi'][idx][i]
-        lep_E = la[b'lep_E'][idx][i]
+        lep_pt = nom.lep_pt[i]
+        lep_eta = nom.lep_eta[i]
+        lep_phi = nom.lep_phi[i]
+        lep_E = nom.lep_E[i]
 
         lepVec = LorentzVector()
         lepVec.SetPtEtaPhiE(lep_pt, lep_eta, lep_phi, lep_E)
         lep4Vecs.append(lepVec)
 
-        if la[b'lep_parent'][idx][i]==25:
+        if nom.lep_parent[i]==25:
             lepH.append(i)
 
     if len(lepH)!=1: continue
 
-    for j in range(len(la[b'jet_pt'][idx])):#la[b'selected_jets'][i]:
+    for j in range(len(nom.jet_pt)):#nom.selected_jets'][i]:
         jetVec = LorentzVector()
-        jetVec.SetPtEtaPhiE(la[b'jet_pt'][idx][j], la[b'jet_eta'][idx][j], la[b'jet_phi'][idx][j], la[b'jet_E'][idx][j])
+        jetVec.SetPtEtaPhiE(nom.jet_pt[j], nom.jet_eta[j], nom.jet_phi[j], nom.jet_E[j])
         jet4Vecs.append(jetVec)
 
-        btags.append(la[b'jet_MV2c10'][idx][j])
+        btags.append(nom.jet_MV2c10[j])
 
     combos = []
     combosTop = []
@@ -104,22 +102,22 @@ for idx in range(len(la[b'met']) ):
             for j in range(i+1, len(jet4Vecs)):
                 comb = [l,i,j]
                 
-                if l==0:
-                    k = higgsDict( jet4Vecs[i], jet4Vecs[j], lep4Vecs[l], met, btags[i], btags[j], lep4Vecs[1],
-                                   la[b'jet_jvt'][idx][i], la[b'jet_jvt'][idx][j],
-                                   la[b'jet_numTrk'][idx][i], la[b'jet_numTrk'][idx][j])
+                if l==1:
+                    k = higgs1lDict( jet4Vecs[i], jet4Vecs[j], lep4Vecs[l], met, btags[i], btags[j], lep4Vecs[0], lep4Vecs[2],
+                                     nom.jet_jvt[i], nom.jet_jvt[j],
+                                     nom.jet_numTrk[i], nom.jet_numTrk[j])
                 else:
-                    k = higgsDict( jet4Vecs[i], jet4Vecs[j], lep4Vecs[l], met, btags[i], btags[j], lep4Vecs[0],
-                                   la[b'jet_jvt'][idx][i], la[b'jet_jvt'][idx][j],
-                                   la[b'jet_numTrk'][idx][i], la[b'jet_numTrk'][idx][j])
+                    k = higgs1lDict( jet4Vecs[i], jet4Vecs[j], lep4Vecs[l], met, btags[i], btags[j], lep4Vecs[0], lep4Vecs[1],
+                                     nom.jet_jvt[i], nom.jet_jvt[j],
+                                     nom.jet_numTrk[i], nom.jet_numTrk[j])
                 
                 combos.append([k, comb])
 
                 #k = flatDict( lep4Vecs[l], jet4Vecs[i], jet4Vecs[j], met, btags[i], btags[j] )
                 t = topDict( jet4Vecs[i], jet4Vecs[j], lep4Vecs[0], lep4Vecs[1], lep4Vecs[2], met,
                              btags[i], btags[j],
-                             la[b'jet_jvt'][idx][i], la[b'jet_jvt'][idx][j],
-                             la[b'jet_numTrk'][idx][i], la[b'jet_numTrk'][idx][j])
+                             nom.jet_jvt[i], nom.jet_jvt[j],
+                             nom.jet_numTrk[i], nom.jet_numTrk[j])
 
                 combosTop.append([t, comb])
 
@@ -146,50 +144,50 @@ for idx in range(len(la[b'met']) ):
     jetMatches = bestComb[1:]
 
     k = {}
-    k['higgs_pt'] = la[b'higgs_pt'][idx]
+    k['higgs_pt'] = nom.higgs_pt
     k['comboScore'] = pred[best]
 
     if lepMatch == 1:
-        k['lep_Pt_H'] = la[b'lep_pt'][idx][1]
-        k['lep_Eta_H'] = la[b'lep_eta'][idx][1]
-        phi_0 = la[b'lep_phi'][idx][1]
-        k['lep_E_H'] = la[b'lep_E'][idx][1]
+        k['lep_Pt_H'] = nom.lep_pt[1]
+        k['lep_Eta_H'] = nom.lep_eta[1]
+        phi_0 = nom.lep_phi[1]
+        k['lep_E_H'] = nom.lep_E[1]
 
-        k['lep_Pt_0'] = la[b'lep_pt'][idx][0]
-        k['lep_Eta_0'] = la[b'lep_eta'][idx][0]
-        k['lep_Phi_0'] = calc_phi(phi_0, la[b'lep_phi'][idx][0])
-        k['lep_E_0'] = la[b'lep_E'][idx][0]
+        k['lep_Pt_0'] = nom.lep_pt[0]
+        k['lep_Eta_0'] = nom.lep_eta[0]
+        k['lep_Phi_0'] = calc_phi(phi_0, nom.lep_phi[0])
+        k['lep_E_0'] = nom.lep_E[0]
 
-        k['lep_Pt_1'] = la[b'lep_pt'][idx][2]
-        k['lep_Eta_1'] = la[b'lep_eta'][idx][2]
-        k['lep_Phi_1'] = calc_phi(phi_0, la[b'lep_phi'][idx][2])
-        k['lep_E_1'] = la[b'lep_E'][idx][2]
+        k['lep_Pt_1'] = nom.lep_pt[2]
+        k['lep_Eta_1'] = nom.lep_eta[2]
+        k['lep_Phi_1'] = calc_phi(phi_0, nom.lep_phi[2])
+        k['lep_E_1'] = nom.lep_E[2]
 
 
     elif lepMatch == 2:
-        k['lep_Pt_H'] = la[b'lep_pt'][idx][2]
-        k['lep_Eta_H'] = la[b'lep_eta'][idx][2]
-        phi_0 = la[b'lep_phi'][idx][2]
-        k['lep_E_H'] = la[b'lep_E'][idx][2]
+        k['lep_Pt_H'] = nom.lep_pt[2]
+        k['lep_Eta_H'] = nom.lep_eta[2]
+        phi_0 = nom.lep_phi[2]
+        k['lep_E_H'] = nom.lep_E[2]
 
-        k['lep_Pt_0'] = la[b'lep_pt'][idx][0]
-        k['lep_Eta_0'] = la[b'lep_eta'][idx][0]
-        k['lep_Phi_0'] = calc_phi(phi_0, la[b'lep_phi'][idx][0])
-        k['lep_E_0'] = la[b'lep_E'][idx][0]
+        k['lep_Pt_0'] = nom.lep_pt[0]
+        k['lep_Eta_0'] = nom.lep_eta[0]
+        k['lep_Phi_0'] = calc_phi(phi_0, nom.lep_phi[0])
+        k['lep_E_0'] = nom.lep_E[0]
 
-        k['lep_Pt_1'] = la[b'lep_pt'][idx][1]
-        k['lep_Eta_1'] = la[b'lep_eta'][idx][1]
-        k['lep_Phi_1'] = calc_phi(phi_0, la[b'lep_phi'][idx][1])
-        k['lep_E_1'] = la[b'lep_E'][idx][1]
+        k['lep_Pt_1'] = nom.lep_pt[1]
+        k['lep_Eta_1'] = nom.lep_eta[1]
+        k['lep_Phi_1'] = calc_phi(phi_0, nom.lep_phi[1])
+        k['lep_E_1'] = nom.lep_E[1]
 
     n = 0
-    for i in jetMatches:#la[b'nJets_OR_T):
+    for i in jetMatches:#nom.nJets_OR_T):
 
-        k['jet_Pt_h'+str(n)] = la[b'jet_pt'][idx][i]
-        k['jet_Eta_h'+str(n)] = la[b'jet_eta'][idx][i]
-        k['jet_E_h'+str(n)] = la[b'jet_E'][idx][i]
-        k['jet_Phi_h'+str(n)] = calc_phi(phi_0, la[b'jet_phi'][idx][i])
-        k['jet_MV2c10_h'+str(n)] = la[b'jet_MV2c10'][idx][i]
+        k['jet_Pt_h'+str(n)] = nom.jet_pt[i]
+        k['jet_Eta_h'+str(n)] = nom.jet_eta[i]
+        k['jet_E_h'+str(n)] = nom.jet_E[i]
+        k['jet_Phi_h'+str(n)] = calc_phi(phi_0, nom.jet_phi[i])
+        k['jet_MV2c10_h'+str(n)] = nom.jet_MV2c10[i]
         
         n+=1
 
@@ -200,17 +198,17 @@ for idx in range(len(la[b'met']) ):
     bestBtags = np.argpartition(btags, -2)[-2:]
 
     n = 0
-    for i in topMatches:#bestBtags:#la[b'nJets_OR_T):      
-        k['top_Pt_'+str(n)] = la[b'jet_pt'][idx][i]
-        k['top_Eta_'+str(n)] = la[b'jet_eta'][idx][i]
-        k['top_E_'+str(n)] = la[b'jet_E'][idx][i]
-        k['top_Phi_'+str(n)] = calc_phi(phi_0, la[b'jet_phi'][idx][i])
-        k['top_MV2c10_'+str(n)] = la[b'jet_MV2c10'][idx][i]
+    for i in topMatches:#bestBtags:#nom.nJets_OR_T):      
+        k['top_Pt_'+str(n)] = nom.jet_pt[i]
+        k['top_Eta_'+str(n)] = nom.jet_eta[i]
+        k['top_E_'+str(n)] = nom.jet_E[i]
+        k['top_Phi_'+str(n)] = calc_phi(phi_0, nom.jet_phi[i])
+        k['top_MV2c10_'+str(n)] = nom.jet_MV2c10[i]
 
         n+=1
 
-    k['MET'] = la[b'met'][idx]
-    k['MET_phi'] = calc_phi(phi_0, la[b'met_phi'][idx])
+    k['MET'] = nom.met
+    k['MET_phi'] = calc_phi(phi_0, nom.met_phi)
 
     #k['rough_pt'], k['lepJetCat'] = higgsCandidate.calcHiggsCandidate(e)
     #_, k['lepJetCat'] = higgsCandidate.calcHiggsCandidate(e) 

@@ -85,9 +85,16 @@ for e in oldTree:
     #k['DRlj10'] = e.DRlj10
     k['DRjj01'] = e.DRjj01
 
-    k['dNN_bin_score_3l'] = e.dNN_bin_score_3l
-    k['dNN_pt_score_3l'] = e.dNN_pt_score_3l
+    k['bin_score_3lF'] = e.xgb_bin_score_3lF
+    k['bin_score_3lS'] = e.xgb_bin_score_3lS
+    k['pt_score_3lF'] = e.xgb_pt_score_3lF
+    k['pt_score_3lS'] = e.xgb_pt_score_3lS
+
     k['decayScore'] = e.decayScore
+
+    k['higgsScore1l'] = e.higgsScore1l
+    k['higgsScore2l'] = e.higgsScore2l
+    k['topScore'] = e.topScore
 
     #k['rough_pt'], k['lepJetCat'] = higgsCandidate.calcHiggsCandidate(e)                                                                       
     #_, k['lepJetCat'] = higgsCandidate.calcHiggsCandidate(e)

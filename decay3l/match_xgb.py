@@ -22,8 +22,8 @@ inDF = pd.read_csv(inFile)
 
 outStr = sys.argv[2]
 
-#if outStr=='fullLep':
-#inDF['decay'] = inDF['decay'].replace({0:1, 1:0})
+if outStr=='fullLep':
+    inDF['decay'] = inDF['decay'].replace({0:1, 1:0})
 
 inDF = sk.utils.shuffle(inDF)
 inDF[abs(inDF) < 0.01] = 0

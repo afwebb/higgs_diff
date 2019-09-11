@@ -1,4 +1,4 @@
-import uproot
+import ROOT
 import pandas as pd
 from rootpy.tree import Tree
 from rootpy.vector import LorentzVector
@@ -28,19 +28,19 @@ import torch.optim as optim
 inf = sys.argv[1]
 #outFile = sys.argv[2]
 decayModelPath = "models/3l/xgb_decay_decay3l_recoScores.dat"
-higgs1lModelPath = "models/3l/xgb_match_higgs1l.dat"
-higgs2lModelPath = "models/3l/xgb_match_higgs2l.dat"
+higgs1lModelPath = "models/3l/xgb_match_higgs1lLepCut.dat"
+higgs2lModelPath = "models/3l/xgb_match_higgs2lLepCut.dat"
 topModelPath = "models/3l/xgb_match_top3lJVT.dat"
 #outFile = sys.argv[4]
 
 #njet = sys.argv[3]
-f = uproot.open(inf)
+f = ROOT.TFile.Open(inf, "READ")
 
 dsid = inf.split('/')[-1]
 dsid = dsid.replace('.root', '')
 print(dsid)
 
-oldTree = f.get('nominal')
+nom = f.Get('nominal')
     #oldTree.SetBranchStatus("*",0)
     #for br in branch_list:
     #    oldTree.SetBranchStatus(br,1)
@@ -70,10 +70,10 @@ xMax2l = normFactors2l[1:]
 #xgbPtModel = pickle.load(open('models/3l/xgb_higgsPflowFlatBranch.dat
 
 #la=f['nominal'].lazyarrays(['higgs_pt', 'jet_*', 'lep_*', 'met', 'met_phi', 'truth_jet_*', 'track_jet_*'])#, 'is2LSS0Tau', 'is2LSS1Tau',
-la=f['nominal'].lazyarrays(['m_truth*','dilep_type','trilep_type','quadlep_type','higgs*','lep_Pt*','lep_Eta_*', 'lep_E_*','total_charge',
-                            'total_leptons', 'lep_Phi*','lep_ID*','lep_Index*', 'm_track_jet*', 'm_pflow_jet*',
-                            'nJets_OR_T','nJets_OR_T_MV2c10_70',
-                            'MET_RefFinal_et', 'MET_RefFinal_phi'])
+#la=f['nominal'].lazyarrays(['m_truth*','dilep_type','trilep_type','quadlep_type','higgs*','lep_Pt*','lep_Eta_*', 'lep_E_*','total_charge',
+#                            'total_leptons', 'lep_Phi*','lep_ID*','lep_Index*', 'm_track_jet*', 'm_pflow_jet*',
+#                            'nJets_OR_T','nJets_OR_T_MV2c10_70',
+#                            'MET_RefFinal_et', 'MET_RefFinal_phi'])
 #'total_leptons', 'dilep_type', 'total_charge', 'nJets_OR_T_MV2c10_70', 'nJets_OR_T'])
 
 def calc_phi(phi_0, new_phi):
@@ -86,20 +86,20 @@ def calc_phi(phi_0, new_phi):
 
 def create_dict():
     current = 0
-    totalEvt = len(la[b'MET_RefFinal_et'])
     
-    for idx in range(len(la[b'MET_RefFinal_et']) ):
-        current+=1
-        if current%1000==0:
-            print(str(current)+"/"+str(totalEvt))
-        #if current%100==0:
-        #    break
+    nEntries = nom.GetEntries()
+    for idx in range(nEntries):
+        if idx%10000==0:
+            print(str(idx)+'/'+str(nEntries))
+            #if current%100000==0:
+            #break
+        nom.GetEntry(idx)
 
-        #if la[b'total_leptons'][idx] < 2: continue
-        #if la[b'dilep_type'][idx] < 1: continue                                                                                                
-        #if la[b'total_charge'][idx] == 0: continue  
-        #if la[b'nJets_OR_T_MV2c10_70'][idx] < 1: continue
-        #if la[b'nJets_OR_T'][idx] < 2: continue
+        #if nom.total_leptons < 2: continue
+        #if nom.dilep_type < 1: continue                                                                                                
+        #if nom.total_charge == 0: continue  
+        #if nom.nJets_OR_T_MV2c10_70 < 1: continue
+        #if nom.nJets_OR_T < 2: continue
 
         higgCand = LorentzVector()
         
@@ -109,21 +109,26 @@ def create_dict():
         btags = []
         
         met = LorentzVector()
-        met.SetPtEtaPhiE(la[b'MET_RefFinal_et'][idx], 0, la[b'MET_RefFinal_phi'][idx], la[b'MET_RefFinal_et'][idx])
+        met.SetPtEtaPhiE(nom.MET_RefFinal_et, 0, nom.MET_RefFinal_phi, nom.MET_RefFinal_et)
 
-        for i in range(3):
-            i = str.encode(str(i))
-            lepVec_0 = LorentzVector()
-            lepVec_0.SetPtEtaPhiE(la[b'lep_Pt_'+i][idx], la[b'lep_Eta_'+i][idx], la[b'lep_Phi_'+i][idx], 
-                                  la[b'lep_E_'+i][idx])
-            lep4Vecs.append(lepVec_0)
+        lepVec_0 = LorentzVector()
+        lepVec_0.SetPtEtaPhiE(nom.lep_Pt_0, nom.lep_Eta_0, nom.lep_Phi_0, nom.lep_E_0)
+        lep4Vecs.append(lepVec_0)
 
-        for j in range(len(la[b'm_pflow_jet_pt'][idx])):#la[b'selected_jets'][i]:
+        lepVec_1 = LorentzVector()
+        lepVec_1.SetPtEtaPhiE(nom.lep_Pt_1, nom.lep_Eta_1, nom.lep_Phi_1, nom.lep_E_1)
+        lep4Vecs.append(lepVec_1)
+
+        lepVec_2 = LorentzVector()
+        lepVec_2.SetPtEtaPhiE(nom.lep_Pt_2, nom.lep_Eta_2, nom.lep_Phi_2, nom.lep_E_2)
+        lep4Vecs.append(lepVec_2)
+
+        for j in range(len(nom.m_pflow_jet_pt)):#nom.selected_jets'][i]:
             jetVec = LorentzVector()
-            jetVec.SetPtEtaPhiM(la[b'm_pflow_jet_pt'][idx][j], la[b'm_pflow_jet_eta'][idx][j], la[b'm_pflow_jet_phi'][idx][j], la[b'm_pflow_jet_m'][idx][j])
+            jetVec.SetPtEtaPhiM(nom.m_pflow_jet_pt[j], nom.m_pflow_jet_eta[j], nom.m_pflow_jet_phi[j], nom.m_pflow_jet_m[j])
             jet4Vecs.append(jetVec)
             
-            btags.append(la[b'm_pflow_jet_flavor_weight_MV2c10'][idx][j])
+            btags.append(nom.m_pflow_jet_flavor_weight_MV2c10[j])
 
         combosTop = []
         
@@ -133,8 +138,8 @@ def create_dict():
                     comb = [l,i,j]
                 
                     t = topDict( jet4Vecs[i], jet4Vecs[j], lep4Vecs[0], lep4Vecs[1], lep4Vecs[2], met, btags[i], btags[j],
-                                 la[b'm_pflow_jet_jvt'][idx][i], la[b'm_pflow_jet_jvt'][idx][j],
-                                 la[b'm_pflow_jet_numTrk'][idx][i], la[b'm_pflow_jet_numTrk'][idx][j] )
+                                 nom.m_pflow_jet_jvt[i], nom.m_pflow_jet_jvt[j],
+                                 nom.m_pflow_jet_numTrk[i], nom.m_pflow_jet_numTrk[j] )
                     
                     combosTop.append([t, comb])
 
@@ -156,14 +161,14 @@ def create_dict():
                     comb = [l,i,j]
                     if l==0:
                         k = higgs1lDict( jet4Vecs[i], jet4Vecs[j], lep4Vecs[l], met, 
-                                         la[b'm_pflow_jet_flavor_weight_MV2c10'][idx][i], la[b'm_pflow_jet_flavor_weight_MV2c10'][idx][j], lep4Vecs[1],
-                                         la[b'm_pflow_jet_jvt'][idx][i], la[b'm_pflow_jet_jvt'][idx][j],
-                                         la[b'm_pflow_jet_numTrk'][idx][i], la[b'm_pflow_jet_numTrk'][idx][j])
+                                         nom.m_pflow_jet_flavor_weight_MV2c10[i], nom.m_pflow_jet_flavor_weight_MV2c10[j], lep4Vecs[1],
+                                         nom.m_pflow_jet_jvt[i], nom.m_pflow_jet_jvt[j],
+                                         nom.m_pflow_jet_numTrk[i], nom.m_pflow_jet_numTrk[j])
                     else:
                         k = higgs1lDict( jet4Vecs[i], jet4Vecs[j], lep4Vecs[l], met, 
-                                         la[b'm_pflow_jet_flavor_weight_MV2c10'][idx][i], la[b'm_pflow_jet_flavor_weight_MV2c10'][idx][j], lep4Vecs[0],
-                                         la[b'm_pflow_jet_jvt'][idx][i], la[b'm_pflow_jet_jvt'][idx][j],
-                                         la[b'm_pflow_jet_numTrk'][idx][i], la[b'm_pflow_jet_numTrk'][idx][j])
+                                         nom.m_pflow_jet_flavor_weight_MV2c10[i], nom.m_pflow_jet_flavor_weight_MV2c10[j], lep4Vecs[0],
+                                         nom.m_pflow_jet_jvt[i], nom.m_pflow_jet_jvt[j],
+                                         nom.m_pflow_jet_numTrk[i], nom.m_pflow_jet_numTrk[j])
                         
                     combos1l.append([k, comb])
 
@@ -199,8 +204,8 @@ def create_dict():
         ### Add decay dict
         
         k = decayDict( lep4Vecs[0], lep4Vecs[1], lep4Vecs[2], met, jet4Vecs[ topMatches[0] ], jet4Vecs[ topMatches[1] ] )
-        k['nJets'] = la[b'nJets_OR_T'][idx]
-        k['nJets_MV2c10_70'] = la[b'nJets_OR_T_MV2c10_70'][idx]
+        k['nJets'] = nom.nJets_OR_T
+        k['nJets_MV2c10_70'] = nom.nJets_OR_T_MV2c10_70
         k['higgs2l_score'] = pred2l[best2l]
         k['higgs1l_score'] = pred1l[best1l]
         decayDicts.append(k)
@@ -212,113 +217,113 @@ def create_dict():
         q['comboScore'] = pred2l[best2l]
         
         if lepMatch2l == 1:
-            q['lep_Pt_0'] = la[b'lep_Pt_0'][idx]
-            q['lep_Eta_0'] = la[b'lep_Eta_0'][idx]
-            phi_0 = la[b'lep_Phi_0'][idx]
-            q['lep_E_0'] = la[b'lep_E_0'][idx]
+            q['lep_Pt_0'] = nom.lep_Pt_0
+            q['lep_Eta_0'] = nom.lep_Eta_0
+            phi_0 = nom.lep_Phi_0
+            q['lep_E_0'] = nom.lep_E_0
 
-            q['lep_Pt_1'] = la[b'lep_Pt_1'][idx]
-            q['lep_Eta_1'] = la[b'lep_Eta_1'][idx]
-            q['lep_Phi_1'] = calc_phi(phi_0, la[b'lep_Phi_1'][idx])
-            q['lep_E_1'] = la[b'lep_E_1'][idx]
+            q['lep_Pt_1'] = nom.lep_Pt_1
+            q['lep_Eta_1'] = nom.lep_Eta_1
+            q['lep_Phi_1'] = calc_phi(phi_0, nom.lep_Phi_1)
+            q['lep_E_1'] = nom.lep_E_1
             
-            q['lep_Pt_2'] = la[b'lep_Pt_2'][idx]
-            q['lep_Eta_2'] = la[b'lep_Eta_2'][idx]
-            q['lep_Phi_2'] = calc_phi(phi_0, la[b'lep_Phi_2'][idx])
-            q['lep_E_2'] = la[b'lep_E_2'][idx]
+            q['lep_Pt_2'] = nom.lep_Pt_2
+            q['lep_Eta_2'] = nom.lep_Eta_2
+            q['lep_Phi_2'] = calc_phi(phi_0, nom.lep_Phi_2)
+            q['lep_E_2'] = nom.lep_E_2
             
         elif lepMatch2l == 2:
-            q['lep_Pt_0'] = la[b'lep_Pt_0'][idx]
-            q['lep_Eta_0'] = la[b'lep_Eta_0'][idx]
-            phi_0 = la[b'lep_Phi_0'][idx]
-            q['lep_E_0'] = la[b'lep_E_0'][idx]
+            q['lep_Pt_0'] = nom.lep_Pt_0
+            q['lep_Eta_0'] = nom.lep_Eta_0
+            phi_0 = nom.lep_Phi_0
+            q['lep_E_0'] = nom.lep_E_0
             
-            q['lep_Pt_1'] = la[b'lep_Pt_2'][idx]
-            q['lep_Eta_1'] = la[b'lep_Eta_2'][idx]
-            q['lep_Phi_1'] = calc_phi(phi_0, la[b'lep_Phi_2'][idx])
-            q['lep_E_1'] = la[b'lep_E_2'][idx]
+            q['lep_Pt_1'] = nom.lep_Pt_2
+            q['lep_Eta_1'] = nom.lep_Eta_2
+            q['lep_Phi_1'] = calc_phi(phi_0, nom.lep_Phi_2)
+            q['lep_E_1'] = nom.lep_E_2
             
-            q['lep_Pt_2'] = la[b'lep_Pt_1'][idx]
-            q['lep_Eta_2'] = la[b'lep_Eta_1'][idx]
-            q['lep_Phi_2'] = calc_phi(phi_0, la[b'lep_Phi_1'][idx])
-            q['lep_E_2'] = la[b'lep_E_1'][idx]
+            q['lep_Pt_2'] = nom.lep_Pt_1
+            q['lep_Eta_2'] = nom.lep_Eta_1
+            q['lep_Phi_2'] = calc_phi(phi_0, nom.lep_Phi_1)
+            q['lep_E_2'] = nom.lep_E_1
 
         n = 0
         for i in topMatches:
-            q['top_Pt_'+str(n)] = la[b'm_pflow_jet_pt'][idx][i]
-            q['top_Eta_'+str(n)] = la[b'm_pflow_jet_eta'][idx][i]
-            q['top_E_'+str(n)] = jet4Vecs[i].E()#la[b'm_pflow_jet_E'][idx][i]
-            q['top_Phi_'+str(n)] = calc_phi(phi_0, la[b'm_pflow_jet_phi'][idx][i])
-            q['top_MV2c10_'+str(n)] = la[b'm_pflow_jet_flavor_weight_MV2c10'][idx][i]
+            q['top_Pt_'+str(n)] = nom.m_pflow_jet_pt[i]
+            q['top_Eta_'+str(n)] = nom.m_pflow_jet_eta[i]
+            q['top_E_'+str(n)] = jet4Vecs[i].E()#nom.m_pflow_jet_E[i]
+            q['top_Phi_'+str(n)] = calc_phi(phi_0, nom.m_pflow_jet_phi[i])
+            q['top_MV2c10_'+str(n)] = nom.m_pflow_jet_flavor_weight_MV2c10[i]
 
             n+=1
 
-        q['MET'] = la[b'MET_RefFinal_et'][idx]
-        q['MET_phi'] = calc_phi(phi_0, la[b'MET_RefFinal_phi'][idx])
+        q['MET'] = nom.MET_RefFinal_et
+        q['MET_phi'] = calc_phi(phi_0, nom.MET_RefFinal_phi)
 
         events2l.append(q)
 
         ### Add 1l Pt prediction dict
 
         y = {}
-        #y['higgs_pt'] = la[b'higgs_pt'][idx]
+        #y['higgs_pt'] = nom.higgs_pt
         y['comboScore'] = pred1l[best1l]
         
         if lepMatch1l == 1:
-            y['lep_Pt_H'] = la[b'lep_Pt_1'][idx]
-            y['lep_Eta_H'] = la[b'lep_Eta_1'][idx]
-            phi_0 = la[b'lep_Phi_1'][idx]
-            y['lep_E_H'] = la[b'lep_E_1'][idx]
+            y['lep_Pt_H'] = nom.lep_Pt_1
+            y['lep_Eta_H'] = nom.lep_Eta_1
+            phi_0 = nom.lep_Phi_1
+            y['lep_E_H'] = nom.lep_E_1
             
-            y['lep_Pt_0'] = la[b'lep_Pt_0'][idx]
-            y['lep_Eta_0'] = la[b'lep_Eta_0'][idx]
-            y['lep_Phi_0'] = calc_phi(phi_0, la[b'lep_Phi_0'][idx])
-            y['lep_E_0'] = la[b'lep_E_0'][idx]
+            y['lep_Pt_0'] = nom.lep_Pt_0
+            y['lep_Eta_0'] = nom.lep_Eta_0
+            y['lep_Phi_0'] = calc_phi(phi_0, nom.lep_Phi_0)
+            y['lep_E_0'] = nom.lep_E_0
             
-            y['lep_Pt_1'] = la[b'lep_Pt_2'][idx]
-            y['lep_Eta_1'] = la[b'lep_Eta_2'][idx]
-            y['lep_Phi_1'] = calc_phi(phi_0, la[b'lep_Phi_2'][idx])
-            y['lep_E_1'] = la[b'lep_E_2'][idx]
+            y['lep_Pt_1'] = nom.lep_Pt_2
+            y['lep_Eta_1'] = nom.lep_Eta_2
+            y['lep_Phi_1'] = calc_phi(phi_0, nom.lep_Phi_2)
+            y['lep_E_1'] = nom.lep_E_2
 
         elif lepMatch1l == 2:
-            y['lep_Pt_H'] = la[b'lep_Pt_2'][idx]
-            y['lep_Eta_H'] = la[b'lep_Eta_2'][idx]
-            phi_0 = la[b'lep_Phi_2'][idx]
-            y['lep_E_H'] = la[b'lep_E_2'][idx]
+            y['lep_Pt_H'] = nom.lep_Pt_2
+            y['lep_Eta_H'] = nom.lep_Eta_2
+            phi_0 = nom.lep_Phi_2
+            y['lep_E_H'] = nom.lep_E_2
             
-            y['lep_Pt_0'] = la[b'lep_Pt_0'][idx]
-            y['lep_Eta_0'] = la[b'lep_Eta_0'][idx]
-            y['lep_Phi_0'] = calc_phi(phi_0, la[b'lep_Phi_0'][idx])
-            y['lep_E_0'] = la[b'lep_E_0'][idx]
+            y['lep_Pt_0'] = nom.lep_Pt_0
+            y['lep_Eta_0'] = nom.lep_Eta_0
+            y['lep_Phi_0'] = calc_phi(phi_0, nom.lep_Phi_0)
+            y['lep_E_0'] = nom.lep_E_0
             
-            y['lep_Pt_1'] = la[b'lep_Pt_1'][idx]
-            y['lep_Eta_1'] = la[b'lep_Eta_1'][idx]
-            y['lep_Phi_1'] = calc_phi(phi_0, la[b'lep_Phi_1'][idx])
-            y['lep_E_1'] = la[b'lep_E_1'][idx]
+            y['lep_Pt_1'] = nom.lep_Pt_1
+            y['lep_Eta_1'] = nom.lep_Eta_1
+            y['lep_Phi_1'] = calc_phi(phi_0, nom.lep_Phi_1)
+            y['lep_E_1'] = nom.lep_E_1
             
         n = 0
-        for i in jetMatches1l:#la[b'nJets_OR_T):
+        for i in jetMatches1l:#nom.nJets_OR_T):
             
-            y['jet_Pt_h'+str(n)] = la[b'm_pflow_jet_pt'][idx][i]
-            y['jet_Eta_h'+str(n)] = la[b'm_pflow_jet_eta'][idx][i]
-            y['jet_E_h'+str(n)] = jet4Vecs[i].E()#la[b'm_pflow_jet_E'][idx][i]
-            y['jet_Phi_h'+str(n)] = calc_phi(phi_0, la[b'm_pflow_jet_phi'][idx][i])
-            y['jet_MV2c10_h'+str(n)] = la[b'm_pflow_jet_flavor_weight_MV2c10'][idx][i]
+            y['jet_Pt_h'+str(n)] = nom.m_pflow_jet_pt[i]
+            y['jet_Eta_h'+str(n)] = nom.m_pflow_jet_eta[i]
+            y['jet_E_h'+str(n)] = jet4Vecs[i].E()#nom.m_pflow_jet_E[i]
+            y['jet_Phi_h'+str(n)] = calc_phi(phi_0, nom.m_pflow_jet_phi[i])
+            y['jet_MV2c10_h'+str(n)] = nom.m_pflow_jet_flavor_weight_MV2c10[i]
             
             n+=1
         
         n = 0
-        for i in topMatches:#bestBtags:#la[b'nJets_OR_T):      
-            y['top_Pt_'+str(n)] = la[b'm_pflow_jet_pt'][idx][i]
-            y['top_Eta_'+str(n)] = la[b'm_pflow_jet_eta'][idx][i]
-            y['top_E_'+str(n)] = jet4Vecs[i].E()#la[b'm_pflow_jet_E'][idx][i]
-            y['top_Phi_'+str(n)] = calc_phi(phi_0, la[b'm_pflow_jet_phi'][idx][i])
-            y['top_MV2c10_'+str(n)] = la[b'm_pflow_jet_flavor_weight_MV2c10'][idx][i]
+        for i in topMatches:#bestBtags:#nom.nJets_OR_T):      
+            y['top_Pt_'+str(n)] = nom.m_pflow_jet_pt[i]
+            y['top_Eta_'+str(n)] = nom.m_pflow_jet_eta[i]
+            y['top_E_'+str(n)] = jet4Vecs[i].E()#nom.m_pflow_jet_E[i]
+            y['top_Phi_'+str(n)] = calc_phi(phi_0, nom.m_pflow_jet_phi[i])
+            y['top_MV2c10_'+str(n)] = nom.m_pflow_jet_flavor_weight_MV2c10[i]
             
             n+=1
 
-        y['MET'] = la[b'MET_RefFinal_et'][idx]
-        y['MET_phi'] = calc_phi(phi_0, la[b'MET_RefFinal_phi'][idx])
+        y['MET'] = nom.MET_RefFinal_et
+        y['MET_phi'] = calc_phi(phi_0, nom.MET_RefFinal_phi)
 
         events1l.append(y)
 

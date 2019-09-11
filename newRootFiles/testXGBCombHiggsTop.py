@@ -16,11 +16,11 @@ from dict_top import topDict
 from dict_higgsTop import higgsTopDict
 import matplotlib.pyplot as plt
 
-inputFile = sys.argv[1]
+inf = sys.argv[1]
 modelPath = sys.argv[2]
 topModelPath = sys.argv[3]
-f=uproot.open(inputFile)
-nom=f.get('nominal')
+f=ROOT.TFile(inf, "READ")
+nom=f.Get('nominal')
 
 totalPast = 0
 nCorrect = 0
@@ -52,28 +52,6 @@ def calc_phi(phi_0, new_phi):
     return new_phi
 
 
-la=f['nominal'].lazyarrays(['jet_*', 'lep_*', 'met', 'met_phi', 'truth_jet_*', 'track_jet_*'])
-'''
-from collections import namedtuple
-parttype = namedtuple('parttype', ['barcode', 'pdgid', 'status', 'eta', 'phi', 'pt', 'parents', 'children'])
-
-def make_partdict(la, idx):
-    rv = dict(zip(la[b'm_truth_barcode'][idx],
-                 (parttype(*_2) for
-                  _2 in zip(la[b'm_truth_barcode'][idx],
-                            la[b'm_truth_pdgId'][idx],
-                            la[b'm_truth_status'][idx],
-                            la[b'm_truth_eta'][idx],
-                            la[b'm_truth_phi'][idx],
-                            la[b'm_truth_pt'][idx],
-                            la[b'm_truth_parents'][idx],
-                            la[b'm_truth_children'][idx])
-                 )
-                 ))
-    return rv
-
-'''
-
 def drCheck(eta, phi, truth_eta, truth_phi, cut):
     dr = sqrt( (phi-truth_phi)**2 + (eta-truth_eta)**2 )
   
@@ -94,12 +72,14 @@ higgVecs = []
 
 fourVecDicts = []
 
-for idx in range(len(la[b'met']) ):
-    #current+=1
+nEntries = nom.GetEntries()
+for idx in range(nEntries):
     if idx%10000==0:
-        print(idx)                                                                                                 
-    if idx==1500:
+        print(str(idx)+'/'+str(nEntries))
+    if idx==2000:
         break
+
+    nom.GetEntry(idx)
 
     truthComb = []
 
@@ -108,7 +88,7 @@ for idx in range(len(la[b'met']) ):
     fourVecs = {}
     
     met = LorentzVector()
-    met.SetPtEtaPhiE(la[b'met'][idx], 0, la[b'met_phi'][idx], la[b'met'][idx])
+    met.SetPtEtaPhiE(nom.met, 0, nom.met_phi, nom.met)
     
     fourVecs['met'] = met
     
@@ -119,16 +99,16 @@ for idx in range(len(la[b'met']) ):
     lepMatch = -1
     for i in range(2):
 
-        lep_pt = la[b'lep_pt'][idx][i]
-        lep_eta = la[b'lep_eta'][idx][i]
-        lep_phi = la[b'lep_phi'][idx][i]
-        lep_E = la[b'lep_E'][idx][i]
+        lep_pt = nom.lep_pt[i]
+        lep_eta = nom.lep_eta[i]
+        lep_phi = nom.lep_phi[i]
+        lep_E = nom.lep_E[i]
 
         lepVec = LorentzVector()
         lepVec.SetPtEtaPhiE(lep_pt, lep_eta, lep_phi, lep_E)
         lep4Vecs.append(lepVec)
 
-        if la[b'lep_parent'][idx][i]==25:
+        if nom.lep_parent[i]==25:
             lepMatch=i
 
     if lepMatch == -1:
@@ -150,13 +130,13 @@ for idx in range(len(la[b'met']) ):
 
     match = 0
 
-    for i in range(len(la[b'jet_pt'][idx])):#la[b'selected_jets'][i]:
+    for i in range(len(nom.jet_pt)):#nom.selected_jets'][i]:
 
-        jet_pt = la[b'jet_pt'][idx][i]
-        jet_eta = la[b'jet_eta'][idx][i]
-        jet_phi = la[b'jet_phi'][idx][i]
-        jet_E = la[b'jet_E'][idx][i]
-        jet_MV2c10 = la[b'jet_MV2c10'][idx][i]
+        jet_pt = nom.jet_pt[i]
+        jet_eta = nom.jet_eta[i]
+        jet_phi = nom.jet_phi[i]
+        jet_E = nom.jet_E[i]
+        jet_MV2c10 = nom.jet_MV2c10[i]
         
         jetVec = LorentzVector()
         jetVec.SetPtEtaPhiE(jet_pt, jet_eta, jet_phi, jet_E)
@@ -164,7 +144,7 @@ for idx in range(len(la[b'met']) ):
         jet4Vecs.append(jetVec)
         jet4VecsMV2c10.append(jet_MV2c10)
         
-        if la[b'jet_parent'][idx][i]==25:
+        if nom.jet_parent[i]==25:
             truthJets.append(i)
             higgCand+=jetVec
             higgsJets.append(jetVec)
@@ -185,8 +165,8 @@ for idx in range(len(la[b'met']) ):
                 comb = [l,i,j]
 
                 t = topDict( jet4Vecs[i], jet4Vecs[j], lep4Vecs[0], lep4Vecs[1], met, jet4VecsMV2c10[i], jet4VecsMV2c10[j],
-                             la[b'jet_jvt'][idx][i], la[b'jet_jvt'][idx][j],
-                             la[b'jet_numTrk'][idx][i], la[b'jet_numTrk'][idx][j]
+                             nom.jet_jvt[i], nom.jet_jvt[j],
+                             nom.jet_numTrk[i], nom.jet_numTrk[j]
                          )
 
                 combosTop.append([t, comb])
@@ -211,14 +191,14 @@ for idx in range(len(la[b'met']) ):
                 if l==0:
                     k = higgsTopDict( jet4Vecs[i], jet4Vecs[j], lep4Vecs[0], met, jet4VecsMV2c10[i], jet4VecsMV2c10[j],
                                       jet4Vecs[ topMatches[0] ], jet4Vecs[ topMatches[1] ], lep4Vecs[1],
-                                      la[b'jet_jvt'][idx][i], la[b'jet_jvt'][idx][j],
-                                      la[b'jet_numTrk'][idx][i], la[b'jet_numTrk'][idx][j]
+                                      nom.jet_jvt[i], nom.jet_jvt[j],
+                                      nom.jet_numTrk[i], nom.jet_numTrk[j]
                                   )
                 else:
                     k = higgsTopDict( jet4Vecs[i], jet4Vecs[j], lep4Vecs[1], met, jet4VecsMV2c10[i], jet4VecsMV2c10[j],
                                       jet4Vecs[ topMatches[0] ], jet4Vecs[ topMatches[1] ], lep4Vecs[0],
-                                      la[b'jet_jvt'][idx][i], la[b'jet_jvt'][idx][j],
-                                      la[b'jet_numTrk'][idx][i], la[b'jet_numTrk'][idx][j]
+                                      nom.jet_jvt[i], nom.jet_jvt[j],
+                                      nom.jet_numTrk[i], nom.jet_numTrk[j]
                                   )
                 k['topScore'] = topPred[topBest]
                 combos.append([k, comb])

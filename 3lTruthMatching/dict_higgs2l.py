@@ -12,9 +12,9 @@ def higgs2lDict(lep0, lep1, lep2, met, match=-1):
     k['Mll01'] = (lep0+lep1).M()
     k['Mll02'] = (lep0+lep2).M()
     k['Mll12'] = (lep1+lep2).M()
-
-    #k['Ptll01'] = (lep0+lep1).Pt()
-    #k['Ptll02'] = (lep0+lep2).Pt()
+    
+    k['Ptll01'] = (lep0+lep1).Pt()
+    k['Ptll02'] = (lep0+lep2).Pt()
 
     k['dRll01'] = lep0.DeltaR(lep1)
     k['dRll02'] = lep0.DeltaR(lep2)
@@ -32,6 +32,6 @@ def higgs2lDict(lep0, lep1, lep2, met, match=-1):
     k['Mll02Met'] = (lep0+lep2+met).M()
     k['Mll12Met'] = (lep1+lep2+met).M()
 
-    #k['met'] = met.Pt()
+    k['met'] = met.Pt()
 
     return k

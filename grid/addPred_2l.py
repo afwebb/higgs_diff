@@ -1,4 +1,4 @@
-import uproot
+import ROOT
 import pandas as pd
 from rootpy.tree import Tree
 from rootpy.vector import LorentzVector
@@ -25,18 +25,18 @@ import torch.optim as optim
 
 inf = sys.argv[1]
 #outFile = sys.argv[2]
-higgsModelPath = "models/2l/xgb_match_higgsPflowFlat_21.dat"
-topModelPath = "models/2l/xgb_match_topPflowJVT.dat"
+higgsModelPath = "models/2l/xgb_match_higgsLepCut.dat"
+topModelPath = "models/2l/xgb_match_topLepCut.dat"
 #outFile = sys.argv[4]
 
 #njet = sys.argv[3]
-f = uproot.open(inf)
+f = ROOT.TFile(inf, "READ")
 
 dsid = inf.split('/')[-1]
 dsid = dsid.replace('.root', '')
 print(dsid)
 
-oldTree = f.get('nominal')
+nom = f.Get('nominal')
     #oldTree.SetBranchStatus("*",0)
     #for br in branch_list:
     #    oldTree.SetBranchStatus(br,1)
@@ -55,13 +55,6 @@ xMax = normFactors[1:]#torch.from_numpy(normFactors[1:]).float()#X.max(0, keepdi
 
 #xgbPtModel = pickle.load(open('models/2l/xgb_higgsPflowFlatBranch.dat
 
-#la=f['nominal'].lazyarrays(['higgs_pt', 'jet_*', 'lep_*', 'met', 'met_phi', 'truth_jet_*', 'track_jet_*'])#, 'is2LSS0Tau', 'is2LSS1Tau',
-la=f['nominal'].lazyarrays(['m_truth*','dilep_type','trilep_type','quadlep_type','higgs*','lep_Pt*','lep_Eta_*', 'lep_E_*','total_charge',
-                            'total_leptons', 'lep_Phi*','lep_ID*','lep_Index*', 'm_track_jet*', 'm_pflow_jet*',
-                            'nJets_OR_T','nJets_OR_T_MV2c10_70',
-                            'MET_RefFinal_et', 'MET_RefFinal_phi'])
-#'total_leptons', 'dilep_type', 'total_charge', 'nJets_OR_T_MV2c10_70', 'nJets_OR_T'])
-
 def calc_phi(phi_0, new_phi):
     new_phi = new_phi-phi_0
     if new_phi>math.pi:
@@ -72,20 +65,19 @@ def calc_phi(phi_0, new_phi):
 
 def create_dict():
     current = 0
-    totalEvt = len(la[b'MET_RefFinal_et'])
     
-    for idx in range(len(la[b'MET_RefFinal_et']) ):
-        current+=1
-        if current%1000==0:
-            print(str(current)+"/"+str(totalEvt))
-        #if current%100==0:
-        #    break
+    nEntries = nom.GetEntries()
+    for idx in range(nEntries):
+        if idx%10000==0:
+            print(str(idx)+'/'+str(nEntries))
 
-        #if la[b'total_leptons'][idx] < 2: continue
-        #if la[b'dilep_type'][idx] < 1: continue                                                                                                
-        #if la[b'total_charge'][idx] == 0: continue  
-        #if la[b'nJets_OR_T_MV2c10_70'][idx] < 1: continue
-        #if la[b'nJets_OR_T'][idx] < 2: continue
+        nom.GetEntry(idx)
+
+        #if nom.total_leptons < 2: continue
+        #if nom.dilep_type < 1: continue                                                                                                
+        #if nom.total_charge == 0: continue  
+        #if nom.nJets_OR_T_MV2c10_70 < 1: continue
+        #if nom.nJets_OR_T < 2: continue
 
         higgCand = LorentzVector()
         
@@ -95,33 +87,33 @@ def create_dict():
         btags = []
         
         met = LorentzVector()
-        met.SetPtEtaPhiE(la[b'MET_RefFinal_et'][idx], 0, la[b'MET_RefFinal_phi'][idx], la[b'MET_RefFinal_et'][idx])
+        met.SetPtEtaPhiE(nom.MET_RefFinal_et, 0, nom.MET_RefFinal_phi, nom.MET_RefFinal_et)
 
         #for i in range(2):
-        lep_Pt_0 = la[b'lep_Pt_0'][idx]
-        lep_Eta_0 = la[b'lep_Eta_0'][idx]
-        lep_Phi_0 = la[b'lep_Phi_0'][idx]
-        lep_E_0 = la[b'lep_E_0'][idx]
+        lep_Pt_0 = nom.lep_Pt_0
+        lep_Eta_0 = nom.lep_Eta_0
+        lep_Phi_0 = nom.lep_Phi_0
+        lep_E_0 = nom.lep_E_0
         
         lepVec_0 = LorentzVector()
         lepVec_0.SetPtEtaPhiE(lep_Pt_0, lep_Eta_0, lep_Phi_0, lep_E_0)
         lep4Vecs.append(lepVec_0)
 
-        lep_Pt_1 = la[b'lep_Pt_1'][idx]
-        lep_Eta_1 = la[b'lep_Eta_1'][idx]
-        lep_Phi_1 = la[b'lep_Phi_1'][idx]
-        lep_E_1 = la[b'lep_E_1'][idx]
+        lep_Pt_1 = nom.lep_Pt_1
+        lep_Eta_1 = nom.lep_Eta_1
+        lep_Phi_1 = nom.lep_Phi_1
+        lep_E_1 = nom.lep_E_1
 
         lepVec_1 = LorentzVector()
         lepVec_1.SetPtEtaPhiE(lep_Pt_1, lep_Eta_1, lep_Phi_1, lep_E_1)
         lep4Vecs.append(lepVec_1)
 
-        for j in range(len(la[b'm_pflow_jet_pt'][idx])):#la[b'selected_jets'][i]:
+        for j in range(len(nom.m_pflow_jet_pt)):#nom.selected_jets'][i]:
             jetVec = LorentzVector()
-            jetVec.SetPtEtaPhiM(la[b'm_pflow_jet_pt'][idx][j], la[b'm_pflow_jet_eta'][idx][j], la[b'm_pflow_jet_phi'][idx][j], la[b'm_pflow_jet_m'][idx][j])
+            jetVec.SetPtEtaPhiM(nom.m_pflow_jet_pt[j], nom.m_pflow_jet_eta[j], nom.m_pflow_jet_phi[j], nom.m_pflow_jet_m[j])
             jet4Vecs.append(jetVec)
             
-            btags.append(la[b'm_pflow_jet_flavor_weight_MV2c10'][idx][j])
+            btags.append(nom.m_pflow_jet_flavor_weight_MV2c10[j])
 
         combos = []
         combosTop = []
@@ -132,8 +124,8 @@ def create_dict():
                     comb = [l,i,j]
                 
                     t = topDict( jet4Vecs[i], jet4Vecs[j], lep4Vecs[0], lep4Vecs[1], met, btags[i], btags[j],
-                                 la[b'm_pflow_jet_jvt'][idx][i], la[b'm_pflow_jet_jvt'][idx][j],
-                                 la[b'm_pflow_jet_numTrk'][idx][i], la[b'm_pflow_jet_numTrk'][idx][j] )
+                                 nom.m_pflow_jet_jvt[i], nom.m_pflow_jet_jvt[j],
+                                 nom.m_pflow_jet_numTrk[i], nom.m_pflow_jet_numTrk[j] )
                     
                     combosTop.append([t, comb])
 
@@ -154,12 +146,12 @@ def create_dict():
 
                     if l==0:
                         k = higgsDict( jet4Vecs[i], jet4Vecs[j], lep4Vecs[l], met, btags[i], btags[j], lep4Vecs[1],
-                                       la[b'm_pflow_jet_jvt'][idx][i], la[b'm_pflow_jet_jvt'][idx][j],
-                                       la[b'm_pflow_jet_numTrk'][idx][i], la[b'm_pflow_jet_numTrk'][idx][j])
+                                       nom.m_pflow_jet_jvt[i], nom.m_pflow_jet_jvt[j],
+                                       nom.m_pflow_jet_numTrk[i], nom.m_pflow_jet_numTrk[j])
                     else:
                         k = higgsDict( jet4Vecs[i], jet4Vecs[j], lep4Vecs[l], met, btags[i], btags[j], lep4Vecs[0],
-                                       la[b'm_pflow_jet_jvt'][idx][i], la[b'm_pflow_jet_jvt'][idx][j],
-                                       la[b'm_pflow_jet_numTrk'][idx][i], la[b'm_pflow_jet_numTrk'][idx][j])
+                                       nom.m_pflow_jet_jvt[i], nom.m_pflow_jet_jvt[j],
+                                       nom.m_pflow_jet_numTrk[i], nom.m_pflow_jet_numTrk[j])
 
                     combos.append([k, comb])
 
@@ -178,40 +170,41 @@ def create_dict():
         jetMatches = bestComb[1:]
         
         k = {}
-        #k['higgs_pt'] = la[b'higgs_pt'][idx]
+        #k['higgs_pt'] = nom.higgs_pt
         k['comboScore'] = pred[best]
+        k['topScore'] = topPred[topBest]
         
         if lepMatch == 0:
-            k['lep_Pt_H'] = la[b'lep_Pt_0'][idx]
-            k['lep_Eta_H'] = la[b'lep_Eta_0'][idx]
-            phi_0 = la[b'lep_Phi_0'][idx]
-            k['lep_E_H'] = la[b'lep_E_0'][idx]
+            k['lep_Pt_H'] = nom.lep_Pt_0
+            k['lep_Eta_H'] = nom.lep_Eta_0
+            phi_0 = nom.lep_Phi_0
+            k['lep_E_H'] = nom.lep_E_0
             
-            k['lep_Pt_O'] = la[b'lep_Pt_1'][idx]
-            k['lep_Eta_O'] = la[b'lep_Eta_1'][idx]
-            k['lep_Phi_O'] = calc_phi(phi_0, la[b'lep_Phi_1'][idx])
-            k['lep_E_O'] = la[b'lep_E_1'][idx]
+            k['lep_Pt_O'] = nom.lep_Pt_1
+            k['lep_Eta_O'] = nom.lep_Eta_1
+            k['lep_Phi_O'] = calc_phi(phi_0, nom.lep_Phi_1)
+            k['lep_E_O'] = nom.lep_E_1
 
         elif lepMatch == 1:
-            k['lep_Pt_H'] = la[b'lep_Pt_1'][idx]
-            k['lep_Eta_H'] = la[b'lep_Eta_1'][idx]
-            phi_0 = la[b'lep_Phi_1'][idx]
-            k['lep_E_H'] = la[b'lep_E_1'][idx]
+            k['lep_Pt_H'] = nom.lep_Pt_1
+            k['lep_Eta_H'] = nom.lep_Eta_1
+            phi_0 = nom.lep_Phi_1
+            k['lep_E_H'] = nom.lep_E_1
 
-            k['lep_Pt_O'] = la[b'lep_Pt_0'][idx]
-            k['lep_Eta_O'] = la[b'lep_Eta_0'][idx]
-            k['lep_Phi_O'] = calc_phi(phi_0, la[b'lep_Phi_0'][idx])
-            k['lep_E_O'] = la[b'lep_E_0'][idx]
+            k['lep_Pt_O'] = nom.lep_Pt_0
+            k['lep_Eta_O'] = nom.lep_Eta_0
+            k['lep_Phi_O'] = calc_phi(phi_0, nom.lep_Phi_0)
+            k['lep_E_O'] = nom.lep_E_0
 
             
         n = 0
-        for i in jetMatches:#la[b'nJets_OR_T):
+        for i in jetMatches:#nom.nJets_OR_T):
             
-            k['jet_Pt_h'+str(n)] = la[b'm_pflow_jet_pt'][idx][i]
-            k['jet_Eta_h'+str(n)] = la[b'm_pflow_jet_eta'][idx][i]
-            k['jet_E_h'+str(n)] = jet4Vecs[i].E()#la[b'm_pflow_jet_E'][idx][i]
-            k['jet_Phi_h'+str(n)] = calc_phi(phi_0, la[b'm_pflow_jet_phi'][idx][i])
-            k['jet_MV2c10_h'+str(n)] = la[b'm_pflow_jet_flavor_weight_MV2c10'][idx][i]
+            k['jet_Pt_h'+str(n)] = nom.m_pflow_jet_pt[i]
+            k['jet_Eta_h'+str(n)] = nom.m_pflow_jet_eta[i]
+            k['jet_E_h'+str(n)] = jet4Vecs[i].E()#nom.m_pflow_jet_E[i]
+            k['jet_Phi_h'+str(n)] = calc_phi(phi_0, nom.m_pflow_jet_phi[i])
+            k['jet_MV2c10_h'+str(n)] = nom.m_pflow_jet_flavor_weight_MV2c10[i]
             
             n+=1
 
@@ -222,17 +215,17 @@ def create_dict():
         bestBtags = np.argpartition(btags, -2)[-2:]
         
         n = 0
-        for i in topMatches:#bestBtags:#la[b'nJets_OR_T):      
-            k['top_Pt_'+str(n)] = la[b'm_pflow_jet_pt'][idx][i]
-            k['top_Eta_'+str(n)] = la[b'm_pflow_jet_eta'][idx][i]
-            k['top_E_'+str(n)] = jet4Vecs[i].E()#la[b'm_pflow_jet_E'][idx][i]
-            k['top_Phi_'+str(n)] = calc_phi(phi_0, la[b'm_pflow_jet_phi'][idx][i])
-            k['top_MV2c10_'+str(n)] = la[b'm_pflow_jet_flavor_weight_MV2c10'][idx][i]
+        for i in topMatches:#bestBtags:#nom.nJets_OR_T):      
+            k['top_Pt_'+str(n)] = nom.m_pflow_jet_pt[i]
+            k['top_Eta_'+str(n)] = nom.m_pflow_jet_eta[i]
+            k['top_E_'+str(n)] = jet4Vecs[i].E()#nom.m_pflow_jet_E[i]
+            k['top_Phi_'+str(n)] = calc_phi(phi_0, nom.m_pflow_jet_phi[i])
+            k['top_MV2c10_'+str(n)] = nom.m_pflow_jet_flavor_weight_MV2c10[i]
             
             n+=1
 
-        k['MET'] = la[b'MET_RefFinal_et'][idx]
-        k['MET_phi'] = calc_phi(phi_0, la[b'MET_RefFinal_phi'][idx])
+        k['MET'] = nom.MET_RefFinal_et
+        k['MET_phi'] = calc_phi(phi_0, nom.MET_RefFinal_phi)
 
         events.append(k)
 
@@ -283,8 +276,8 @@ def make_tensors(inDF, xMax):
 def pred_pt(X, yMax):
 
     #print(X.shape[1])
-    net_pt = Net(X.size()[1],75,6)
-    net_pt.load_state_dict(torch.load('models/2l/torch_pt_6l_75n.pt'))
+    net_pt = Net(X.size()[1],90,6)
+    net_pt.load_state_dict(torch.load('models/2l/torch_pt_6l_90n.pt'))
     net_pt.eval()
 
     Y_pred_pt = net_pt(X)[:,0]
@@ -294,8 +287,8 @@ def pred_pt(X, yMax):
 
 def pred_bin(X):
 
-    net_bin = Net(X.size()[1], 75, 5)
-    net_bin.load_state_dict(torch.load('models/2l/torch_binned_5l_75n.pt'))
+    net_bin = Net(X.size()[1], 125, 5)
+    net_bin.load_state_dict(torch.load('models/2l/torch_binned_5l_125n.pt'))
     net_bin.eval()
     
     Y_pred_bin = net_bin(X)[:,0]

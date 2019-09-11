@@ -8,7 +8,7 @@ from numpy import unwrap
 from numpy import arange
 from rootpy.vector import LorentzVector
 import random
-from dict_higgs2l import higgsDict
+from dict_higgs2l import higgs2lDict
 #import matplotlib.pyplot as plt
 
 inf = sys.argv[1]
@@ -77,11 +77,11 @@ for e in nom:
 
     i,j = random.sample(lepH,2)
 
-    k = higgsDict( leps[i], leps[j], leps[lepB[0]], met, 
+    k = higgs2lDict( leps[i], leps[j], leps[lepB[0]], met, 
                    1 )
     eventsFlat.append(k)
 
-    k = higgsDict( leps[i], leps[lepB[0]], leps[j], met,
+    k = higgs2lDict( leps[i], leps[lepB[0]], leps[j], met,
                    0 )
     eventsFlat.append(k)
 

@@ -18,8 +18,7 @@ import os
 
 h2o.remove_all()
 
-dsid = sys.argv[1]
-njet = sys.argv[2]
+outDir = sys.argv[1]
 '''
 #Reading the data
 #inDF = pd.read_csv('../inputData/67_4j.csv')
@@ -40,8 +39,8 @@ test.shape
 #test = test.drop(['higgs_pt'],axis=1)
 '''
 
-h2o_train = h2o.import_file(path='/data_ceph/afwebb/higgs_diff/inputData/tensors/h2o_train_'+dsid+'_'+njet+'.csv', destination_frame='h2o_train')
-h2o_test = h2o.import_file(path='/data_ceph/afwebb/higgs_diff/inputData/tensors/h2o_train_'+dsid+'_'+njet+'.csv', destination_frame='h2o_test')
+h2o_train = h2o.import_file(path='/data_ceph/afwebb/higgs_diff/inputData/tensors/h2o_train_'+outDir+'.csv', destination_frame='h2o_train')
+h2o_test = h2o.import_file(path='/data_ceph/afwebb/higgs_diff/inputData/tensors/h2o_train_'+outDir+'.csv', destination_frame='h2o_test')
 
 #convert to tensors
 #h2o_test = h2o.H2OFrame(test)
@@ -50,13 +49,18 @@ h2o_test = h2o.import_file(path='/data_ceph/afwebb/higgs_diff/inputData/tensors/
 #h2o_train = h2o.H2OFrame(train)
 #h2o_train[3] = h2o_train[3].asfactor()
 
-layers = [4, 6, 9, 12]
+layers = [6, 9]
 nodes = [150, 250, 350, 450]
 hidden_grid = []
 
 for i in layers:
     for j in nodes:
         hidden_grid.append( np.full(i, j).tolist() )
+
+#hidden_grid.append([250,250,250,250,250,250,250,250,250])
+hidden_grid.append([250,250,250,50,50,50,50,50])
+#hidden_grid.append([250,250,250,250,250])
+#hidden_grid.append([250,250,50,50,50])
 
 param_grid = {
     'hidden':hidden_grid,
@@ -66,29 +70,37 @@ param_grid = {
     'l1':[1e-5],
     'l2':[1e-5],
     'max_w2':[10],
-    'stopping_tolerance':[1e-5],
-    #'loss':'mse'
+    'stopping_tolerance':[1e-6],
+    #'loss':'rmse'
 }
 
 nn_grid = H2OGridSearch(
     model = H2ODeepLearningEstimator,
     hyper_params=param_grid,
-    grid_id = 'h2o_grid_'+str(njet)+'_'+str(dsid),
+    grid_id = 'h2o_grid_'+outDir,
 )
 
 #nn_grid#.set_params(hidden=[150,150,150,150,150,150,150,150], epochs=1000, train_samples_per_iteration=10000)
 nn_grid.train(x=h2o_train.names.remove('higgs_pt'), y = 'higgs_pt',
               #x=h2o_train.names[1:], y = h2o_train.names[0], 
               training_frame = h2o_train, 
-              validation_frame = h2o_test)
+              validation_frame = h2o_test,
+              )
 
-print(nn_grid.get_grid(sort_by='mae', decreasing=True))
+print(nn_grid.get_grid(sort_by='rmse', decreasing=True))
 best_model = nn_grid.models[0]
 
-#model_path = h2o.save_model(nn_grid, path = 'nn_grid_results', force=True)
+for m in nn_grid.models:
+    print(m.hidden(valid=True), m.rmse(valid=True))
+
+print(best_model.hidden)
+
+n = best_model.hidden[0]
+l = len(best_model.hidden)
+
 
 for mod in nn_grid.models:
-    model_path = h2o.save_model(mod, path = 'h2o_models/'+str(njet)+'_'+str(dsid), force=True)
+    model_path = h2o.save_model(mod, path = 'h2o_models/'+outDir, force=True)
     print(model_path)
 
 plt.figure()
@@ -103,9 +115,62 @@ ax.set_yticklabels(variables)
 ax.invert_yaxis()
 ax.set_xlabel('Scaled Importance')
 ax.set_title('Variable Importance')
-plt.savefig('/data_ceph/afwebb/higgs_diff/ml_scripts/plots/'+njet+'_'+dsid+'/h2o_var_important.png')
+plt.savefig('/data_ceph/afwebb/higgs_diff/ml_scripts/plots/'+outDir+'/h2o_var_important.png')
+
+y_train_pred = h2o_model.predict(h2o_train)
+y_test_pred = h2o_model.predict(h2o_test)
+
+y_train = h2o_train[3].as_data_frame() #.values()
+y_test = h2o_test[3].as_data_frame() #.values()                                                                    
+
+y_train_pred = y_train_pred.as_data_frame() #.values()
+y_test_pred = y_test_pred.as_data_frame() #.values()                                                                         
+
+plt.figure()
+plt.hist(y_test, 20, log=False, range=(0,800000), alpha=0.5, label='truth')
+plt.hist(y_test_pred, 20, log=False, range=(0,800000), alpha=0.5, label='test')
+plt.title("H2O Test Data, layers=%i, nodes=%i, loss=%0.4f" %(l, n, h2o_model.rmse(valid=True)))
+plt.xlabel('Higgs Pt')
+plt.ylabel('NEvents')
+plt.legend(loc='upper right')
+plt.savefig('plots/'+outDir+'/h2o_test_pt_spectrum_'+str(l)+'l_'+str(n)+'n.png')
+'''
+xy = np.vstack([y_test[:50000], y_test_pred[:50000]])
+z = scipy.stats.gaussian_kde(xy)(xy)
+
+plt.figure()
+plt.scatter(y_test[:50000], y_test_pred[:50000], c=log(z), edgecolor='')
+plt.title("H2O Test Data, loss=%0.4f" %(l, n, h2o_model.rmse(valid=True)))
+plt.xlabel('Truth Pt')
+plt.ylabel('Predicted Pt')
+plt.plot([0,0.6],[0,0.6], zorder=10)
+plt.savefig('plots/'+outDir+'/h2o_test_pt_scatter_'+str(l)+'l_'+str(n)+'n.png')
+'''
+cutoff = [150000]
+
+plt.figure()
+for c in cutoff:
+    yTest = np.where(y_test > c, 1, 0)
+    ypTest = y_test_pred
+
+    auc = sk.metrics.roc_auc_score(yTest,ypTest)
+    fpr, tpr, _ = sk.metrics.roc_curve(yTest,ypTest)
+
+    plt.plot(fpr, tpr, label='test AUC = %.3f' %(auc))
+
+    yTrain = np.where(y_train > c, 1, 0)
+    ypTrain = y_train_pred
+
+    auc = sk.metrics.roc_auc_score(yTrain,ypTrain)
+    fpr, tpr, _ = sk.metrics.roc_curve(yTrain,ypTrain)
+
+    plt.plot(fpr, tpr, label='train AUC = %.3f' %(auc))
+
+plt.title("H2O Test ROC")
+plt.legend(loc='lower right')
+plt.savefig('plots/'+outDir+'/h2o_test_roc_'+str(l)+'l_'+str(n)+'n.png')
 
 #plt.figure()
 #perf = best_model.model_performance()
 #perf.plot()
-#plt.savefig('/data_ceph/afwebb/higgs_diff/ml_scripts/plots/'+njet+'_'+dsid+'/h2o_roc.png')
+#plt.savefig('/data_ceph/afwebb/higgs_diff/ml_scripts/plots/'+outDir+'/h2o_roc.png')

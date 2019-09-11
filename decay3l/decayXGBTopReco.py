@@ -1,7 +1,7 @@
 #import ROOT
 import numpy as np
 #import rootpy.io
-import uproot
+import ROOT
 import sys
 import math
 from math import sqrt
@@ -26,11 +26,11 @@ twoLepModelPath = sys.argv[3]
 oneLepModelPath = sys.argv[4]
 
 #f = rootpy.io.root_open(inf)
-f=uproot.open(inputFile)
+f=ROOT.TFile.Open(inputFile, "READ")
 dsid = inputFile.split('/')[-1]
 dsid = dsid.replace('.root', '')
 print(dsid)
-nom = f.get('nominal')
+nom = f.Get('nominal')
 
 topModel = pickle.load(open(topModelPath, "rb"))
 twoLepModel = pickle.load(open(twoLepModelPath, "rb"))
@@ -46,10 +46,6 @@ def calc_phi(phi_0, new_phi):
         new_phi = new_phi + 2*math.pi
     return new_phi
 
-la=f['nominal'].lazyarrays(['jet_*', 'lep_*', 'met', 'met_phi', 'truth_jet_*', 'track_jet_*', 'trilep_type', 'nJets', 'nJets_MV2c10_70', 'jet_numTrk'])
-
-print(la[b'jet_numTrk'][4])
-
 current = 0
 nMatch = 0
 higgVecs = []
@@ -61,24 +57,27 @@ fourVecDicts = []
 eventsFlat = []
 current = 0
 
-for idx in range(len(la[b'met']) ):
-    current+=1
-    if current%10000==0:
-        print(current)
-    #if current%200==0:
-    #    break
+nEntries = nom.GetEntries()
+for idx in range(nEntries):
+    if idx%10000==0:
+        print(str(idx)+'/'+str(nEntries))
 
-    if la[b'trilep_type'][idx]==0: continue
-    if la[b'nJets'][idx]<2: continue
-    if la[b'nJets_MV2c10_70'][idx]==0: continue
-    if len(la[b'lep_pt'][idx])!=3: continue
+    nom.GetEntry(idx)
+
+    if nom.trilep_type==0: continue
+    if nom.nJets<2: continue
+    if nom.nJets_MV2c10_70==0: continue
+    if len(nom.lep_pt)!=3: continue
+    if nom.lep_pt[0]<10000: continue
+    if nom.lep_pt[1]<20000: continue
+    if nom.lep_pt[2]<20000: continue
           
     fourVecs = {}
     
     met = LorentzVector()
-    met.SetPtEtaPhiE(la[b'met'][idx], 0, la[b'met_phi'][idx], la[b'met'][idx])
+    met.SetPtEtaPhiE(nom.met, 0, nom.met_phi, nom.met)
     
-    if len(la[b'lep_pt'][idx])!=3: continue
+    if len(nom.lep_pt)!=3: continue
 
     lepH = []
     lepB = []
@@ -89,10 +88,10 @@ for idx in range(len(la[b'met']) ):
 
     for i in range(3):
         lep = LorentzVector()
-        lep.SetPtEtaPhiE(la[b'lep_pt'][idx][i], la[b'lep_eta'][idx][i], la[b'lep_phi'][idx][i], la[b'lep_E'][idx][i])
+        lep.SetPtEtaPhiE(nom.lep_pt[i], nom.lep_eta[i], nom.lep_phi[i], nom.lep_E[i])
         leps.append(lep)
 
-        if la[b'lep_parent'][idx][i]==25:
+        if nom.lep_parent[i]==25:
             lepH.append(lep)
         else:
             lepB.append(lep)
@@ -108,14 +107,14 @@ for idx in range(len(la[b'met']) ):
     higgsJets = []
     topJets = []
     badJets = []
-    for i in range(len(la[b'jet_pt'][idx])):
+    for i in range(len(nom.jet_pt)):
         jet = LorentzVector()
-        jet.SetPtEtaPhiE(la[b'jet_pt'][idx][i], la[b'jet_eta'][idx][i], la[b'jet_phi'][idx][i], la[b'jet_E'][idx][i])
+        jet.SetPtEtaPhiE(nom.jet_pt[i], nom.jet_eta[i], nom.jet_phi[i], nom.jet_E[i])
         jets.append(jet)
         
-        if la[b'jet_parent'][idx][i]==25:
+        if nom.jet_parent[i]==25:
             higgsJets.append(i)
-        elif abs(la[b'jet_parent'][idx][i])==6:
+        elif abs(nom.jet_parent[i])==6:
             topJets.append(i)
         else:
             badJets.append(i)
@@ -129,20 +128,20 @@ for idx in range(len(la[b'met']) ):
         for i in range(len(jets)-1):
             for j in range(i+1, len(jets)):
                 comb = [l,i,j]
-                t = topDict( jets[i], jets[j], leps[0], leps[1], leps[2], met, la[b'jet_MV2c10'][idx][i], la[b'jet_MV2c10'][idx][j],
-                             la[b'jet_jvt'][idx][i], la[b'jet_jvt'][idx][j], la[b'jet_numTrk'][idx][i], la[b'jet_numTrk'][idx][j])
-                #t['nJets'] = la[b'nJets'][idx]
-                #t['nJets_MV2c10_70'] = la[b'nJets_MV2c10_70'][idx]
+                t = topDict( jets[i], jets[j], leps[0], leps[1], leps[2], met, nom.jet_MV2c10[i], nom.jet_MV2c10[j],
+                             nom.jet_jvt[i], nom.jet_jvt[j], nom.jet_numTrk[i], nom.jet_numTrk[j])
+                #t['nJets'] = nom.nJets
+                #t['nJets_MV2c10_70'] = nom.nJets_MV2c10_70
                 combosTop.append([t, comb])
 
-                if l==0:
-                    k = higgs1lDict( jets[i], jets[j], leps[l], met, la[b'jet_MV2c10'][idx][i], la[b'jet_MV2c10'][idx][j], leps[1],
-                                   la[b'jet_jvt'][idx][i], la[b'jet_jvt'][idx][j],
-                                   la[b'jet_numTrk'][idx][i], la[b'jet_numTrk'][idx][j])
+                if l==1:
+                    k = higgs1lDict( jets[i], jets[j], leps[l], met, nom.jet_MV2c10[i], nom.jet_MV2c10[j], leps[0], leps[2],
+                                   nom.jet_jvt[i], nom.jet_jvt[j],
+                                   nom.jet_numTrk[i], nom.jet_numTrk[j])
                 else:
-                    k = higgs1lDict( jets[i], jets[j], leps[l], met, la[b'jet_MV2c10'][idx][i], la[b'jet_MV2c10'][idx][j], leps[0],
-                                   la[b'jet_jvt'][idx][i], la[b'jet_jvt'][idx][j],
-                                   la[b'jet_numTrk'][idx][i], la[b'jet_numTrk'][idx][j])
+                    k = higgs1lDict( jets[i], jets[j], leps[l], met, nom.jet_MV2c10[i], nom.jet_MV2c10[j], leps[0], leps[2],
+                                   nom.jet_jvt[i], nom.jet_jvt[j],
+                                   nom.jet_numTrk[i], nom.jet_numTrk[j])
 
                 combos1l.append([k, comb])
 
@@ -178,8 +177,8 @@ for idx in range(len(la[b'met']) ):
     best1l = np.argmax(pred1l)
 
     k = decayDict( leps[0], leps[1], leps[2], met, jets[ topMatches[0] ], jets[ topMatches[1] ], decay )
-    k['nJets'] = la[b'nJets'][idx]
-    k['nJets_MV2c10_70'] = la[b'nJets_MV2c10_70'][idx]
+    k['nJets'] = nom.nJets
+    k['nJets_MV2c10_70'] = nom.nJets_MV2c10_70
     k['higgs2l_score'] = pred2l[best2l]
     k['higgs1l_score'] = pred1l[best1l]
     eventsFlat.append(k)

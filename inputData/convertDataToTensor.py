@@ -13,8 +13,8 @@ from sklearn.model_selection import train_test_split
 import pickle
 import sys
 import torch
-#import h2o
-#h2o.init()
+import h2o
+h2o.init()
 
 #dsid = sys.argv[1]
 #njet = sys.argv[2]
@@ -27,21 +27,23 @@ inDF = pd.read_csv(inFile)#, nrows=600000)
 #    inDF = inDF[inDF['is2LSS0Tau']==1]
 #    inDF = inDF.drop(['is2LSS0Tau'],axis=1)
 
-if not inDF['comboScore'].empty:
-    inDF = inDF[inDF['comboScore'] > 0.3]
-    inDF.drop('comboScore', axis=1)
+#if not inDF['comboScore'].empty:
+#inDF = inDF[inDF['comboScore'] > 0.3]
+#inDF = inDF.drop('comboScore', axis=1)
+
+#inDF['higgs_pt'].values[inDF['higgs_pt']>10e6]=10e6
+#inDF.loc[inDF['higgs_pt']>10e5, 'higgs_pt']=10e5
 
 inDF = sk.utils.shuffle(inDF)
 
 train, test = train_test_split(inDF, test_size=0.2)
 
 #Convert to h2o frames
-'''
 h2o_train = h2o.H2OFrame(train)
 h2o_test = h2o.H2OFrame(test)
 
-h2o.export_file(h2o_train, '/data_ceph/afwebb/higgs_diff/inputData/tensors/h2o_train_'+dsid+'_'+njet+'.csv', force=True)
-h2o.export_file(h2o_test, '/data_ceph/afwebb/higgs_diff/inputData/tensors/h2o_test_'+dsid+'_'+njet+'.csv', force=True)
+h2o.export_file(h2o_train, '/data_ceph/afwebb/higgs_diff/inputData/tensors/h2o_train_'+outDir+'.csv', force=True)
+h2o.export_file(h2o_test, '/data_ceph/afwebb/higgs_diff/inputData/tensors/h2o_test_'+outDir+'.csv', force=True)
 '''
 y_train = train['higgs_pt']
 y_test = test['higgs_pt']
@@ -78,3 +80,4 @@ torch.save(y_test, 'tensors/torch_y_test_'+outDir+'.pt')
 
 #torch.save(nBin_train, 'tensors/torch_nBin_train_'+outDir+'.pt')
 #torch.save(nBin_test, 'tensors/torch_nBin_test_'+outDir+'.pt')
+'''

@@ -40,7 +40,7 @@ Y = Y / yMax #normalize(Y)
 
 X_test = X_test / xMax#X.max(0, keepdim=True)[0]#normalize(X_test)
 Y_test = Y_test / yMax#normalize(Y_test)
-
+print(yMax)
 normFactors = xMax.float().detach()#.numpy() #[*yMax.float().detach().numpy(), *xMax.float().detach().numpy()]
 normFactors = np.insert(normFactors, 0, yMax.float().detach())#.numpy())
 print(normFactors)
@@ -83,6 +83,7 @@ class Net(nn.Module):
         self.dout = nn.Dropout(0.25)
         #self.fc2 = nn.Linear(50, 100)                                                                                                           
         self.fc = nn.Linear(nodes, nodes)
+        self.bnorm = nn.BatchNorm1d(nodes)
         self.prelu = nn.PReLU(1)
         self.out = nn.Linear(nodes, 1)
         self.out_act = nn.Sigmoid()
@@ -90,7 +91,7 @@ class Net(nn.Module):
     def forward(self, input_):
         h1 = self.dout(self.relu1(self.fc1(input_)))
         for i in range(self.layers):
-            h1 = self.dout(self.relu1(self.fc(h1)))
+            h1 = self.dout(self.bnorm(self.relu1(self.fc(h1))))
         a1 = self.out(h1)
         y = self.out_act(a1)
         return y
@@ -152,7 +153,7 @@ num_epochs = [300]
 nLayers = [6]#[2, 3, 4, 6, 8]
 nNodes = [75]#[25, 50, 75, 100]#[50, 75, 125]#, 100, 175, 250]#[250, 350, 450, 600]
 
-lnPairs = [[6,100], [7,100]]#[[5,100],[6,75],[6,100],[8,50],[8,75]]
+lnPairs = [[6,75]]#[[5,100],[6,75],[6,100],[8,50],[8,75]]
 
 param_grid = []
 for ep in num_epochs:
@@ -185,7 +186,7 @@ for p in param_grid:
             test_loss = criterion(y_pred_test, Y_test).float().detach().numpy()
             test_losses.append(test_loss)
             e_losses.append(e_loss.float().detach().numpy())
-            print("[Epoch]: %i, [Train Loss]: %.5f, [Test Loss]: %.5f" % (e, e_loss, test_loss))
+            print("[Epoch]: %i, [Train Loss]: %.6f, [Test Loss]: %.6f" % (e, e_loss, test_loss))
             #if e>3 and test_losses[-2]-test_losses[-1]<10e-8 and test_losses[-3]-test_losses[-1]<10e-8:
             #    p.epochs=e
             #    break
@@ -281,11 +282,11 @@ for p in param_grid:
     '''
 
     # Calculate the point density
-    xy = np.vstack([Y_full_test[:100000], p.y_pred_test[:100000]])
+    xy = np.vstack([Y_full_test[:50000], p.y_pred_test[:50000]])
     z = scipy.stats.gaussian_kde(xy)(xy)
 
     plt.figure()
-    plt.scatter(Y_full_test[:100000], p.y_pred_test[:100000], c=np.log(z), edgecolor='')
+    plt.scatter(Y_full_test[:50000], p.y_pred_test[:50000], c=np.log(z), edgecolor='')
     plt.title("pyTorch Test Data, layers=%i, nodes=%i, loss=%0.4f" %(p.layers, p.nodes, p.test_loss))
     plt.xlabel('Truth Pt')
     plt.ylabel('Predicted Pt')
@@ -293,11 +294,11 @@ for p in param_grid:
     plt.savefig('plots/'+outDir+'/torch_test_pt_scatter_'+str(p.layers)+'l_'+str(p.nodes)+'n.png')
 
     # Calculate the point density                                                                                      
-    xy_train = np.vstack([Y_full[:100000], p.y_pred[:100000] ])
+    xy_train = np.vstack([Y_full[:50000], p.y_pred[:50000] ])
     z_train = scipy.stats.gaussian_kde(xy_train)(xy_train)
 
     plt.figure()
-    plt.scatter(Y_full[:100000], p.y_pred[:100000], c=np.log(z_train), edgecolor='')
+    plt.scatter(Y_full[:50000], p.y_pred[:50000], c=np.log(z_train), edgecolor='')
     plt.title("pyTorch Train Data, layers=%i, nodes=%i, loss=%0.4f" %(p.layers, p.nodes, p.train_loss))
     plt.xlabel('Truth Pt')
     plt.ylabel('Predicted Pt')

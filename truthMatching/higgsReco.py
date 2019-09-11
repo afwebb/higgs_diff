@@ -178,8 +178,9 @@ for idx in range(len(la[b'nJets_OR_T']) ):
     if la[b'total_leptons'][idx] < 1: continue
     if la[b'dilep_type'][idx]==0: continue
     if la[b'total_charge'][idx] == 0: continue
-    #if la[b'nJets_OR_T'][idx] <4: continue
-        
+    if la[b'nJets_OR_T'][idx] <4: continue
+    if la[b'nJets_MV2c10_70'][idx] <4: continue
+
     higgCand = LorentzVector()
     
     fourVecs = {}

@@ -45,13 +45,16 @@ test = test.drop(['higgs_pt'],axis=1)
 xgb_train = xgb.DMatrix(train, label=y_train, feature_names=list(test))
 xgb_test = xgb.DMatrix(test, label=y_test, feature_names=list(train))
 '''
-features=['M(jjl)','Mjj','Pt(jjl)','comboScore','dR(jj, l)','dRjl0H','dRjl0O','dRjl1H','dRjl1O','dRll','dRtj00','dRtj01','dRtj10','dRtj11','dRtl0H','dRtl1H','jet_MV2c10_h0','jet_MV2c10_h1','jet_Pt_0','jet_Pt_1','lep_Pt_H','lep_Pt_O','top_Pt_0','top_Pt_1']
+#features=['M(jjl)','Mjj','Pt(jjl)','comboScore','dR(jj, l)','dRjl0H','dRjl0O','dRjl1H','dRjl1O','dRll','dRtj00','dRtj01','dRtj10','dRtj11','dRtl0H','dRtl1H','jet_MV2c10_h0','jet_MV2c10_h1','jet_Pt_0','jet_Pt_1','lep_Pt_H','lep_Pt_O','top_Pt_0','top_Pt_1']
 
-if outDir=="flatBranches":
-    features = [ 'MET_RefFinal_et', 'MET_RefFinal_phi', 'lep_Pt_0', 'lep_Eta_0', 'lep_Phi_0', 'lep_Pt_1', 'lep_Eta_1', 'lep_Phi_1', 'Mll01', 'Ptll01', 'DRll01', 'nJets_OR_T', 'nJets_OR_T_MV2c10_70', 'HT', 'lead_jetPt', 'lead_jetEta', 'lead_jetPhi', 'sublead_jetPt', 'sublead_jetEta', 'sublead_jetPhi']
+features=['MET', 'MET_phi', 'comboScore', 'jet_E_h0', 'jet_E_h1', 'jet_Eta_h0', 'jet_Eta_h1', 'jet_MV2c10_h0', 'jet_MV2c10_h1', 'jet_Phi_h0', 'jet_Phi_h1', 'jet_Pt_h0', 'jet_Pt_h1', 'lep_E_H', 'lep_E_O', 'lep_Eta_H', 'lep_Eta_O', 'lep_Phi_O', 'lep_Pt_H', 'lep_Pt_O', 'topScore', 'top_E_0', 'top_E_1', 'top_Eta_0', 'top_Eta_1', 'top_MV2c10_0', 'top_MV2c10_1', 'top_Phi_0', 'top_Phi_1', 'top_Pt_0', 'top_Pt_1']
 
-elif outDir=="fourVec":
-    features = ['Unnamed: 0', 'MET', 'MET_phi', 'jet_E_0', 'jet_E_1', 'jet_E_2', 'jet_E_3', 'jet_Eta_0', 'jet_Eta_1', 'jet_Eta_2', 'jet_Eta_3', 'jet_MV2c10_0', 'jet_MV2c10_1', 'jet_MV2c10_2', 'jet_MV2c10_3', 'jet_Phi_0', 'jet_Phi_1', 'jet_Phi_2', 'jet_Phi_3', 'jet_Pt_0', 'jet_Pt_1', 'jet_Pt_2', 'jet_Pt_3', 'lep_E_0', 'lep_E_1', 'lep_Eta_0', 'lep_Eta_1', 'lep_Phi_1', 'lep_Pt_0', 'lep_Pt_1']
+if 'higgs2l' in outDir:
+    features = ['MET', 'MET_phi', 'comboScore', 'lep_E_0', 'lep_E_1', 'lep_E_2', 'lep_Eta_0', 'lep_Eta_1', 'lep_Eta_2', 'lep_Phi_1', 'lep_Phi_2', 'lep_Pt_0', 'lep_Pt_1', 'lep_Pt_2', 'top_E_0', 'top_E_1', 'top_Eta_0', 'top_Eta_1', 'top_MV2c10_0', 'top_MV2c10_1', 'top_Phi_0', 'top_Phi_1', 'top_Pt_0', 'top_Pt_1']
+
+elif 'higgs1l' in outDir:
+    features = ['MET', 'MET_phi', 'comboScore', 'jet_E_h0', 'jet_E_h1', 'jet_Eta_h0', 'jet_Eta_h1', 'jet_MV2c10_h0', 'jet_MV2c10_h1', 'jet_Phi_h0', 'jet_Phi_h1', 'jet_Pt_h0', 'jet_Pt_h1', 'lep_E_0', 'lep_E_1', 'lep_E_H', 'lep_Eta_0', 'lep_Eta_1', 'lep_Eta_H', 'lep_Phi_0', 'lep_Phi_1', 'lep_Pt_0', 'lep_Pt_1', 'lep_Pt_H', 'top_E_0', 'top_E_1', 'top_Eta_0', 'top_Eta_1', 'top_MV2c10_0', 'top_MV2c10_1', 'top_Phi_0', 'top_Phi_1', 'top_Pt_0', 'top_Pt_1']
+
 
 xgb_test = xgb.DMatrix('../inputData/tensors/xgb_test_'+outDir+'.buffer', feature_names = features)
 xgb_train = xgb.DMatrix('../inputData/tensors/xgb_train_'+outDir+'.buffer', feature_names = features)
@@ -63,7 +66,7 @@ y_train = y_train.float().detach().numpy()
 
 params = {
     'learning_rate' : 0.01,
-    'max_depth': 10,
+    'max_depth': 9,
     'min_child_weight': 2,
     'gamma': 0.9,
     'subsample' : 0.8,
@@ -73,7 +76,7 @@ params = {
     'scale_pos_weight':1
 }
 
-gbm = xgb.cv(params, xgb_train, num_boost_round=1200, verbose_eval=True)
+gbm = xgb.cv(params, xgb_train, num_boost_round=800, verbose_eval=True)
 
 best_nrounds = pd.Series.idxmax(gbm['test-auc-mean'])
 print( best_nrounds)

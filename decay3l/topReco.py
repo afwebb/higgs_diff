@@ -55,6 +55,9 @@ for e in nom:
     if e.nJets<2: continue
     if e.nJets_MV2c10_70==0: continue
     if len(e.lep_pt)!=3: continue
+    if e.lep_pt[0]<10000: continue
+    if e.lep_pt[1]<20000: continue
+    if e.lep_pt[2]<20000: continue
 
     leps = []
     for i in range(3):
@@ -120,4 +123,4 @@ dfFlat = pd.DataFrame.from_dict(eventsFlat)
 from sklearn.utils import shuffle
 dfFlat = shuffle(dfFlat)
 
-dfFlat.to_csv('topFiles/'+dsid+'Flat.csv', index=False)
+dfFlat.to_csv('topLepCutFiles/'+dsid+'Flat.csv', index=False)

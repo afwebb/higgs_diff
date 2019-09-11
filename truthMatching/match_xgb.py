@@ -36,7 +36,7 @@ xgb_test = xgb.DMatrix(test, label=y_test, feature_names=list(train))
 
 params = {
     'learning_rate' : 0.01,
-    'max_depth': 21,
+    'max_depth': 18,
     'min_child_weight': 2,
     'gamma': 0.9,
     'subsample' : 0.7,
