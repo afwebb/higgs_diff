@@ -3,106 +3,66 @@ from rootpy.tree import Tree
 import sys
 import pandas as pd
 import math
+from dict_3l import dict3l, calc_phi
+from joblib import Parallel, delayed
+import multiprocessing
 
 inf = sys.argv[1]
-#njet = sys.argv[3]
-f = rootpy.io.root_open(inf)
-dsid = inf.split('/')[-1]
-dsid = dsid.replace('.root', '')
-print(dsid)
-oldTree = f.get('nominal')
+
+listDSIDs = [x.rstrip() for x in open('../used_samples.txt', 'r')]
+
+def run_csv(inFile):
+
+    dsid = inFile.split('/')[-1]
+    dsid = dsid.replace('.root', '')
+    if dsid not in listDSIDs: return 0
+
+    f = rootpy.io.root_open(inFile)
+    
+    outFile = "used_3lFiles/"+dsid
+    if 'mc16a' in inFile:
+        outFile = outFile+'a.csv'
+    elif 'mc16d' in inFile:
+        outFile = outFile+'d.csv'
+    elif 'mc16e' in inFile:
+        outFile = outFile+'e.csv'
+                                                                        
+    print(dsid, outFile)
+    oldTree = f.get('nominal')
     #oldTree.SetBranchStatus("*",0)
     #for br in branch_list:
     #    oldTree.SetBranchStatus(br,1)
 
-events = []
+    events = []
+    
+    current = 0
+    for e in oldTree:
+        current+=1
+        if current%10000==0:
+            print(current)
 
-def calc_phi(phi_0, new_phi):
-    new_phi = new_phi-phi_0
-    if new_phi>math.pi:
-        new_phi = new_phi - 2*math.pi
-    if new_phi<-math.pi:
-        new_phi = new_phi + 2*math.pi
-    return new_phi
+        #if e.is3L==0: continue
+        if e.trilep_type==0: continue
+        if abs(e.total_charge)!=1: continue
+        if e.nJets_OR_T<2: continue
+        if e.nJets_OR_T_MV2c10_70<1: continue
+        if e.lep_Pt_0<20e3 or e.lep_Pt_1<10e3 or e.lep_Pt_2<10e3: continue
+        if e.lep_ID_0==-e.lep_ID_1 and abs(e.Mll01-91.2e3)<10e3: continue
+        if e.lep_ID_0==-e.lep_ID_2 and abs(e.Mll02-91.2e3)<10e3: continue
+        if e.MVA3lCERN_weight_ttH<-1: continue
+        
+        if '34587' in dsid or '34567' in dsid or '34634' in dsid:
+            sig = 1
+        else:
+            sig = 0
 
-current = 0
-for e in oldTree:
-    current+=1
-    if current%10000==0:
-        print(current)
-
-    #if e.total_leptons!=2: continue
-    #if abs(e.total_charge)!=2: continue
-    #if e.nJets_OR_T_MV2c10_70<1: continue
-    #if e.nJets_OR_T<4: continue
-
-    if e.is3L==0: continue
-    if e.trilep_type==0: continue
-    if abs(e.total_charge)!=1: continue
-    if e.nJets_OR_T<2: continue
-    if e.nJets_OR_T_MV2c10_70<1: continue
-    if e.lep_ID_0==-e.lep_ID_1 and abs(e.Mll01-91.2e3)<10e3: continue
-    if e.lep_ID_0==-e.lep_ID_2 and abs(e.Mll02-91.2e3)<10e3: continue
-
-    k = {}
-
-    if '34587' in dsid or '34567' in dsid or '34634' in dsid:
-        k['signal'] = 1
-    else:
-        k['signal'] = 0
-
-    k['trilep_type'] = e.dilep_type
-    k['lep_Pt_0'] = e.lep_Pt_0
-    k['lep_Eta_0'] = e.lep_Eta_0
-    k['lep_Phi_0'] = e.lep_Phi_0
-    k['lep_ID_0'] = e.lep_ID_0
-    k['lep_Pt_1'] = e.lep_Pt_1
-    k['lep_Eta_1'] = e.lep_Eta_1
-    k['lep_Phi_1'] = e.lep_Phi_1
-    k['lep_ID_1'] = e.lep_ID_1
-    k['lep_Pt_2'] = e.lep_Pt_2
-    k['lep_Eta_2'] = e.lep_Eta_2
-    k['lep_Phi_2'] = e.lep_Phi_2
-    k['lep_ID_2'] = e.lep_ID_2
-    k['Mll01'] = e.Mll01
-    k['Mll02'] = e.Mll02
-    k['Mll12'] = e.Mll12
-    k['DRll01'] = e.DRll01
-    k['Ptll01'] = e.Ptll01
-    k['lead_jetPt'] = e.lead_jetPt 
-    k['lead_jetEta'] = e.lead_jetEta
-    k['lead_jetPhi'] = e.lead_jetPhi 
-    k['sublead_jetPt'] = e.sublead_jetPt 
-    k['sublead_jetEta'] = e.sublead_jetEta
-    k['sublead_jetPhi'] = e.sublead_jetPhi
-    k['HT'] = e.HT 
-    k['HT_lep'] = e.HT_lep
-    k['nJets_OR_T'] = e.nJets_OR_T
-    k['nJets_OR_T_MV2c10_70'] = e.nJets_OR_T_MV2c10_70 
-    k['MET_RefFinal_et'] = e.MET_RefFinal_et
-    k['MET_RefFinal_phi'] = e.MET_RefFinal_phi
-    k['DRlj00'] = e.DRlj00 
-    #k['DRlj10'] = e.DRlj10
-    k['DRjj01'] = e.DRjj01
-
-    k['bin_score_3lF'] = e.xgb_bin_score_3lF
-    k['bin_score_3lS'] = e.xgb_bin_score_3lS
-    k['pt_score_3lF'] = e.xgb_pt_score_3lF
-    k['pt_score_3lS'] = e.xgb_pt_score_3lS
-
-    k['decayScore'] = e.decayScore
-
-    k['higgsScore1l'] = e.higgsScore1l
-    k['higgsScore2l'] = e.higgsScore2l
-    k['topScore'] = e.topScore
-
-    #k['rough_pt'], k['lepJetCat'] = higgsCandidate.calcHiggsCandidate(e)                                                                       
-    #_, k['lepJetCat'] = higgsCandidate.calcHiggsCandidate(e)
-
-    #else: continue
-
-    events.append(k)
+        k = dict3l(e, sig)
+        events.append(k)
 
     
-dFrame = pd.DataFrame(events)
-dFrame.to_csv(sys.argv[2], index=False)
+    dFrame = pd.DataFrame(events)
+    dFrame.to_csv(outFile, index=False)
+
+linelist = [line.rstrip() for line in open(inf)]
+print(linelist)
+Parallel(n_jobs=20)(delayed(run_csv)(inFile) for inFile in linelist)

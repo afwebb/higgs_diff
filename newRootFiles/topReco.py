@@ -88,7 +88,7 @@ for idx in range(nEntries):
 
     k = topDict( jets[ topJets[0] ], jets[ topJets[1] ], leps[0], leps[1], met, 
                  nom.jet_MV2c10[ topJets[0] ], nom.jet_MV2c10[ topJets[1] ], 
-                 nom.jet_jvt[ topJets[0] ], nom.jet_jvt[ topJets[1] ],
+                 #nom.jet_jvt[ topJets[0] ], nom.jet_jvt[ topJets[1] ],
                  nom.jet_numTrk[ topJets[0] ], nom.jet_numTrk[ topJets[1] ],
                  1 )
     eventsFlat.append(k)
@@ -97,7 +97,7 @@ for idx in range(nEntries):
         i,j = random.sample(badJets,2)
         k = topDict( jets[ topJets[0] ], jets[j], leps[0], leps[1], met, 
                      nom.jet_MV2c10[ topJets[0] ], nom.jet_MV2c10[j], 
-                     nom.jet_jvt[ topJets[0] ], nom.jet_jvt[j],
+                     #nom.jet_jvt[ topJets[0] ], nom.jet_jvt[j],
                      nom.jet_numTrk[ topJets[0] ], nom.jet_numTrk[j],
                      0 )
         eventsFlat.append(k)
@@ -106,7 +106,7 @@ for idx in range(nEntries):
         i,j = random.sample(badJets,2)
         k = topDict( jets[ i ], jets[ topJets[1] ], leps[0], leps[1], met, 
                      nom.jet_MV2c10[ i ], nom.jet_MV2c10[ topJets[1] ], 
-                     nom.jet_jvt[ i ], nom.jet_jvt[ topJets[1] ],
+                     #nom.jet_jvt[ i ], nom.jet_jvt[ topJets[1] ],
                      nom.jet_numTrk[ i ], nom.jet_numTrk[ topJets[1] ],
                      0 )
         eventsFlat.append(k)
@@ -115,7 +115,7 @@ for idx in range(nEntries):
         i,j = random.sample(badJets,2)
         k = topDict( jets[i], jets[j], leps[0], leps[1], met, 
                      nom.jet_MV2c10[i], nom.jet_MV2c10[j], 
-                     nom.jet_jvt[i], nom.jet_jvt[j],
+                     #nom.jet_jvt[i], nom.jet_jvt[j],
                      nom.jet_numTrk[i], nom.jet_numTrk[j],
                      0 )
         eventsFlat.append(k)

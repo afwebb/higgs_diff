@@ -34,9 +34,9 @@ def higgsDict(jet1, jet2, lep, met, jet1_MV2c10, jet2_MV2c10, lepO, jet1_jvt, je
     k['Mj1lO'] = (jet2+lepO).M()
 
     k['jet_jvt_0'] = jet1_jvt
-    k['jet_jvt_1'] = jet1_jvt
+    k['jet_jvt_1'] = jet2_jvt
 
     k['jet_numTrk_0'] = jet1_numTrk
-    k['jet_numTrk_1'] = jet1_numTrk
+    k['jet_numTrk_1'] = jet2_numTrk
 
     return k

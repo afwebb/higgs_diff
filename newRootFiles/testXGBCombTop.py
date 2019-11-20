@@ -177,6 +177,8 @@ for idx in range(len(la[b'met']) ):
     match = 0
 
     for i in range(len(la[b'jet_pt'][idx])):#la[b'selected_jets'][i]:
+        if la[b'jet_jvt'][idx][i]<0.59:
+            continue
 
         jet_pt = la[b'jet_pt'][idx][i]
         jet_eta = la[b'jet_eta'][idx][i]
@@ -218,7 +220,7 @@ for idx in range(len(la[b'met']) ):
                 comb = [l,i,j]
 
                 t = topDict( jet4Vecs[i], jet4Vecs[j], lep4Vecs[0], lep4Vecs[1], met, jet4VecsMV2c10[i], jet4VecsMV2c10[j],
-                             la[b'jet_jvt'][idx][ i ], la[b'jet_jvt'][idx][j],
+                             #la[b'jet_jvt'][idx][ i ], la[b'jet_jvt'][idx][j],
                              la[b'jet_numTrk'][idx][ i ], la[b'jet_numTrk'][idx][j]
                              )
                 combosTop.append([t, comb])

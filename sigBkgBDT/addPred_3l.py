@@ -10,8 +10,6 @@ import sys
 import pickle
 import math
 import numpy as np
-from dict_top import topDict
-from dict_higgs import higgsDict
 import torch
 from torch import nn, optim
 import torch.nn.functional as F
@@ -20,6 +18,8 @@ import torch.optim as optim
 from joblib import Parallel, delayed
 import multiprocessing
 import pandas as pd
+import dict_3l
+from dict_3l import dict3l, calc_phi
 #from rootpy.io import root_open
 
 #Read in list of files
@@ -27,8 +27,16 @@ inf = sys.argv[1]
 
 #load xgb models
 
-modelPath = "xgb_models/3l/xgb_match_higgsLepCut.dat"
-model = pickle.load(open(modelPath, "rb"))
+#model_3l = pickle.load(open("xgb_models/3l.dat", "rb"))
+
+model_3lF = pickle.load(open("xgb_models/3lF.dat", "rb"))
+model_3lS = pickle.load(open("xgb_models/3lS.dat", "rb"))
+
+model_3lFHigh = pickle.load(open("xgb_models/3lFHigh.dat", "rb"))
+model_3lSHigh = pickle.load(open("xgb_models/3lSHigh.dat", "rb"))
+
+model_3lFLow = pickle.load(open("xgb_models/3lFLow.dat", "rb"))
+model_3lSLow = pickle.load(open("xgb_models/3lSLow.dat", "rb"))
 
 def calc_phi(phi_0, new_phi):
     new_phi = new_phi-phi_0
@@ -52,50 +60,7 @@ def create_dict(nom):
 
         nom.GetEntry(idx)
 
-        k = {}
-        k['trilep_type'] = nom.dilep_type
-        k['lep_Pt_0'] = nom.lep_Pt_0
-        k['lep_Eta_0'] = nom.lep_Eta_0
-        k['lep_Phi_0'] = nom.lep_Phi_0
-        k['lep_ID_0'] = nom.lep_ID_0
-        k['lep_Pt_1'] = nom.lep_Pt_1
-        k['lep_Eta_1'] = nom.lep_Eta_1
-        k['lep_Phi_1'] = nom.lep_Phi_1
-        k['lep_ID_1'] = nom.lep_ID_1
-        k['lep_Pt_2'] = nom.lep_Pt_2
-        k['lep_Eta_2'] = nom.lep_Eta_2
-        k['lep_Phi_2'] = nom.lep_Phi_2
-        k['lep_ID_2'] = nom.lep_ID_2
-        k['Mll01'] = nom.Mll01
-        k['Mll02'] = nom.Mll02
-        k['Mll12'] = nom.Mll12
-        k['DRll01'] = nom.DRll01
-        k['Ptll01'] = nom.Ptll01
-        k['lead_jetPt'] = nom.lead_jetPt
-        k['lead_jetEta'] = nom.lead_jetEta
-        k['lead_jetPhi'] = nom.lead_jetPhi
-        k['sublead_jetPt'] = nom.sublead_jetPt
-        k['sublead_jetEta'] = nom.sublead_jetEta
-        k['sublead_jetPhi'] = nom.sublead_jetPhi
-        k['HT'] = nom.HT
-        k['HT_lep'] = nom.HT_lep
-        k['nJets_OR_T'] = nom.nJets_OR_T
-        k['nJets_OR_T_MV2c10_70'] = nom.nJets_OR_T_MV2c10_70
-        k['MET_RefFinal_et'] = nom.MET_RefFinal_et
-        k['MET_RefFinal_phi'] = nom.MET_RefFinal_phi
-        k['DRlj00'] = nom.DRlj00
-        k['DRjj01'] = nom.DRjj01
-        
-        k['bin_score_3lF'] = nom.xgb_bin_score_3lF
-        k['bin_score_3lS'] = nom.xgb_bin_score_3lS
-        k['pt_score_3lF'] = nom.xgb_pt_score_3lF
-        k['pt_score_3lS'] = nom.xgb_pt_score_3lS
-        
-        k['decayScore'] = nom.decayScore
-        
-        k['higgsScore1l'] = nom.higgsScore1l
-        k['higgsScore2l'] = nom.higgsScore2l
-        k['topScore'] = nom.topScore
+        k = dict3l(nom)
         
         events.append(k)
 
@@ -117,14 +82,64 @@ def run_pred(inputPath):
     event_dict = create_dict(nom)
     inDF = pd.DataFrame(event_dict)
     xgbMat = xgb.DMatrix(inDF, feature_names=list(inDF))
-    y_pred = model.predict(xgbMat)
-    
+
+    in3lF = inDF.drop(['pt_score_3lS'],axis=1)
+    #in3lF = in3lF.drop(['bin_score_3lS'],axis=1)
+
+    in3lS = inDF.drop(['pt_score_3lF'],axis=1)
+    #in3lS = in3lS.drop(['bin_score_3lF'],axis=1)
+
+    xgbMat3lF = xgb.DMatrix(in3lF, feature_names=list(in3lF))
+    xgbMat3lS = xgb.DMatrix(in3lS, feature_names=list(in3lS))
+
+    #y_pred_3l = model_3l.predict(xgbMat)
+
+    y_pred_3lF = model_3lF.predict(xgbMat3lF)
+    y_pred_3lS = model_3lS.predict(xgbMat3lS)
+
+    y_pred_3lFHigh = model_3lFHigh.predict(xgbMat3lF)
+    y_pred_3lSHigh = model_3lSHigh.predict(xgbMat3lS)
+
+    y_pred_3lFLow = model_3lFLow.predict(xgbMat3lF)
+    y_pred_3lSLow = model_3lSLow.predict(xgbMat3lS)
+
+
     with root_open(inputPath, mode='a') as myfile:
-        xgbScore_sigBkg_3l = np.asarray(y_pred)
-        xgbScore_sigBkg_3l.dtype = [('xgbScore_sigBkg_3l', 'float32')]
-        xgbScore_sigBkg_3l.dtype.names = ['xgbScore_sigBkg_3l']
-        root_numpy.array2tree(xgbScore_sigBkg_3l, tree=myfile.nominal)
+        #xgb_sigBkg_3l = np.asarray(y_pred_3l)
+        #xgb_sigBkg_3l.dtype = [('xgb_sigBkg_3l_2', 'float32')]
+        #xgb_sigBkg_3l.dtype.names = ['xgb_sigBkg_3l_2']
+        #root_numpy.array2tree(xgb_sigBkg_3l, tree=myfile.nominal)
+
+        xgb_sigBkg_3lF = np.asarray(y_pred_3lF)
+        xgb_sigBkg_3lF.dtype = [('xgb_sigBkg_3lF_2', 'float32')]
+        xgb_sigBkg_3lF.dtype.names = ['xgb_sigBkg_3lF_2']
+        root_numpy.array2tree(xgb_sigBkg_3lF, tree=myfile.nominal)
         
+        xgb_sigBkg_3lS = np.asarray(y_pred_3lS)
+        xgb_sigBkg_3lS.dtype = [('xgb_sigBkg_3lS_2', 'float32')]
+        xgb_sigBkg_3lS.dtype.names = ['xgb_sigBkg_3lS_2']
+        root_numpy.array2tree(xgb_sigBkg_3lS, tree=myfile.nominal)
+
+        xgb_sigBkg_3lFHigh = np.asarray(y_pred_3lFHigh)
+        xgb_sigBkg_3lFHigh.dtype = [('xgb_sigBkg_3lFHigh_2', 'float32')]
+        xgb_sigBkg_3lFHigh.dtype.names = ['xgb_sigBkg_3lFHigh_2']
+        root_numpy.array2tree(xgb_sigBkg_3lFHigh, tree=myfile.nominal)
+
+        xgb_sigBkg_3lSHigh = np.asarray(y_pred_3lSHigh)
+        xgb_sigBkg_3lSHigh.dtype = [('xgb_sigBkg_3lSHigh_2', 'float32')]
+        xgb_sigBkg_3lSHigh.dtype.names = ['xgb_sigBkg_3lSHigh_2']
+        root_numpy.array2tree(xgb_sigBkg_3lSHigh, tree=myfile.nominal)
+
+        xgb_sigBkg_3lFLow = np.asarray(y_pred_3lFLow)
+        xgb_sigBkg_3lFLow.dtype = [('xgb_sigBkg_3lFLow_2', 'float32')]
+        xgb_sigBkg_3lFLow.dtype.names = ['xgb_sigBkg_3lFLow_2']
+        root_numpy.array2tree(xgb_sigBkg_3lFLow, tree=myfile.nominal)
+
+        xgb_sigBkg_3lSLow = np.asarray(y_pred_3lSLow)
+        xgb_sigBkg_3lSLow.dtype = [('xgb_sigBkg_3lSLow_2', 'float32')]
+        xgb_sigBkg_3lSLow.dtype.names = ['xgb_sigBkg_3lSLow_2']
+        root_numpy.array2tree(xgb_sigBkg_3lSLow, tree=myfile.nominal)
+
         myfile.write()
         myfile.Close()
 

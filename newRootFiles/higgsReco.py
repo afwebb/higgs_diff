@@ -50,6 +50,9 @@ for e in nom:
     if e.total_charge==0: continue
     if e.nJets<4: continue
     if e.nJets_MV2c10_70<1: continue
+    if e.lep_pt[0]<20000: continue
+    if e.lep_pt[1]<20000: continue
+
 
     fourVecs = {}
     
@@ -73,6 +76,8 @@ for e in nom:
     higgsJets = []
     badJets = []
     for i in range(len(e.jet_pt)):
+        if e.jet_jvt<0.59:
+            continue
         jet = LorentzVector()
         jet.SetPtEtaPhiE(e.jet_pt[i], e.jet_eta[i], e.jet_phi[i], e.jet_E[i])
         jets.append(jet)

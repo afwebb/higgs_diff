@@ -22,6 +22,8 @@ for c in inDF:
         r = (-1, 1)
     elif 'dR' in c:
         r = (0, 6)
+    elif "Score" in c:
+        r = (0,1)
     else:
         r = (0, 300000)
 
@@ -42,5 +44,5 @@ plt.yticks(range(inDF.shape[1]), inDF.columns, fontsize=14)
 cb = plt.colorbar()
 #cb.ax.tick
 #plt.title('Top Match Feature Correlations', fontsize=16)
-plt.savefig(outDir+"CorrMat.png")
-plt.close()
+#plt.savefig(outDir+"CorrMat.png")
+#plt.close()

@@ -10,8 +10,6 @@ import sys
 import pickle
 import math
 import numpy as np
-from dict_top import topDict
-from dict_higgs import higgsDict
 import torch
 from torch import nn, optim
 import torch.nn.functional as F
@@ -20,6 +18,7 @@ import torch.optim as optim
 from joblib import Parallel, delayed
 import multiprocessing
 import pandas as pd
+from dict_2l import dict2l, calc_phi
 #from rootpy.io import root_open
 
 #Read in list of files
@@ -27,8 +26,9 @@ inf = sys.argv[1]
 
 #load xgb models
 
-modelPath = "xgb_models/2l/xgb_match_higgsLepCut.dat"
-model = pickle.load(open(modelPath, "rb"))
+model = pickle.load(open("xgb_models/2l.dat", "rb"))
+highModel = pickle.load(open("xgb_models/2lHigh.dat","rb"))
+lowModel = pickle.load(open("xgb_models/2lLow.dat","rb"))
 
 def calc_phi(phi_0, new_phi):
     new_phi = new_phi-phi_0
@@ -51,40 +51,8 @@ def create_dict(nom):
             print(str(idx)+'/'+str(nEntries))
 
         nom.GetEntry(idx)
-
-        k = {}
-        k['dilep_type'] = nom.dilep_type
-        k['lep_Pt_0'] = nom.lep_Pt_0
-        k['lep_Eta_0'] = nom.lep_Eta_0
-        k['lep_Phi_0'] = nom.lep_Phi_0
-        k['lep_ID_0'] = nom.lep_ID_0
-        k['lep_Pt_1'] = nom.lep_Pt_1
-        k['lep_Eta_1'] = nom.lep_Eta_1
-        k['lep_Phi_1'] = nom.lep_Phi_1
-        k['lep_ID_1'] = nom.lep_ID_1
-        k['Mll01'] = nom.Mll01
-        k['DRll01'] = nom.DRll01
-        k['Ptll01'] = nom.Ptll01
-        k['lead_jetPt'] = nom.lead_jetPt
-        k['lead_jetEta'] = nom.lead_jetEta
-        k['lead_jetPhi'] = nom.lead_jetPhi
-        k['sublead_jetPt'] = nom.sublead_jetPt
-        k['sublead_jetEta'] = nom.sublead_jetEta
-        k['sublead_jetPhi'] = nom.sublead_jetPhi
-        k['HT'] = nom.HT
-        k['HT_lep'] = nom.HT_lep
-        k['nJets_OR_T'] = e.nJets_OR_T
-        k['nJets_OR_T_MV2c10_70'] = e.nJets_OR_T_MV2c10_70
-        k['MET_RefFinal_et'] = e.MET_RefFinal_et
-        k['MET_RefFinal_phi'] = e.MET_RefFinal_phi
-        k['DRlj00'] = e.DRlj00
-        k['DRjj01'] = e.DRjj01
         
-        k['bin_score'] = e.xgb_bin_score_2l
-        k['pt_score'] = e.xgb_pt_score_2l
-        k['higgsScore'] = e.higgsScore
-        k['topScore'] = e.topScore
-        
+        k = dict2l(nom)
         events.append(k)
 
     return events
@@ -105,18 +73,39 @@ def run_pred(inputPath):
     event_dict = create_dict(nom)
     inDF = pd.DataFrame(event_dict)
     xgbMat = xgb.DMatrix(inDF, feature_names=list(inDF))
-    y_pred = model.predict(xgbMat)
-    
+
+    inHigh = inDF#.drop(['pt_score'],axis=1)
+    #inHigh = inHigh.drop(['bin_score'],axis=1)
+    xgbMatHigh = xgb.DMatrix(inHigh, feature_names=list(inHigh))
+
+    inLow = inDF#.drop(['pt_score'],axis=1)
+    #inLow = inLow.drop(['bin_score'],axis=1)    
+    xgbMatLow = xgb.DMatrix(inLow, feature_names=list(inLow))
+
+    y_pred_2l = model.predict(xgbMat)
+    y_pred_2lHigh = highModel.predict(xgbMatHigh)
+    y_pred_2lLow = lowModel.predict(xgbMatLow)
+
     with root_open(inputPath, mode='a') as myfile:
-        xgbScore_sigBkg_2l = np.asarray(y_pred)
-        xgbScore_sigBkg_2l.dtype = [('xgbScore_sigBkg_2l', 'float32')]
-        xgbScore_sigBkg_2l.dtype.names = ['xgbScore_sigBkg_2l']
-        root_numpy.array2tree(xgbScore_sigBkg_2l, tree=myfile.nominal)
+        xgb_sigBkg_2l = np.asarray(y_pred_2l)
+        xgb_sigBkg_2l.dtype = [('xgb_sigBkg_2l_2', 'float32')]
+        xgb_sigBkg_2l.dtype.names = ['xgb_sigBkg_2l_2']
+        root_numpy.array2tree(xgb_sigBkg_2l, tree=myfile.nominal)
         
+        xgb_sigBkg_2lHigh = np.asarray(y_pred_2lHigh)
+        xgb_sigBkg_2lHigh.dtype = [('xgb_sigBkg_2lHigh_2', 'float32')]
+        xgb_sigBkg_2lHigh.dtype.names = ['xgb_sigBkg_2lHigh_2']
+        root_numpy.array2tree(xgb_sigBkg_2lHigh, tree=myfile.nominal)
+
+        xgb_sigBkg_2lLow = np.asarray(y_pred_2lLow)
+        xgb_sigBkg_2lLow.dtype = [('xgb_sigBkg_2lLow_2', 'float32')]
+        xgb_sigBkg_2lLow.dtype.names = ['xgb_sigBkg_2lLow_2']
+        root_numpy.array2tree(xgb_sigBkg_2lLow, tree=myfile.nominal)
+
         myfile.write()
         myfile.Close()
 
 linelist = [line.rstrip() for line in open(inf)]
 print(linelist)
-Parallel(n_jobs=10)(delayed(run_pred)(inFile) for inFile in linelist)
+Parallel(n_jobs=20)(delayed(run_pred)(inFile) for inFile in linelist)
 

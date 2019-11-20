@@ -1,4 +1,4 @@
-def topDict(jet1, jet2, lep1, lep2, met, jet1_MV2c10, jet2_MV2c10, jet1_jvt, jet2_jvt, jet1_numTrk, jet2_numTrk, match=-1):
+def topDict(jet1, jet2, lep1, lep2, met, jet1_MV2c10, jet2_MV2c10, jet1_numTrk, jet2_numTrk, match=-1):
     k = {}
 
     if match!=-1:
@@ -8,7 +8,7 @@ def topDict(jet1, jet2, lep1, lep2, met, jet1_MV2c10, jet2_MV2c10, jet1_jvt, jet
     k['jet_Pt_1'] = jet2.Pt()
 
     k['dRjj'] = jet1.DeltaR(jet2)
-    k['Ptjj'] = (jet1+jet2).Pt()
+    #k['Ptjj'] = (jet1+jet2).Pt()
     k['Mjj'] = (jet1+jet2).M()
 
     k['dRlj00'] = lep1.DeltaR(jet1)
@@ -29,13 +29,21 @@ def topDict(jet1, jet2, lep1, lep2, met, jet1_MV2c10, jet2_MV2c10, jet1_jvt, jet
     k['dRjjl0'] = (jet1+jet2).DeltaR(lep1)
     k['dRjjl1'] = (jet1+jet2).DeltaR(lep2)
 
-    k['Mjjl0'] = (jet1+jet2+lep1).M()
-    k['Mjjl1'] = (jet1+jet2+lep2).M()
+    #k['Mjjl0'] = (jet1+jet2+lep1).M()
+    #k['Mjjl1'] = (jet1+jet2+lep2).M()
 
-    k['jet_jvt_0'] = jet1_jvt
-    k['jet_jvt_1'] = jet1_jvt
-    
+    #k['dRj0l0met'] = jet1.DeltaR(lep1+met)
+    #k['dRj0l1met'] = jet1.DeltaR(lep2+met)
+
+    #k['dRj1l0met'] = jet2.DeltaR(lep1+met)
+    #k['dRj1l1met'] = jet2.DeltaR(lep2+met)
+
+    k['dRj0met'] = jet1.DeltaR(met)
+    k['dRj1met'] = jet2.DeltaR(met)
+
+    #k['dRjjmet'] = (jet1+jet2).DeltaR(met)
+
     k['jet_numTrk_0'] = jet1_numTrk
-    k['jet_numTrk_1'] = jet1_numTrk
+    k['jet_numTrk_1'] = jet2_numTrk
 
     return k
