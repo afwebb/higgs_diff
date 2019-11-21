@@ -19,8 +19,6 @@ import scipy
 inFile = sys.argv[1]
 inDF = pd.read_csv(inFile)
 
-maxDepth = 8
-
 outDir = sys.argv[2]
 
 inDF = sk.utils.shuffle(inDF)
@@ -38,7 +36,7 @@ xgb_test = xgb.DMatrix(test, label=y_test, feature_names=list(train))
 
 params = {
     'learning_rate' : 0.01,
-    'max_depth': maxDepth,
+    'max_depth': 14,
     'min_child_weight': 2,
     'gamma': 0.9,
     'subsample' : 0.6,
@@ -92,7 +90,7 @@ plt.hist(testPredTrue, 30, range=(-0.1,1.1), log=False, alpha=0.5, label='Correc
 plt.hist(testPredFalse[:len(testPredTrue)], 30, range=(-0.1,1.1), log=False, alpha=0.5, label='Incorrect - Test')
 plt.hist(trainPredTrue[:len(testPredTrue)], 30, range=(-0.1,1.1), log=False, histtype='step', alpha=0.5, label='Correct - Train')
 plt.hist(trainPredFalse[:len(testPredTrue)], 30, range=(-0.1,1.1), log=False, histtype='step', alpha=0.5, label='Incorrect - Train')
-plt.title("BDT Output, max depth=%i" %(maxDepth))
+plt.title("BDT Output, Train Data")
 plt.xlabel('BDT Score')
 plt.ylabel('NEvents')
 plt.legend(loc='upper right')

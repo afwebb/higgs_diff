@@ -8,12 +8,17 @@ from numpy import unwrap
 from numpy import arange
 from rootpy.vector import LorentzVector
 import random
-from dict_higgs2l import higgs2lDict
+from dict_higgsTop2l import higgsTop2lDict
+from dict_top3l import topDict
+import xgboost as xgb
+import pickle
 import pandas as pd
 #import matplotlib.pyplot as plt
 
 inf = sys.argv[1]
-outDir = sys.argv[2]
+outDir = sys.argv[3]
+modelPath = sys.argv[2]
+xgbModel = pickle.load(open(modelPath, "rb"))
 
 f = ROOT.TFile(inf, "READ")
 nom=f.Get('nominal')
@@ -81,27 +86,58 @@ for idx in range(nEntries):
 
     if len(lepH)!=2: continue
 
-    i,j = random.sample(lepH,2)
+    jet4Vecs = []
+    jet4VecsMV2c10 = []
+    for i in range(len(nom.jet_pt)):
+        jet_pt = nom.jet_pt[i]
+        jet_eta = nom.jet_eta[i]
+        jet_phi = nom.jet_phi[i]
+        jet_E = nom.jet_E[i]
+        jet_flav = nom.jet_flavor[i]
+        jet_MV2c10 = nom.jet_MV2c10[i]
+
+        jetVec = LorentzVector()
+        jetVec.SetPtEtaPhiE(jet_pt, jet_eta, jet_phi, jet_E)
+
+        jet4Vecs.append(jetVec)
+        jet4VecsMV2c10.append(jet_MV2c10)
+
+    combos = []
+
+    for i in range(len(jet4Vecs)-1):
+        for j in range(i+1, len(jet4Vecs)):
+            comb = [i,j]
+            t = topDict( jet4Vecs[i], jet4Vecs[j], leps[0], leps[1], leps[2], met,
+                         jet4VecsMV2c10[i], jet4VecsMV2c10[j],
+                         nom.jet_numTrk[i], nom.jet_numTrk[j])
+            combos.append([t, comb])
+
+    df = pd.DataFrame.from_dict([x[0] for x in combos])
+    xgbMat = xgb.DMatrix(df, feature_names=list(df))
+
+    pred = xgbModel.predict(xgbMat)
+    best = np.argmax(pred)
+    bestComb = combos[best][1]
+
+    top1 = jet4Vecs[bestComb[0]]
+    top2 = jet4Vecs[bestComb[1]]
+    topScore = pred[best]
 
     if 1 in lepH:
-        k = higgs2lDict( leps[0], leps[1], leps[2], met, 1 )
+        k = higgsTop2lDict( leps[0], leps[1], leps[2], met, top1, top2, topScore, 1 )
         eventsFlat.append(k)
-        
-        k = higgs2lDict( leps[0], leps[2], leps[1], met, 0 )
+
+        k = higgsTop2lDict( leps[0], leps[2], leps[1], met, top1, top2, topScore, 0 )
         eventsFlat.append(k)
     elif 2 in lepH:
-        k = higgs2lDict( leps[0], leps[2], leps[1], met, 1 )
+        k = higgsTop2lDict( leps[0], leps[2], leps[1], met, top1, top2, topScore, 1 )
         eventsFlat.append(k)
-        
-        k = higgs2lDict( leps[0], leps[1], leps[2], met, 0 )
+
+        k = higgsTop2lDict( leps[0], leps[1], leps[2], met, top1, top2, topScore, 0 )
         eventsFlat.append(k)
     else:
         print("lep 0 not from Higgs?")
-    #k = higgs2lDict( leps[lepB[0]], leps[i], leps[j], met, 
-    #               0 )
-    #eventsFlat.append(k)
 
-#import pandas as pd
 
 dfFlat = pd.DataFrame.from_dict(eventsFlat)
 

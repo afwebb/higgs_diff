@@ -8,11 +8,17 @@ from numpy import unwrap
 from numpy import arange
 from rootpy.vector import LorentzVector
 import random
-from dict_higgs1l import higgs1lDict
+from dict_higgsTop1l import higgsTop1lDict
+from dict_top3l import topDict
+import pandas as pd
+import xgboost as xgb
+import pickle
 #import matplotlib.pyplot as plt
 
 inf = sys.argv[1]
-outDir = sys.argv[2]
+outDir = sys.argv[3]
+modelPath = sys.argv[2]
+xgbModel = pickle.load(open(modelPath, "rb"))
 
 f = ROOT.TFile.Open(inf)
 dsid = inf.split('/')[-1]
@@ -63,16 +69,19 @@ for idx in range(nEntries):
     
     lepH = []
     lepB = []
+    leps = []
 
     for i in range(3):
         lep = LorentzVector()
         lep.SetPtEtaPhiE(nom.lep_pt[i], nom.lep_eta[i], nom.lep_phi[i], nom.lep_E[i])
+        leps.append(lep)
         if nom.lep_parent[i]==25:
             lepH.append(lep)
         else:
             lepB.append(lep)
 
     jets = []
+    jetsMV2c10 = []
     higgsJets = []
     badJets = []
     for i in range(len(nom.jet_pt)):
@@ -80,6 +89,8 @@ for idx in range(nEntries):
         jet.SetPtEtaPhiE(nom.jet_pt[i], nom.jet_eta[i], nom.jet_phi[i], nom.jet_E[i])
         jets.append(jet)
         
+        jetsMV2c10.append(nom.jet_MV2c10[i])
+
         if nom.jet_parent[i]==25:
             higgsJets.append(i)
         else:
@@ -87,50 +98,75 @@ for idx in range(nEntries):
         
     if len(lepH)!=1 or len(higgsJets)!=2: continue
 
-    k = higgs1lDict( jets[ higgsJets[0] ], jets[ higgsJets[1] ], lepH[0], met, 
+    combos = []
+    
+    for i in range(len(jets)-1):
+        for j in range(i+1, len(jets)):
+            comb = [i,j]
+            t = topDict( jets[i], jets[j], leps[0], leps[1], leps[2], met,
+                         jetsMV2c10[i], jetsMV2c10[j],
+                         nom.jet_numTrk[i], nom.jet_numTrk[j])
+            combos.append([t, comb])
+            
+    df = pd.DataFrame.from_dict([x[0] for x in combos])
+    xgbMat = xgb.DMatrix(df, feature_names=list(df))
+
+    pred = xgbModel.predict(xgbMat)
+    best = np.argmax(pred)
+    bestComb = combos[best][1]
+
+    top1 = jets[bestComb[0]]
+    top2 = jets[bestComb[1]]
+    topScore = pred[best]
+
+    k = higgsTop1lDict( jets[ higgsJets[0] ], jets[ higgsJets[1] ], lepH[0], met, 
                      nom.jet_MV2c10[ higgsJets[0] ], nom.jet_MV2c10[ higgsJets[1] ], lepB[0], lepB[1],
                      nom.jet_numTrk[ higgsJets[0] ], nom.jet_numTrk[ higgsJets[1] ], 
+                     top1, top2, topScore,
                      1 )
     eventsFlat.append(k)
 
     for l in range(2):
-        k = higgs1lDict( jets[ higgsJets[0] ], jets[ higgsJets[1] ], lepB[0], met, 
+        k = higgsTop1lDict( jets[ higgsJets[0] ], jets[ higgsJets[1] ], lepB[0], met, 
                          nom.jet_MV2c10[ higgsJets[0] ], nom.jet_MV2c10[ higgsJets[1] ], lepH[0], lepB[1],
                          nom.jet_numTrk[ higgsJets[0] ], nom.jet_numTrk[ higgsJets[1] ], 
+                         top1, top2, topScore,
                          0 )
         eventsFlat.append(k)
 
     for l in range(2):
         if len(badJets)<2: break
         i,j = random.sample(badJets,2)
-        k = higgs1lDict( jets[i], jets[j], lepH[0], met, 
+        k = higgsTop1lDict( jets[i], jets[j], lepH[0], met, 
                          nom.jet_MV2c10[i], nom.jet_MV2c10[j], lepB[0], lepB[1],
                          nom.jet_numTrk[i], nom.jet_numTrk[j],
+                         top1, top2, topScore,
                          0 )
         eventsFlat.append(k)
 
-        k = higgs1lDict( jets[i], jets[ higgsJets[1] ], lepH[0], met, 
+        k = higgsTop1lDict( jets[i], jets[ higgsJets[1] ], lepH[0], met, 
                          nom.jet_MV2c10[i], nom.jet_MV2c10[ higgsJets[1]], lepB[0], lepB[1], 
                          nom.jet_numTrk[i], nom.jet_numTrk[ higgsJets[1]],
+                         top1, top2, topScore,
                          0 )
         eventsFlat.append(k)
         
-        k = higgs1lDict( jets[ higgsJets[0] ], jets[j], lepH[0], met, 
+        k = higgsTop1lDict( jets[ higgsJets[0] ], jets[j], lepH[0], met, 
                          nom.jet_MV2c10[ higgsJets[0] ], nom.jet_MV2c10[j], lepB[0], lepB[1],
                          nom.jet_numTrk[ higgsJets[0] ], nom.jet_numTrk[j],
+                         top1, top2, topScore,
                          0 )
         eventsFlat.append(k)
 
     for l in range(min([6, len(badJets)])):
         if len(badJets)<2: break
         i,j = random.sample(badJets,2)
-        k = higgs1lDict( jets[i], jets[j], lepB[0], met, 
+        k = higgsTop1lDict( jets[i], jets[j], lepB[0], met, 
                          nom.jet_MV2c10[i], nom.jet_MV2c10[j], lepH[0], lepB[1],
                          nom.jet_numTrk[i], nom.jet_numTrk[j],
+                         top1, top2, topScore,
                          0 )
         eventsFlat.append(k)
-
-import pandas as pd
 
 dfFlat = pd.DataFrame.from_dict(eventsFlat)
 

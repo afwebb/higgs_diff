@@ -1,4 +1,4 @@
-def higgs2lDict(lep0, lep1, lep2, met, top0, top1, match=-1):
+def higgsTop2lDict(lep0, lep1, lep2, met, top0, top1, topScore, match=-1):
 
     k = {}
 
@@ -43,6 +43,8 @@ def higgs2lDict(lep0, lep1, lep2, met, top0, top1, match=-1):
 
     k['dRlt10'] = lep1.DeltaR(top1)
     k['dRlt20'] = lep2.DeltaR(top1)
+
+    k['topScore'] = topScore
 
     k['met'] = met.Pt()
 

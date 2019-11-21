@@ -1,4 +1,4 @@
-def higgs1lDict(jet1, jet2, lep, met, jet1_MV2c10, jet2_MV2c10, lepO1, lepO2, jet1_numTrk, jet2_numTrk, top1, top2, topScore, match=-1):
+def higgsTop1lDict(jet1, jet2, lep, met, jet1_MV2c10, jet2_MV2c10, lepO1, lepO2, jet1_numTrk, jet2_numTrk, top1, top2, topScore, match=-1):
 
     k = {}
 
@@ -35,7 +35,7 @@ def higgs1lDict(jet1, jet2, lep, met, jet1_MV2c10, jet2_MV2c10, lepO1, lepO2, je
     k['dR(l)(lO2)'] = lep.DeltaR(lepO2)
 
     k['jet_numTrk_0'] = jet1_numTrk
-    k['jet_numTrk_1'] = jet1_numTrk
+    k['jet_numTrk_1'] = jet2_numTrk
 
     k['M(jjt0)'] = (jet1+jet2+top1).M()
     k['M(jjt1)'] = (jet1+jet2+top2).M()

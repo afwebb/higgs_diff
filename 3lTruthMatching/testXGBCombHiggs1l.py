@@ -1,9 +1,8 @@
 #Script to test whether the combination of leptons/jets with the highest xgb score corresponds to the correct combo
-
 import ROOT
 import pandas as pd
 import numpy as np
-import uproot
+#import uproot
 import sys
 import math
 import pickle
@@ -12,7 +11,7 @@ from numpy import unwrap
 from numpy import arange
 from rootpy.vector import LorentzVector
 import xgboost as xgb
-from dict_higgs2l import higgs2lDict
+from dict_higgs1l import higgs1lDict
 import matplotlib.pyplot as plt
 
 inputFile = sys.argv[1]
@@ -71,12 +70,18 @@ higgVecs = []
 
 fourVecDicts = []
 
+#for idx in range(len(la[b'met']) ):
+#    #current+=1
+#    if idx%10000==0:
+#        print(idx)                                                                                                 
+#    if idx==50000:
+#        break
 nEntries = nom.GetEntries()
 for idx in range(nEntries):
     if idx%10000==0:
         print(str(idx)+'/'+str(nEntries))
-    if idx==30000:
-        break
+    if idx==30000:       
+        break                                                                                                                                   
 
     nom.GetEntry(idx)
 
@@ -89,6 +94,8 @@ for idx in range(nEntries):
     if nom.lep_pt[2]<20000: continue
 
     truthComb = []
+    match=0
+    lepMatch = 0
 
     higgCand = LorentzVector()
     
@@ -97,41 +104,60 @@ for idx in range(nEntries):
     met = LorentzVector()
     met.SetPtEtaPhiE(nom.met, 0, nom.met_phi, nom.met)
     
-    fourVecs['met'] = met
-    
-    higgCand+=met
-        
     lep4Vecs = []
-
-    lepMatch = []
-    badLep = -1
     for i in range(3):
-
         lep_pt = nom.lep_pt[i]
         lep_eta = nom.lep_eta[i]
         lep_phi = nom.lep_phi[i]
         lep_E = nom.lep_E[i]
+        lep_flav = nom.lep_flavor[i]
 
         lepVec = LorentzVector()
         lepVec.SetPtEtaPhiE(lep_pt, lep_eta, lep_phi, lep_E)
+
         lep4Vecs.append(lepVec)
 
         if nom.lep_parent[i]==25:
-            lepMatch.append(i)
-        else:
-            badLep = i
+            truthComb.append(i)
+            lepMatch+=1
 
-    if len(lepMatch)!=2:
-        continue
+    jet4Vecs = []
+    jet4VecsMV2c10 = []
+    for i in range(len(nom.jet_pt)):
+        #if nom.jet_jvt[i]<0.59:
+        #    continue
 
-    truthComb=lepMatch
+        jet_pt = nom.jet_pt[i]
+        jet_eta = nom.jet_eta[i]
+        jet_phi = nom.jet_phi[i]
+        jet_E = nom.jet_E[i]
+        jet_flav = nom.jet_flavor[i]
+        jet_MV2c10 = nom.jet_MV2c10[i]
+
+        jetVec = LorentzVector()
+        jetVec.SetPtEtaPhiE(jet_pt, jet_eta, jet_phi, jet_E)
+
+        jet4Vecs.append(jetVec)
+        jet4VecsMV2c10.append(jet_MV2c10)
+
+        if abs(nom.jet_parent[i])==6:
+            truthComb.append(i)
+            match+=1
+
+    if match!=2 or lepMatch!=1: continue
 
     combos = []
 
-    possCombs = [[0,1,2],[0,2,1]]
-    for comb in possCombs:
-        k = higgs2lDict( lep4Vecs[ comb[0] ], lep4Vecs[ comb[1] ], lep4Vecs[ comb[2] ], met)
-        combos.append([k, [comb[0], comb[1]] ])
+    for l in range(len(lep4Vecs)):
+        for i in range(len(jet4Vecs)-1):
+            for j in range(i+1, len(jet4Vecs)):
+                comb = [l,i,j]
+
+                k = higgs1lDict( jet4Vecs[ i ], jet4Vecs[ j ], lep4Vecs[l], met,
+                                 jet4VecsMV2c10[ i ], jet4VecsMV2c10[ j ], 
+                                 lep4Vecs[(l+1)%3], lep4Vecs[(l+2)%3],
+                                 nom.jet_numTrk[ i ], nom.jet_numTrk[ j ])
+                combos.append([k, comb])
 
     df = pd.DataFrame.from_dict([x[0] for x in combos])
     xgbMat = xgb.DMatrix(df, feature_names=list(df))
@@ -144,14 +170,13 @@ for idx in range(nEntries):
     bestComb = combos[best][1]
     lepMatch = bestComb[0]
     jetMatches = bestComb[1:]
-    '''
-    for c, s in zip(combos, pred):
-        if c[1][0]==truthComb[0] and c[1][1] in truthComb[1] and c[1][2] in truthComb[1:]:
-            #truthK = {**c[0], **c[1]}
-            truthScores.append(s)
-            #print('truth score', s)
-    '''
-    #predK = {**combos[best][0], **combos[best][1]}
+
+    #for c, s in zip(combos, pred):
+    #    if c[1][0]==truthComb[0] and c[1][1] in truthComb[1:] and c[1][2] in truthComb[1:]:
+    #        truthK = {**c[0], **c[2]}
+    #        print('truth score', s)
+
+    #predK = {**combos[best][0], **combos[best][2]}
 
     #print(bestComb, truthComb, pred[best])
 
@@ -166,11 +191,18 @@ for idx in range(nEntries):
         #wrongTruth.append(truthK)
         #wrongPred.append(predK)
 
+    if bestComb[0]==truthComb[0]:
+        lepCorrect+=1
+    if bestComb[1] in truthComb[1:] and bestComb[2] in truthComb[1:]:
+        j1Correct+=1
+    if bestComb[0]==truthComb[0] and (bestComb[1] in truthComb[1:] or bestComb[2] in truthComb[1:]):
+        lep1jCorrect+=1
+
 print('events passed', totalPast)
 print('percent correct', nCorrect/totalPast)
-#print('lep correct', lepCorrect/totalPast)
-#print('1 jet correct', j1Correct/totalPast)
-#print('lep and 1 jet correct', lep1jCorrect/totalPast)
+print('lep correct', lepCorrect/totalPast)
+print('both jets correct', j1Correct/totalPast)
+print('lep and 1 jet correct', lep1jCorrect/totalPast)
 '''
 rightTruthDF = pd.DataFrame(rightTruth)
 wrongTruthDF = pd.DataFrame(wrongTruth)
@@ -183,12 +215,12 @@ wrongPredDF.to_csv('outputData/wrongPredAllBad.csv', index=False)
 '''
 plt.figure()
 plt.hist(truthScores, 30)
-plt.savefig('plots/higgs2lTruthScores.png')
+plt.savefig('plots/higgs1lTruthScores.png')
 
 plt.figure()
 plt.hist(rightScores, 30, alpha=0.5, label='right')
 plt.hist(wrongScores, 30, alpha=0.5, label='wrong')
 plt.legend()
-plt.savefig('plots/higgs2lMatchScores.png')
+plt.savefig('plots/higgs1lMatchScores.png')
 
 
