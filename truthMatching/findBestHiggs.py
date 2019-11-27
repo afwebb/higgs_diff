@@ -50,18 +50,9 @@ nEntries = nom.GetEntries()
 for idx in range(nEntries):
     if idx%10000==0:
         print(str(idx)+'/'+str(nEntries))
-        #if current%100000==0:
-        #break
+
     nom.GetEntry(idx)
  
-    #if e.is2LSS0Tau==0 and e.is2LSS1Tau==0: continue
-    #if e.total_leptons != 2: continue
-    #if e.dilep_type < 1: continue
-    #if e.total_charge == 0: continue
-    #if e.nJets_OR_T_MV2c10_70 < 1: continue
-    #if e.nJets_OR_T < 4: continue
-    #if e.higgsDecayMode != 3: continue
-
     if nom.total_leptons!=2: continue
     if nom.total_charge==0: continue
     if nom.dilep_type<1: continue
@@ -69,12 +60,6 @@ for idx in range(nEntries):
     if nom.nJets_MV2c10_70<1: continue
     if nom.lep_pt[0]<20000: continue
     if nom.lep_pt[1]<20000: continue
-
-    #lepPts = [e.lep_Pt_0, e.lep_Pt_1]
-    #lepEtas = [e.lep_Eta_0, e.lep_Eta_1]
-    #lepPhis = [e.lep_Phi_0, e.lep_Phi_1]
-    #lepEs = [e.lep_E_0, e.lep_E_1]
-    #lepIDs = [e.lep_ID_0, e.lep_ID_1]
 
     higgCand = LorentzVector()
 
@@ -103,31 +88,19 @@ for idx in range(nEntries):
 
         btags.append(nom.jet_MV2c10[j])
 
+    if len(jet4Vecs)<4: continue
+
     combos = []
     combosTop = []
 
-    for l in range(len(lep4Vecs)):
-        for i in range(len(jet4Vecs)-1):
-            for j in range(i+1, len(jet4Vecs)):
-                comb = [l,i,j]
-                
-                if l==0:
-                    k = higgsDict( jet4Vecs[i], jet4Vecs[j], lep4Vecs[l], met, btags[i], btags[j], lep4Vecs[1],
-                                   nom.jet_jvt[i], nom.jet_jvt[j],
-                                   nom.jet_numTrk[i], nom.jet_numTrk[j])
-                else:
-                    k = higgsDict( jet4Vecs[i], jet4Vecs[j], lep4Vecs[l], met, btags[i], btags[j], lep4Vecs[0],
-                                   nom.jet_jvt[i], nom.jet_jvt[j],
-                                   nom.jet_numTrk[i], nom.jet_numTrk[j])
-                
-                combos.append([k, comb])
+    for i in range(len(jet4Vecs)-1):
+        for j in range(i+1, len(jet4Vecs)):
+            comb = [i,j]
+            t = topDict( jet4Vecs[i], jet4Vecs[j], lep4Vecs[0], lep4Vecs[1], met, btags[i], btags[j],
+                         #nom.jet_jvt[i], nom.jet_jvt[j],
+                         nom.jet_numTrk[i], nom.jet_numTrk[j])
 
-                #k = flatDict( lep4Vecs[l], jet4Vecs[i], jet4Vecs[j], met, btags[i], btags[j] )
-                t = topDict( jet4Vecs[i], jet4Vecs[j], lep4Vecs[0], lep4Vecs[1], met, btags[i], btags[j],
-                             nom.jet_jvt[i], nom.jet_jvt[j],
-                             nom.jet_numTrk[i], nom.jet_numTrk[j])
-
-                combosTop.append([t, comb])
+            combosTop.append([t, comb])
 
     #loop over combinations, score them in the BDT, figure out the best result
     topDF = pd.DataFrame.from_dict([x[0] for x in combosTop])
@@ -136,8 +109,27 @@ for idx in range(nEntries):
     topPred = topModel.predict(topMat)
     topBest = np.argmax(topPred)
 
-    bestTopComb = combosTop[topBest][1]
-    topMatches = bestTopComb[1:]
+    topMatches = combosTop[topBest][1]
+
+    for l in range(len(lep4Vecs)):
+        for i in range(len(jet4Vecs)-1):
+            for j in range(i+1, len(jet4Vecs)):
+                if i in topMatches or j in topMatches:
+                    continue 
+
+                comb = [l,i,j]
+
+                if l==0:                                                                                
+                    k = higgsDict( jet4Vecs[i], jet4Vecs[j], lep4Vecs[l], met, btags[i], btags[j], lep4Vecs[1],
+                                   #nom.jet_jvt[i], nom.jet_jvt[j],
+                                   nom.jet_numTrk[i], nom.jet_numTrk[j])
+                else:
+                    k = higgsDict( jet4Vecs[i], jet4Vecs[j], lep4Vecs[l], met, btags[i], btags[j], lep4Vecs[0],
+                                   #nom.jet_jvt[i], nom.jet_jvt[j],
+                                   nom.jet_numTrk[i], nom.jet_numTrk[j])
+        
+                combos.append([k, comb])
+                                                                                                                             
 
     df = pd.DataFrame.from_dict([x[0] for x in combos])
     xgbMat = xgb.DMatrix(df, feature_names=list(df))

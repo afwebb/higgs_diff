@@ -93,13 +93,16 @@ for idx in range(nEntries):
 
         btags.append(nom.jet_MV2c10[j])
 
+    if len(jet4Vecs)<2:
+        continue
+
     combos = []
     combosTop = []
 
     k = higgs2lDict( lep4Vecs[ 0 ], lep4Vecs[ 1 ], lep4Vecs[ 2 ], met)
     combos.append([k, 1])
 
-    k = higgs2lDict( lep4Vecs[ 0 ], lep4Vecs[ 2 ], lep4Vecs[ 2 ], met)
+    k = higgs2lDict( lep4Vecs[ 0 ], lep4Vecs[ 2 ], lep4Vecs[ 1 ], met)
     combos.append([k, 2])
 
 
@@ -109,7 +112,6 @@ for idx in range(nEntries):
             
             t = topDict( jet4Vecs[i], jet4Vecs[j], lep4Vecs[0], lep4Vecs[1], lep4Vecs[2], met, 
                          btags[i], btags[j],
-                         nom.jet_jvt[i], nom.jet_jvt[j],
                          nom.jet_numTrk[i], nom.jet_numTrk[j])
             
             combosTop.append([t, comb])
@@ -129,6 +131,7 @@ for idx in range(nEntries):
 
     pred = xgbModel.predict(xgbMat)
     best = np.argmax(pred)
+    topScore = pred[best]
 
     bestScores.append(pred[best])
 
@@ -172,6 +175,7 @@ for idx in range(nEntries):
         k['lep_E_2'] = nom.lep_E[1]
 
     n = 0
+    k['topScore'] = topScore
     for i in topMatches:#bestBtags:#nom.nJets_OR_T):      
         k['top_Pt_'+str(n)] = nom.jet_pt[i]
         k['top_Eta_'+str(n)] = nom.jet_eta[i]

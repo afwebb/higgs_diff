@@ -94,7 +94,7 @@ for idx in range(nEntries):
     eventsFlat.append(k)
 
     for l in range(min([3, len(badJets)]) ):
-        i,j = random.sample(badJets,2)
+        j = random.sample(badJets,1)[0]
         k = topDict( jets[ topJets[0] ], jets[j], leps[0], leps[1], met, 
                      nom.jet_MV2c10[ topJets[0] ], nom.jet_MV2c10[j], 
                      #nom.jet_jvt[ topJets[0] ], nom.jet_jvt[j],
@@ -103,7 +103,7 @@ for idx in range(nEntries):
         eventsFlat.append(k)
 
     for l in range(min([3, len(badJets)]) ):
-        i,j = random.sample(badJets,2)
+        i = random.sample(badJets,1)[0]
         k = topDict( jets[ i ], jets[ topJets[1] ], leps[0], leps[1], met, 
                      nom.jet_MV2c10[ i ], nom.jet_MV2c10[ topJets[1] ], 
                      #nom.jet_jvt[ i ], nom.jet_jvt[ topJets[1] ],
@@ -112,13 +112,14 @@ for idx in range(nEntries):
         eventsFlat.append(k)
 
     for l in range(min([6, len(badJets)]) ):
-        i,j = random.sample(badJets,2)
-        k = topDict( jets[i], jets[j], leps[0], leps[1], met, 
-                     nom.jet_MV2c10[i], nom.jet_MV2c10[j], 
-                     #nom.jet_jvt[i], nom.jet_jvt[j],
-                     nom.jet_numTrk[i], nom.jet_numTrk[j],
-                     0 )
-        eventsFlat.append(k)
+        if len(badJets)>2:
+            i,j = random.sample(badJets,2)
+            k = topDict( jets[i], jets[j], leps[0], leps[1], met, 
+                         nom.jet_MV2c10[i], nom.jet_MV2c10[j], 
+                         #nom.jet_jvt[i], nom.jet_jvt[j],
+                         nom.jet_numTrk[i], nom.jet_numTrk[j],
+                         0 )
+            eventsFlat.append(k)
 
 import pandas as pd
 
@@ -127,4 +128,4 @@ dfFlat = pd.DataFrame.from_dict(eventsFlat)
 from sklearn.utils import shuffle
 dfFlat = shuffle(dfFlat)
 
-dfFlat.to_csv('topLepCutFiles/'+dsid+'Flat.csv', index=False)
+dfFlat.to_csv('topFiles/'+dsid+'Flat.csv', index=False)

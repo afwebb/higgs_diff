@@ -104,6 +104,9 @@ for idx in range(nEntries):
 
     combos = []
 
+    if len(jet4Vecs)<2:
+        continue
+
     for i in range(len(jet4Vecs)-1):
         for j in range(i+1, len(jet4Vecs)):
             comb = [i,j]

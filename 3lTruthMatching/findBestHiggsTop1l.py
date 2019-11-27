@@ -1,6 +1,3 @@
-#Using truth match algo, find the two jets, 1 lepton most likely to have come from the Higgs. 
-#Output kinematics of result to a CSV, to be used by a NN
-
 import ROOT
 import pandas as pd
 from rootpy.tree import Tree
@@ -57,7 +54,6 @@ for idx in range(nEntries):
         
     if nom.trilep_type==0: continue
     if nom.nJets<2: continue
-    if len(nom.jet_pt)<4: continue
     if nom.nJets_MV2c10_70==0: continue
     if len(nom.lep_pt)!=3: continue
     if nom.lep_pt[0]<10000: continue
@@ -101,14 +97,29 @@ for idx in range(nEntries):
     combos = []
     combosTop = []
 
-    for i in range(len(jet4Vecs)-1):
-        for j in range(i+1, len(jet4Vecs)):
-            comb = [i,j]
-            t = topDict( jet4Vecs[i], jet4Vecs[j], lep4Vecs[0], lep4Vecs[1], lep4Vecs[2], met,
-                         btags[i], btags[j],
-                         nom.jet_numTrk[i], nom.jet_numTrk[j])
+    for l in range(1, len(lep4Vecs)):
+        for i in range(len(jet4Vecs)-1):
+            for j in range(i+1, len(jet4Vecs)):
+                comb = [l,i,j]
+                
+                if l==1:
+                    k = higgs1lDict( jet4Vecs[i], jet4Vecs[j], lep4Vecs[l], met, btags[i], btags[j], lep4Vecs[0], lep4Vecs[2],
+                                     nom.jet_jvt[i], nom.jet_jvt[j],
+                                     nom.jet_numTrk[i], nom.jet_numTrk[j])
+                else:
+                    k = higgs1lDict( jet4Vecs[i], jet4Vecs[j], lep4Vecs[l], met, btags[i], btags[j], lep4Vecs[0], lep4Vecs[1],
+                                     nom.jet_jvt[i], nom.jet_jvt[j],
+                                     nom.jet_numTrk[i], nom.jet_numTrk[j])
+                
+                combos.append([k, comb])
 
-            combosTop.append([t, comb])
+                #k = flatDict( lep4Vecs[l], jet4Vecs[i], jet4Vecs[j], met, btags[i], btags[j] )
+                t = topDict( jet4Vecs[i], jet4Vecs[j], lep4Vecs[0], lep4Vecs[1], lep4Vecs[2], met,
+                             btags[i], btags[j],
+                             nom.jet_jvt[i], nom.jet_jvt[j],
+                             nom.jet_numTrk[i], nom.jet_numTrk[j])
+
+                combosTop.append([t, comb])
 
     #loop over combinations, score them in the BDT, figure out the best result
     topDF = pd.DataFrame.from_dict([x[0] for x in combosTop])
@@ -116,24 +127,9 @@ for idx in range(nEntries):
 
     topPred = topModel.predict(topMat)
     topBest = np.argmax(topPred)
-    topScore = topPred[topBest]
 
-    topMatches = combosTop[topBest][1]
-
-    for l in range(1, len(lep4Vecs)):
-        for i in range(len(jet4Vecs)-1):
-            for j in range(i+1, len(jet4Vecs)):
-                if i in topMatches or j in topMatches:
-                    continue 
-
-                comb = [l,i,j]
-
-                if l==1:
-                    k = higgs1lDict( jet4Vecs[i], jet4Vecs[j], lep4Vecs[l], met, btags[i], btags[j], lep4Vecs[0], lep4Vecs[2], nom.jet_numTrk[i], nom.jet_numTrk[j])
-                else:
-                    k = higgs1lDict( jet4Vecs[i], jet4Vecs[j], lep4Vecs[l], met, btags[i], btags[j], lep4Vecs[0], lep4Vecs[1], nom.jet_numTrk[i], nom.jet_numTrk[j])
-
-                combos.append([k, comb])
+    bestTopComb = combosTop[topBest][1]
+    topMatches = bestTopComb[1:]
 
     df = pd.DataFrame.from_dict([x[0] for x in combos])
     xgbMat = xgb.DMatrix(df, feature_names=list(df))
@@ -195,7 +191,12 @@ for idx in range(nEntries):
         
         n+=1
 
-    k['topScore'] = topScore
+    btags = np.array(btags)
+
+    btags[jetMatches[0]] = 0
+    btags[jetMatches[1]] = 0
+    bestBtags = np.argpartition(btags, -2)[-2:]
+
     n = 0
     for i in topMatches:#bestBtags:#nom.nJets_OR_T):      
         k['top_Pt_'+str(n)] = nom.jet_pt[i]
@@ -209,9 +210,16 @@ for idx in range(nEntries):
     k['MET'] = nom.met
     k['MET_phi'] = calc_phi(phi_0, nom.met_phi)
 
+    #k['rough_pt'], k['lepJetCat'] = higgsCandidate.calcHiggsCandidate(e)
+    #_, k['lepJetCat'] = higgsCandidate.calcHiggsCandidate(e) 
+    #else: continue
+
     events.append(k)
 
     
 dFrame = pd.DataFrame(events)
 dFrame.to_csv(outFile, index=False)
 
+#plt.figure()
+#plt.hist(bestScores)
+#plt.savefig('plots/bestScores/'+dsid+'.png')

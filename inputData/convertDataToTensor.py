@@ -13,8 +13,8 @@ from sklearn.model_selection import train_test_split
 import pickle
 import sys
 import torch
-import h2o
-h2o.init()
+#import h2o
+#h2o.init()
 
 #dsid = sys.argv[1]
 #njet = sys.argv[2]
@@ -37,7 +37,7 @@ inDF = pd.read_csv(inFile)#, nrows=600000)
 inDF = sk.utils.shuffle(inDF)
 
 train, test = train_test_split(inDF, test_size=0.2)
-
+'''
 #Convert to h2o frames
 h2o_train = h2o.H2OFrame(train)
 h2o_test = h2o.H2OFrame(test)
@@ -80,4 +80,4 @@ torch.save(y_test, 'tensors/torch_y_test_'+outDir+'.pt')
 
 #torch.save(nBin_train, 'tensors/torch_nBin_train_'+outDir+'.pt')
 #torch.save(nBin_test, 'tensors/torch_nBin_test_'+outDir+'.pt')
-'''
+

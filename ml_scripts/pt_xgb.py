@@ -47,6 +47,11 @@ xgb_test = xgb.DMatrix(test, label=y_test, feature_names=list(train))
 
 features=['MET','MET_phi','comboScore','jet_E_h0','jet_E_h1','jet_Eta_h0','jet_Eta_h1','jet_MV2c10_h0','jet_MV2c10_h1','jet_Phi_h0','jet_Phi_h1','jet_Pt_h0','jet_Pt_h1','lep_E_H','lep_E_O','lep_Eta_H','lep_Eta_O','lep_Phi_O','lep_Pt_H','lep_Pt_O','topScore','top_E_0','top_E_1','top_Eta_0','top_Eta_1','top_MV2c10_0','top_MV2c10_1','top_Phi_0','top_Phi_1','top_Pt_0','top_Pt_1']
 
+if 'justHiggs2l' in outDir:
+    features = ['MET', 'MET_phi', 'comboScore', 'lep_E_0', 'lep_E_1', 'lep_E_2', 'lep_Eta_0', 'lep_Eta_1', 'lep_Eta_2', 'lep_Phi_1', 'lep_Phi_2', 'lep_Pt_0', 'lep_Pt_1', 'lep_Pt_2']
+elif 'justHiggs1l' in outDir:
+    features = ['MET', 'MET_phi', 'comboScore', 'jet_E_h0', 'jet_E_h1', 'jet_Eta_h0', 'jet_Eta_h1', 'jet_MV2c10_h0', 'jet_MV2c10_h1', 'jet_Phi_h0', 'jet_Phi_h1', 'jet_Pt_h0', 'jet_Pt_h1', 'lep_E_0', 'lep_E_1', 'lep_E_H', 'lep_Eta_0', 'lep_Eta_1', 'lep_Eta_H', 'lep_Phi_0', 'lep_Phi_1', 'lep_Pt_0', 'lep_Pt_1', 'lep_Pt_H']
+
 print(len(features))
 
 if 'higgs2l' in outDir:
@@ -80,7 +85,7 @@ params = {
     'lambda':0
 }
 
-gbm = xgb.cv(params, xgb_train, num_boost_round=1000, verbose_eval=True)
+gbm = xgb.cv(params, xgb_train, num_boost_round=1200, verbose_eval=True)
 
 best_nrounds = pd.Series.idxmin(gbm['test-rmse-mean'])
 print( best_nrounds)
@@ -91,8 +96,8 @@ pickle.dump(bst, open("xgb_models/"+outDir+".dat", "wb"))
 y_test_pred = bst.predict(xgb_test)
 y_train_pred = bst.predict(xgb_train)
 
-test_loss = sk.metrics.mean_absolute_error(y_test, y_test_pred)
-train_loss = sk.metrics.mean_absolute_error(y_train, y_train_pred)
+test_loss = np.sqrt(sk.metrics.mean_squared_error(y_test, y_test_pred))
+train_loss = np.sqrt(sk.metrics.mean_squared_error(y_train, y_train_pred))
 
 plt.figure()
 fip = xgb.plot_importance(bst)
@@ -149,7 +154,7 @@ plt.scatter(y_test[:50000], y_test_pred[:50000], c=np.log(z), edgecolor='')
 plt.title("XGBoost Test Data, loss=%f" %(test_loss))
 plt.xlabel('Truth Pt')
 plt.ylabel('Predicted Pt')
-plt.plot([0,800000],[0,800000],zorder=10)
+plt.plot([0,1000000],[0,1000000],zorder=10)
 plt.savefig('plots/'+outDir+'/xgb_test_pt_scatter.png')
 
 # Calculate the point density
@@ -162,6 +167,6 @@ plt.scatter(y_train[:50000], y_train_pred[:50000], c=np.log(z), edgecolor='')
 plt.title("XGBoost Train Data, loss=%f" %(train_loss))
 plt.xlabel('Truth Pt')
 plt.ylabel('Predicted Pt')
-plt.plot([0,800000],[0,800000],zorder=10)
+plt.plot([0,1000000],[0,1000000],zorder=10)
 plt.savefig('plots/'+outDir+'/xgb_train_pt_scatter.png')
 
