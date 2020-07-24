@@ -104,44 +104,37 @@ for idx in range(nEntries):
         continue
 
     jets = []
-    higgsJets = []
-    topJets = []
-    badJets = []
     for i in range(len(nom.jet_pt)):
         jet = LorentzVector()
         jet.SetPtEtaPhiE(nom.jet_pt[i], nom.jet_eta[i], nom.jet_phi[i], nom.jet_E[i])
         jets.append(jet)
         
-        if nom.jet_parent[i]==25:
-            higgsJets.append(i)
-        elif abs(nom.jet_parent[i])==6:
-            topJets.append(i)
-        else:
-            badJets.append(i)
-        
-    #if len(lepH)!=1 or len(higgsJets)!=2 or len(topJets)!=2: continue
-
     combosTop = []
     combos1l = []
+
+    if len(jets)<2:
+        continue
 
     for l in range(len(leps)):
         for i in range(len(jets)-1):
             for j in range(i+1, len(jets)):
                 comb = [l,i,j]
-                t = topDict( jets[i], jets[j], leps[0], leps[1], leps[2], met, nom.jet_MV2c10[i], nom.jet_MV2c10[j],
-                             nom.jet_jvt[i], nom.jet_jvt[j], nom.jet_numTrk[i], nom.jet_numTrk[j])
+                t = topDict( jets[i], jets[j], leps[0], leps[1], leps[2], met, 
+                             nom.jet_MV2c10[i], nom.jet_MV2c10[j],
+                             #nom.jet_jvt[i], nom.jet_jvt[j], 
+                             nom.jet_numTrk[i], nom.jet_numTrk[j])
                 #t['nJets'] = nom.nJets
                 #t['nJets_MV2c10_70'] = nom.nJets_MV2c10_70
                 combosTop.append([t, comb])
 
                 if l==1:
                     k = higgs1lDict( jets[i], jets[j], leps[l], met, nom.jet_MV2c10[i], nom.jet_MV2c10[j], leps[0], leps[2],
-                                   nom.jet_jvt[i], nom.jet_jvt[j],
-                                   nom.jet_numTrk[i], nom.jet_numTrk[j])
+                                     #nom.jet_jvt[i], nom.jet_jvt[j],
+                                     nom.jet_numTrk[i], nom.jet_numTrk[j])
                 else:
                     k = higgs1lDict( jets[i], jets[j], leps[l], met, nom.jet_MV2c10[i], nom.jet_MV2c10[j], leps[0], leps[2],
-                                   nom.jet_jvt[i], nom.jet_jvt[j],
-                                   nom.jet_numTrk[i], nom.jet_numTrk[j])
+                                     #nom.jet_jvt[i], nom.jet_jvt[j],
+                                     nom.jet_numTrk[i], nom.jet_numTrk[j])
 
                 combos1l.append([k, comb])
 

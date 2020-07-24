@@ -51,15 +51,19 @@ if 'justHiggs2l' in outDir:
     features = ['MET', 'MET_phi', 'comboScore', 'lep_E_0', 'lep_E_1', 'lep_E_2', 'lep_Eta_0', 'lep_Eta_1', 'lep_Eta_2', 'lep_Phi_1', 'lep_Phi_2', 'lep_Pt_0', 'lep_Pt_1', 'lep_Pt_2']
 elif 'justHiggs1l' in outDir:
     features = ['MET', 'MET_phi', 'comboScore', 'jet_E_h0', 'jet_E_h1', 'jet_Eta_h0', 'jet_Eta_h1', 'jet_MV2c10_h0', 'jet_MV2c10_h1', 'jet_Phi_h0', 'jet_Phi_h1', 'jet_Pt_h0', 'jet_Pt_h1', 'lep_E_0', 'lep_E_1', 'lep_E_H', 'lep_Eta_0', 'lep_Eta_1', 'lep_Eta_H', 'lep_Phi_0', 'lep_Phi_1', 'lep_Pt_0', 'lep_Pt_1', 'lep_Pt_H']
-
-print(len(features))
+elif 'justHiggs'==outDir:
+    features= ['MET','MET_phi','comboScore','jet_E_h0','jet_E_h1','jet_Eta_h0','jet_Eta_h1','jet_MV2c10_h0','jet_MV2c10_h1','jet_Phi_h0','jet_Phi_h1','jet_Pt_h0','jet_Pt_h1','lep_E_H','lep_E_O','lep_Eta_H','lep_Eta_O','lep_Phi_O','lep_Pt_H','lep_Pt_O']
 
 if 'higgs2l' in outDir:
-    features = ['MET', 'MET_phi', 'comboScore', 'lep_E_0', 'lep_E_1', 'lep_E_2', 'lep_Eta_0', 'lep_Eta_1', 'lep_Eta_2', 'lep_Phi_1', 'lep_Phi_2', 'lep_Pt_0', 'lep_Pt_1', 'lep_Pt_2', 'top_E_0', 'top_E_1', 'top_Eta_0', 'top_Eta_1', 'top_MV2c10_0', 'top_MV2c10_1', 'top_Phi_0', 'top_Phi_1', 'top_Pt_0', 'top_Pt_1']
+    features = ['MET', 'MET_phi', 'comboScore', 'lep_E_0', 'lep_E_1', 'lep_E_2', 'lep_Eta_0', 'lep_Eta_1', 'lep_Eta_2', 'lep_Phi_1', 'lep_Phi_2', 'lep_Pt_0', 'lep_Pt_1', 'lep_Pt_2', 'topScore', 'top_E_0', 'top_E_1', 'top_Eta_0', 'top_Eta_1', 'top_MV2c10_0', 'top_MV2c10_1', 'top_Phi_0', 'top_Phi_1', 'top_Pt_0', 'top_Pt_1']
 
 elif 'higgs1l' in outDir:
-    features = ['MET', 'MET_phi', 'comboScore', 'jet_E_h0', 'jet_E_h1', 'jet_Eta_h0', 'jet_Eta_h1', 'jet_MV2c10_h0', 'jet_MV2c10_h1', 'jet_Phi_h0', 'jet_Phi_h1', 'jet_Pt_h0', 'jet_Pt_h1', 'lep_E_0', 'lep_E_1', 'lep_E_H', 'lep_Eta_0', 'lep_Eta_1', 'lep_Eta_H', 'lep_Phi_0', 'lep_Phi_1', 'lep_Pt_0', 'lep_Pt_1', 'lep_Pt_H', 'top_E_0', 'top_E_1', 'top_Eta_0', 'top_Eta_1', 'top_MV2c10_0', 'top_MV2c10_1', 'top_Phi_0', 'top_Phi_1', 'top_Pt_0', 'top_Pt_1']
-#elif 'Top' in outDir:
+    features = ['MET', 'MET_phi', 'comboScore', 'jet_E_h0', 'jet_E_h1', 'jet_Eta_h0', 'jet_Eta_h1', 'jet_MV2c10_h0', 'jet_MV2c10_h1', 'jet_Phi_h0', 'jet_Phi_h1', 'jet_Pt_h0', 'jet_Pt_h1', 'lep_E_0', 'lep_E_1', 'lep_E_H', 'lep_Eta_0', 'lep_Eta_1', 'lep_Eta_H', 'lep_Phi_0', 'lep_Phi_1', 'lep_Pt_0', 'lep_Pt_1', 'lep_Pt_H', 'topScore', 'top_E_0', 'top_E_1', 'top_Eta_0', 'top_Eta_1', 'top_MV2c10_0', 'top_MV2c10_1', 'top_Phi_0', 'top_Phi_1', 'top_Pt_0', 'top_Pt_1']
+
+
+print(len(features))
+print(features)
+
 #    features=['MET', 'MET_phi', 'comboScore', 'jet_E_h0', 'jet_E_h1', 'jet_Eta_h0', 'jet_Eta_h1', 'jet_MV2c10_h0', 'jet_MV2c10_h1', 'jet_Phi_h0', 'jet_Phi_h1', 'jet_Pt_h0', 'jet_Pt_h1', 'lep_E_H', 'lep_E_O', 'lep_Eta_H', 'lep_Eta_O', 'lep_Phi_O', 'lep_Pt_H', 'lep_Pt_O', 'top_E_0', 'top_E_1', 'top_Eta_0', 'top_Eta_1', 'top_MV2c10_0', 'top_MV2c10_1', 'top_Phi_0', 'top_Phi_1', 'top_Pt_0', 'top_Pt_1']
 
 xgb_test = xgb.DMatrix('../inputData/tensors/xgb_test_'+outDir+'.buffer',
@@ -74,7 +78,7 @@ y_train = y_train.float().detach().numpy()
 
 params = {
     'learning_rate' : 0.01,
-    'max_depth': 9,
+    'max_depth': 7,
     'min_child_weight': 2,
     'gamma': 0.9,
     'subsample' : 0.8,

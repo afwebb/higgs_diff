@@ -19,7 +19,8 @@ def run_csv(inFile):
 
     f = rootpy.io.root_open(inFile)
     
-    outFile = "used_3lFiles/"+dsid
+    #outFile = "used_3lFiles/"+dsid
+    outFile = 'keras_3lFiles/'+dsid
     if 'mc16a' in inFile:
         outFile = outFile+'a.csv'
     elif 'mc16d' in inFile:

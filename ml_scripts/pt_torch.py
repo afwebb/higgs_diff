@@ -47,32 +47,6 @@ print(normFactors)
 normFactors = np.asarray(normFactors)
 np.save('torch_models/'+outDir+'/normFactors.npy', normFactors)
 
-class OldNet(nn.Module):
-    
-    def __init__(self):
-        super().__init__()
-        self.fc1 = nn.Linear(50, 50)
-        self.relu1 = nn.ReLU()
-        self.dout = nn.Dropout(0.2)
-        self.fc2 = nn.Linear(50, 100)
-        self.prelu = nn.PReLU(1)
-        self.out = nn.Linear(100, 1)
-        self.out_act = nn.Sigmoid()
-        
-    def forward(self, input_):
-        a1 = self.fc1(input_)
-        h1 = self.relu1(a1)
-        dout = self.dout(h1)
-        a2 = self.fc2(dout)
-        h2 = self.prelu(a2)
-        a3 = self.out(h2)
-        y = self.out_act(a3)
-        return y
-    
-oldNet = OldNet()
-#opt = optim.Adam(net.parameters(), lr=0.001, betas=(0.9, 0.999))
-#criterion = nn.BCELoss()
-
 class Net(nn.Module):
     
     def __init__(self, D_in, nodes, layers):
@@ -91,12 +65,13 @@ class Net(nn.Module):
     def forward(self, input_):
         h1 = self.dout(self.relu1(self.fc1(input_)))
         for i in range(self.layers):
-            h1 = self.dout(self.bnorm(self.relu1(self.fc(h1))))
+            #h1 = self.dout(self.bnorm(self.relu1(self.fc(h1))))
+            h1 = self.bnorm(self.relu1(self.fc(h1)))
         a1 = self.out(h1)
         y = self.out_act(a1)
         return y
 
-def train_epoch_batch(model, opt, criterion, batch_size=2000):
+def train_epoch_batch(model, opt, criterion, batch_size=128):
     model.train()
     #losses = []
     for beg_i in range(0, X.size(0), batch_size):

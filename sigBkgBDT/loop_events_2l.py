@@ -19,7 +19,8 @@ def run_csv(inFile):
 
     f = rootpy.io.root_open(inFile)
 
-    outFile = "used_2lFiles/"+dsid
+    #outFile = "used_2lFiles/"+dsid
+    outFile = "keras_2lFiles/"+dsid
     if 'mc16a' in inFile:
         outFile = outFile+'a.csv'
     elif 'mc16d' in inFile:
@@ -66,4 +67,4 @@ def run_csv(inFile):
 
 linelist = [line.rstrip() for line in open(inf)]
 print(linelist)
-Parallel(n_jobs=20)(delayed(run_csv)(inFile) for inFile in linelist)
+Parallel(n_jobs=30)(delayed(run_csv)(inFile) for inFile in linelist)

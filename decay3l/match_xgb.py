@@ -16,14 +16,15 @@ import torch
 import scipy
 
 #outStr = sys.argv[1]
+max_depth=4
 
 inFile = sys.argv[1]
 inDF = pd.read_csv(inFile)
 
-outStr = sys.argv[2]
+outDir = sys.argv[2]
 
-if outStr=='fullLep':
-    inDF['decay'] = inDF['decay'].replace({0:1, 1:0})
+#if outDir=='fullLep':
+inDF['decay'] = inDF['decay'].replace({0:1, 1:0})
 
 inDF = sk.utils.shuffle(inDF)
 inDF[abs(inDF) < 0.01] = 0
@@ -54,7 +55,7 @@ y_train = y_train.float().detach().numpy()
 '''
 params = {
     'learning_rate' : 0.01,
-    'max_depth': 12,
+    'max_depth': max_depth,
     'min_child_weight': 2,
     'gamma': 0.9,
     'subsample' : 0.7,
@@ -70,7 +71,7 @@ best_nrounds = pd.Series.idxmax(gbm['test-auc-mean'])
 print( best_nrounds)
 
 bst = xgb.train(params, xgb_train, num_boost_round=best_nrounds, verbose_eval=True)
-pickle.dump(bst, open('models/xgb_decay_'+outStr+'.dat', "wb"), protocol=2)
+pickle.dump(bst, open('models/xgb_decay_'+outDir+'.dat', "wb"), protocol=2)
 #bst.save_model('models/xgb_decay_test.model')
 
 y_test_pred = bst.predict(xgb_test)
@@ -85,6 +86,40 @@ testPredFalse = y_test_pred[y_test==0]
 trainPredTrue = y_train_pred[y_train==1]
 trainPredFalse = y_train_pred[y_train==0]
 
+plt.figure()
+plt.hist(testPredTrue, 30, range=(-0.1,1.1), log=False, alpha=0.5, label='Semi-lep - Test')
+plt.hist(testPredFalse[:len(testPredTrue)], 30, range=(-0.1,1.1), log=False, alpha=0.5, label='Full-lep - Test')
+plt.hist(trainPredTrue[:len(testPredTrue)], 30, range=(-0.1,1.1), log=False, histtype='step', alpha=0.5, label='Semi-lep - Train')
+plt.hist(trainPredFalse[:len(testPredTrue)], 30, range=(-0.1,1.1), log=False, histtype='step', alpha=0.5, label='Full-lep - Train')
+plt.title("BDT Output, max depth=%i" %(max_depth))
+plt.xlabel('BDT Score')
+plt.ylabel('NEvents')
+plt.legend(loc='upper right')
+plt.savefig('plots/'+outDir+'/xgb_score.png')
+
+plt.figure()
+fip = xgb.plot_importance(bst)
+plt.title("xgboost feature important")
+plt.legend(loc='lower right')
+plt.savefig('plots/'+outDir+'/xgb_feature_importance.png')
+
+plt.figure()
+auc = sk.metrics.roc_auc_score(y_test, y_test_pred)
+fpr, tpr, _ = sk.metrics.roc_curve(y_test, y_test_pred)
+plt.plot(fpr, tpr, label='test AUC = %.3f' %(auc))
+
+auc = sk.metrics.roc_auc_score(y_train, y_train_pred)
+fpr, tpr, _ = sk.metrics.roc_curve(y_train, y_train_pred)
+plt.plot(fpr, tpr, label='train AUC = %.3f' %(auc))
+plt.legend(loc='lower right')
+plt.title('XGBoost Decay ROC')
+plt.savefig('plots/'+outDir+'/xgb_roc.png')
+
+y_test_bin = np.where(y_test_pred > 0.5, 1, 0)
+print(y_test_bin)
+print('Confusion Matrix:', sklearn.metrics.confusion_matrix(y_test, y_test_bin))
+
+'''
 plt.figure()
 plt.hist(testPredTrue, 30, log=False, alpha=0.5, label='Semi-leptonic')
 plt.hist(testPredFalse[:len(testPredTrue)], 30, log=False, alpha=0.5, label='Fully leptonic')
@@ -123,3 +158,4 @@ y_test_bin = np.where(y_test_pred > 0.5, 1, 0)
 print(y_test_bin)
 print('Confusion Matrix:', sklearn.metrics.confusion_matrix(y_test, y_test_bin))
 
+'''

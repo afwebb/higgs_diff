@@ -19,7 +19,7 @@ import scipy
 inFile = sys.argv[1]
 inDF = pd.read_csv(inFile)
 
-maxDepth = 12
+maxDepth = 10
 
 outDir = sys.argv[2]
 
