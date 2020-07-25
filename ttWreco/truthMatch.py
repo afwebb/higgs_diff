@@ -56,27 +56,30 @@ def run_match(inFile, outFile):
     newFile = TFile(outFile, "RECREATE")
     nom = f.Get('nominal').CopyTree("total_leptons==2 && total_charge!=0 && nJets_OR>2 && nJets_OR_DL1r_70>1")
 
+    newTree = nom.CloneTree(0)#ROOT.TTree("nominal", "nominal")
+
     lep_Parent_0 = array( 'i', [ 0 ] )
     lep_Parent_1 = array( 'i', [ 0 ] )
     lep_Parent_2 = array( 'i', [ 0 ] )
     jet_parents = ROOT.std.vector('int')() #np.array(1, dtype=np.int32)
     
-    nom.Branch('lep_Parent_0', lep_Parent_0, 'lep_Parent_0/I')
-    nom.Branch('lep_Parent_1', lep_Parent_1, 'lep_Parent_1/I')
-    nom.Branch('lep_Parent_2', lep_Parent_2, 'lep_Parent_2/I')
-    nom.Branch('jet_parents', jet_parents)#, 'jet_parents/I')
+    newTree.Branch('lep_Parent_0', lep_Parent_0, 'lep_Parent_0/I')
+    newTree.Branch('lep_Parent_1', lep_Parent_1, 'lep_Parent_1/I')
+    newTree.Branch('lep_Parent_2', lep_Parent_2, 'lep_Parent_2/I')
+    newTree.Branch('jet_parents', jet_parents)#, 'jet_parents/I')
 
     nEntries = nom.GetEntries()
-    #for idx in range(nEntries):
-    for idx in range(1000):
+    for idx in range(nEntries):
         if idx%10000==0:
             print(str(idx)+'/'+str(nEntries))
         
         nom.GetEntry(idx)
 
-        lep_Parent_0[0] = 1
-        nom.lep_Parent_1 = 5
-        nom.lep_Parent_2 = 9
+        lep_Parent_0[0] = 0
+        lep_Parent_1[0] = 0
+        lep_Parent_2[0] = 0
+        jet_parents.clear()
+        #jet_parents = []
         
         # Get the parent pdgId for each truth matched lepton
         lepParents = [0 for x in range(nom.total_leptons)]
@@ -116,9 +119,9 @@ def run_match(inFile, outFile):
             #np.append(jet_parents, match)
             jet_parents.push_back(match)
         
-        nom.Fill()
+        newTree.Fill()
         
-    nom.Write()
+    newTree.Write()
     newFile.Close()
 
 inf = sys.argv[1]
