@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 import sys
 import awkward1 as ak
+import numba as nb
 
 f = uproot4.open(sys.argv[1])
 nom = f['nominal']
@@ -17,6 +18,7 @@ branches = ['lep_Pt_0', 'lep_Eta_0', 'lep_Phi_0', 'lep_Parent_0',
 
 #Add top highest b-tagged jets to dataframe
 awkArr = nom.arrays(["jet_pt","jet_DL1r","jet_eta","jet_phi",'jet_parents'],library='ak', how='zip')
+
 j1,j2 = [],[]
 for j in ak.to_list(awkArr.jet.DL1r):
     jIdx = ak.argmax(j)
@@ -47,4 +49,6 @@ df['fromW'] = df['lep_Parent_0'].map(truthId)
 #df = df.drop('lep_Parent_1', axis=1)
 
 #Write output
-df.to_csv('test.csv')
+outFile = sys.argv[1].replace('.root','.csv')
+outFile = 'csvFiles/'+'/'.join(outFile.split('/')[-2:])
+df.to_csv(outFile)

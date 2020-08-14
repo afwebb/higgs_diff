@@ -104,19 +104,19 @@ for idx in range(nEntries):
                 
                 if l==1:
                     k = higgs1lDict( jet4Vecs[i], jet4Vecs[j], lep4Vecs[l], met, btags[i], btags[j], lep4Vecs[0], lep4Vecs[2],
-                                     nom.jet_jvt[i], nom.jet_jvt[j],
+                                     #nom.jet_jvt[i], nom.jet_jvt[j],
                                      nom.jet_numTrk[i], nom.jet_numTrk[j])
                 else:
                     k = higgs1lDict( jet4Vecs[i], jet4Vecs[j], lep4Vecs[l], met, btags[i], btags[j], lep4Vecs[0], lep4Vecs[1],
-                                     nom.jet_jvt[i], nom.jet_jvt[j],
+                                     #nom.jet_jvt[i], nom.jet_jvt[j],
                                      nom.jet_numTrk[i], nom.jet_numTrk[j])
-                
+                    
                 combos.append([k, comb])
 
                 #k = flatDict( lep4Vecs[l], jet4Vecs[i], jet4Vecs[j], met, btags[i], btags[j] )
                 t = topDict( jet4Vecs[i], jet4Vecs[j], lep4Vecs[0], lep4Vecs[1], lep4Vecs[2], met,
                              btags[i], btags[j],
-                             nom.jet_jvt[i], nom.jet_jvt[j],
+                             #nom.jet_jvt[i], nom.jet_jvt[j],
                              nom.jet_numTrk[i], nom.jet_numTrk[j])
 
                 combosTop.append([t, comb])
