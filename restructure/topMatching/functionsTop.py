@@ -47,19 +47,7 @@ def jetCombos2lSS(nom, withMatch):
     varType should be either flat or fourVec
     '''
 
-    #Define met, lepton Lorentz Vectors
-    met = LorentzVector()
-    met.SetPtEtaPhiE(nom.met_met, 0, nom.met_phi, nom.met_met)
-
-    lep0 = LorentzVector()
-    lep0.SetPtEtaPhiE(nom.lep_Pt_0, nom.lep_Eta_0, nom.lep_Phi_0, nom.lep_E_0)
-
-    lep1 = LorentzVector()
-    lep1.SetPtEtaPhiE(nom.lep_Pt_1, nom.lep_Eta_1, nom.lep_Phi_1, nom.lep_E_1)
-
-    #Loop over jet pairs, add topDict to combosTop for each one
     combosTop = {'flatDicts':[],'fourVecDicts':[],'jetIdx':[],'truthComb':[]}
-    #truthComb = []
     for i in range(len(nom.jet_pt)-1):
         if nom.jet_jvt[i]<0.59: continue #Only include jets that pass JVT cut
         for j in range(i+1, len(nom.jet_pt)):
@@ -73,25 +61,12 @@ def jetCombos2lSS(nom, withMatch):
                     combosTop['truthComb'] = [i,j]
             
 
-            jet0 = LorentzVector()
-            jet0.SetPtEtaPhiE(nom.jet_pt[i], nom.jet_eta[i], nom.jet_phi[i], nom.jet_e[i])
-            jet1 = LorentzVector()
-            jet1.SetPtEtaPhiE(nom.jet_pt[j], nom.jet_eta[j], nom.jet_phi[j], nom.jet_e[j])
-
             if withMatch:
-                t = topDictFlat2lSS( jet0, jet1, lep0, lep1, met, nom.jet_tagWeightBin_DL1r_Continuous[i], 
-                                     nom.jet_tagWeightBin_DL1r_Continuous[j], isTop )
-                combosTop['flatDicts'].append(t)
-                t = topDictFourVec2lSS( jet0, jet1, lep0, lep1, met, nom.jet_tagWeightBin_DL1r_Continuous[i], 
-                                        nom.jet_tagWeightBin_DL1r_Continuous[j], isTop )
-                combosTop['fourVecDicts'].append(t)
+                combosTop['flatDicts'].append( topDictFlat2lSS( nom, i, j, isTop) )
+                combosTop['fourVecDicts'].append( topDictFourVec2lSS( nom, i, j, isTop) )
             else:
-                t = topDictFlat2lSS( jet0, jet1, lep0, lep1, met, nom.jet_tagWeightBin_DL1r_Continuous[i], 
-                                     nom.jet_tagWeightBin_DL1r_Continuous[j] )     
-                combosTop['flatDicts'].append(t)                                                                   
-                t = topDictFourVec2lSS( jet0, jet1, lep0, lep1, met, nom.jet_tagWeightBin_DL1r_Continuous[i], 
-                                        nom.jet_tagWeightBin_DL1r_Continuous[j] )
-                combosTop['fourVecDicts'].append(t)
+                combosTop['flatDicts'].append( topDictFlat2lSS( nom, i, j) )
+                combosTop['fourVecDicts'].append( topDictFourVec2lSS( nom, i, j) )
             
     return combosTop #, truthComb
 
@@ -100,20 +75,6 @@ def jetCombos3l(nom, withMatch):
     jets. withMatch option determines whether to include the "match" 
     '''
 
-    #Define met, lepton Lorentz Vectors                                                                     
-    met = LorentzVector()
-    met.SetPtEtaPhiE(nom.met_met, 0, nom.met_phi, nom.met_met)
-
-    lep0 = LorentzVector()
-    lep0.SetPtEtaPhiE(nom.lep_Pt_0, nom.lep_Eta_0, nom.lep_Phi_0, nom.lep_E_0)
-
-    lep1 = LorentzVector()
-    lep1.SetPtEtaPhiE(nom.lep_Pt_1, nom.lep_Eta_1, nom.lep_Phi_1, nom.lep_E_1)
-
-    lep2 = LorentzVector()
-    lep2.SetPtEtaPhiE(nom.lep_Pt_2, nom.lep_Eta_2, nom.lep_Phi_2, nom.lep_E_2)
-
-    #Loop over jet pairs, add topDict to combosTop for each one                                                      
     combosTop = {'flatDicts':[],'fourVecDicts':[],'jetIdx':[],'truthComb':[]}                                     
     for i in range(len(nom.jet_pt)-1):
         for j in range(i+1, len(nom.jet_pt)):                                                                          
@@ -124,24 +85,11 @@ def jetCombos3l(nom, withMatch):
                     isTop = 1
                     combosTop['truthComb'] = [i,j]
                     
-            jet0 = LorentzVector()                                                                                 
-            jet0.SetPtEtaPhiE(nom.jet_pt[i], nom.jet_eta[i], nom.jet_phi[i], nom.jet_e[i])
-            jet1 = LorentzVector() 
-            jet1.SetPtEtaPhiE(nom.jet_pt[j], nom.jet_eta[j], nom.jet_phi[j], nom.jet_e[j])
-
-            if withMatch:
-                t = topDictFlat3l( jet0, jet1, lep0, lep1, lep2, met, nom.jet_tagWeightBin_DL1r_Continuous[i],
-                                   nom.jet_tagWeightBin_DL1r_Continuous[j], isTop )
-                combosTop['flatDicts'].append(t)
-                t = topDictFourVec3l( jet0, jet1, lep0, lep1, lep2, met, nom.jet_tagWeightBin_DL1r_Continuous[i],    
-                                      nom.jet_tagWeightBin_DL1r_Continuous[j], isTop )
-                combosTop['fourVecDicts'].append(t)
+            if withMatch:                                                         
+                combosTop['flatDicts'].append( topDictFlat3l( nom, i, j, isTop) )
+                combosTop['fourVecDicts'].append( topDictFourVec3l( nom, i, j, isTop) )
             else:
-                t = topDictFlat3l( jet0, jet1, lep0, lep1, lep2, met, nom.jet_tagWeightBin_DL1r_Continuous[i],
-                                   nom.jet_tagWeightBin_DL1r_Continuous[j] )
-                combosTop['flatDicts'].append(t)                                                                 
-                t = topDictFourVec3l( jet0, jet1, lep0, lep1, lep2, met, nom.jet_tagWeightBin_DL1r_Continuous[i],
-                                      nom.jet_tagWeightBin_DL1r_Continuous[j] )
-                combosTop['fourVecDicts'].append(t)
+                combosTop['flatDicts'].append( topDictFlat3l( nom, i, j) )
+                combosTop['fourVecDicts'].append( topDictFourVec3l( nom, i, j) )
                 
     return combosTop 

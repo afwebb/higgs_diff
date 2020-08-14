@@ -19,7 +19,7 @@ from rootpy.vector import LorentzVector
 import random
 import keras
 from keras.models import load_model
-from dictHiggs import higgsDict2lSS, higgsDict3lS, higgsDict3lF
+from dictHiggs import higgsTopDict2lSS, higgsTopDict3lS, higgsTopDict3lF
 import functionsTop
 from functionsTop import jetCombos2lSS, jetCombos3l
 
