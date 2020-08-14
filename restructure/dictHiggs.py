@@ -228,6 +228,17 @@ def higgsTopDict2lSS(nom, jetIdx0, jetIdx1, lepIdx, topIdx0, topIdx1, match=-1):
     jet0, jet1, met, lep0, lep1 = lorentzVecsHiggs(nom, jetIdx0, jetIdx1, 0, 0)
     top0, top1 = lorentzVecsTop(nom, topIdx0, topIdx1)
 
+    #Leptons come from top or higgs. Identify which we want to consider to be from the Higgs
+    if lepIdx == 0:                                                                                                          
+        lepH = lep0                                                                                                     
+        lepT = lep1                                                                                                 
+    elif lepIdx == 1:                                                                                                 
+        lepH = lep1                                                                                              
+        lepT = lep0                                                                                        
+    else:
+        print(f"{lepIdx} is not a valid lep index. Must be 0 or 1")
+        return 0
+
     k = {}
     if match!=-1:
         k['match'] = match
@@ -239,54 +250,54 @@ def higgsTopDict2lSS(nom, jetIdx0, jetIdx1, lepIdx, topIdx0, topIdx1, match=-1):
     #k['lep_Pt_T'] = lepT.Pt()
 
     k['dRjj'] = jet0.DeltaR(jet1)
-    k['Ptjj'] = (jet0+jet1).Pt()
+    #k['Ptjj'] = (jet0+jet1).Pt()
     k['Mjj'] = (jet0+jet1).M()
 
     k['dRlj0'] = lepH.DeltaR(jet0)
-    k['Ptlj0'] = (lep+jet0).Pt()
-    k['Mlj0'] = (lep+jet0).M()
+    #k['Ptlj0'] = (lepH+jet0).Pt()
+    k['Mlj0'] = (lepH+jet0).M()
     k['dRlj1'] = lepH.DeltaR(jet1)
-    k['Ptlj1'] = (lep+jet1).Pt()
-    k['Mlj1'] = (lep+jet1).M()
+    #k['Ptlj1'] = (lepH+jet1).Pt()
+    k['Mlj1'] = (lepH+jet1).M()
 
     k['dRlt0'] = lepH.DeltaR(top0)
-    k['Ptlt0'] = (lep+top0).Pt()
-    k['Mlt0'] = (lep+top0).M()
+    #k['Ptlt0'] = (lepH+top0).Pt()
+    k['Mlt0'] = (lepH+top0).M()
 
     k['dRlt1'] = lepH.DeltaR(top1)
-    k['Ptlj1'] = (lep+top1).Pt()
-    k['Mlj1'] = (lep+top1).M()
+    #k['Ptlj1'] = (lepH+top1).Pt()
+    k['Mlt1'] = (lepH+top1).M()
 
     k['dRjt00'] = jet0.DeltaR(top0)
-    k['Ptjt00'] = (jet0+top0).Pt()
-    k['Mljt00'] = (jet0+top0).M()
+    #k['Ptjt00'] = (jet0+top0).Pt()
+    #k['Mjt00'] = (jet0+top0).M()
 
     k['dRjt01'] = jet0.DeltaR(top1)
-    k['Ptjt01'] = (jet0+top1).Pt()
-    k['Mljt01'] = (jet0+top1).M()
+    #k['Ptjt01'] = (jet0+top1).Pt()
+    #k['Mjt01'] = (jet0+top1).M()
 
     k['dRjt10'] = jet1.DeltaR(top0)
-    k['Ptjt10'] = (jet1+top0).Pt()
-    k['Mljt10'] = (jet1+top0).M()
+    #k['Ptjt10'] = (jet1+top0).Pt()
+    #k['Mljt10'] = (jet1+top0).M()
 
     k['dRjt11'] = jet1.DeltaR(top1)
-    k['Ptjt11'] = (jet1+top1).Pt()
-    k['Mljt11'] = (jet1+top1).M()
+    #k['Ptjt11'] = (jet1+top1).Pt()
+    #k['Mljt11'] = (jet1+top1).M()
 
-    k['Mttl'] = (top0+top1+lep).M()
+    #k['Mttl'] = (top0+top1+lepH).M()
 
     k['dR(jj)(lepT)'] = (jet0+jet1).DeltaR(lepT)
 
-    k['MtlT0'] = (top0+lepT).M()
-    k['MtlT1'] = (top1+lepT).M()
+    #k['MtlT0'] = (top0+lepT).M()
+    #k['MtlT1'] = (top1+lepT).M()
 
     k['dRtlT0'] = top0.DeltaR(lepT)
     k['dRtlT1'] = top1.DeltaR(lepT)
 
-    k['dR(jj)(l)'] = (jet0 + jet1).DeltaR(lep + met)
-    k['MhiggsCand'] = (jet0+jet1+lep).M()
+    k['dR(jj)(l)'] = (jet0 + jet1).DeltaR(lepH + met)
+    k['MhiggsCand'] = (jet0+jet1+lepH).M()
 
-    higgsCand = jet0+jet1+lep
+    higgsCand = jet0+jet1+lepH
 
     k['dRht0'] = higgsCand.DeltaR(top0)
     k['dRht1'] = higgsCand.DeltaR(top1)
@@ -300,7 +311,7 @@ def higgsTopDict3lF(nom, lepIdx, topIdx0, topIdx1, match=-1):
     '''
     '''
 
-    jet0, jet1, met, lep0, lep1, lep2 = lorentzVecsHiggs(nom, jetIdx0, jetIdx1, 1, 0)
+    met, lep0, lep1, lep2 = lorentzVecsHiggs(nom, 0, 0, 1, 1)
     top0, top1 = lorentzVecsTop(nom, topIdx0, topIdx1)
 
     k = {}

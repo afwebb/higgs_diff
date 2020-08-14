@@ -116,10 +116,10 @@ dfFlat = shuffle(dfFlat)
 
 outF = '/'.join(inf.split("/")[-2:]).replace('.root','.csv')
 if outDir=='2lSS':
-    dfFlat.to_csv('csvFiles2lSS/'+outF, index=False)
+    dfFlat.to_csv('csvFiles/higgs2lSS/'+outF, index=False)
 elif outDir=='3l':
-    dfFlat.to_csv('csvFiles3lS/'+outF, index=False)
+    dfFlat.to_csv('csvFiles/higgs3lS/'+outF, index=False)
 
     df3lF = pd.DataFrame.from_dict(events3lF)
     df3lF = shuffle(df3lF)
-    df3lF.to_csv('csvFiles3lF/'+outF, index=False)
+    df3lF.to_csv('csvFiles/higgs3lF/'+outF, index=False)

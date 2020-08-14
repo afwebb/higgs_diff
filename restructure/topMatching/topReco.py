@@ -104,8 +104,8 @@ dfFourVec = shuffle(dfFourVec)
 
 outF = '/'.join(inf.split("/")[-2:]).replace('.root','.csv')
 if is3l:
-    dfFlat.to_csv('csvFiles3l/flat/'+outF, index=False)
-    dfFourVec.to_csv('csvFiles3l/fourVec/'+outF, index=False)
+    dfFlat.to_csv('csvFiles/top3l/flat/'+outF, index=False)
+    dfFourVec.to_csv('csvFiles/top3l/fourVec/'+outF, index=False)
 else:
-    dfFlat.to_csv('csvFiles2lSS/flat/'+outF, index=False)        
-    dfFourVec.to_csv('csvFiles2lSS/fourVec/'+outF, index=False) 
+    dfFlat.to_csv('csvFiles/top2lSS/flat/'+outF, index=False)        
+    dfFourVec.to_csv('csvFiles/top2lSS/fourVec/'+outF, index=False) 

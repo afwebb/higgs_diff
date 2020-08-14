@@ -102,7 +102,7 @@ for idx in range(nEntries):
 
         #Get indices of jets from Higgs
         for i in range(len(nom.jet_pt)):
-            if i == topIdx1 or i == topIdx2: continue
+            if i == topIdx0 or i == topIdx1: continue
             if nom.jet_jvt[i]<0.59: continue
             if abs(nom.jet_parents[i])==25:
                 higgsJets.append(i)
@@ -142,10 +142,10 @@ dfFlat = shuffle(dfFlat)
 
 outF = '/'.join(inf.split("/")[-2:]).replace('.root','.csv')
 if outDir=='2lSS':
-    dfFlat.to_csv('csvFilesTop2lSS/'+outF, index=False)
+    dfFlat.to_csv('csvFiles/higgsTop2lSS/'+outF, index=False)
 elif outDir=='3l':
-    dfFlat.to_csv('csvFilesTop3lS/'+outF, index=False)
+    dfFlat.to_csv('csvFiles/higgsTop3lS/'+outF, index=False)
 
     df3lF = pd.DataFrame.from_dict(events3lF)
     df3lF = shuffle(df3lF)
-    df3lF.to_csv('csvFilesTop3lF/'+outF, index=False)
+    df3lF.to_csv('csvFiles/higgsTop3lF/'+outF, index=False)
