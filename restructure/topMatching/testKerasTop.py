@@ -17,7 +17,7 @@ import random
 import keras
 from keras.models import load_model
 import pickle
-from functionsTop import selection2lSS, jetCombos2lSS, jetCombos3l
+from functionsTop import selection2lSS, jetCombosTop2lSS, jetCombosTop3l
 
 #Load in the input file
 inf = sys.argv[1]
@@ -62,9 +62,9 @@ for idx in range(nEntries):
 
     #Get dict of all possible jet combinations
     if '2lSS' in inf:
-        combosTop = jetCombos2lSS(nom, 0)
+        combosTop = jetCombosTop2lSS(nom, 0)
     elif '3l' in inf:
-        combosTop = jetCombos3l(nom, 0)
+        combosTop = jetCombosTop3l(nom, 0)
     else:
         'not sure which channel to use'
         break

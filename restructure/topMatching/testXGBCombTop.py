@@ -13,7 +13,7 @@ from rootpy.vector import LorentzVector
 import xgboost as xgb
 from dictTop2lSS import topDictFlat2lSS
 import matplotlib.pyplot as plt
-from functionsTop import selection2lSS, jetCombos2lSS
+from functionsTop import selection2lSS, jetCombosTop2lSS
 
 inputFile = sys.argv[1]
 modelPath = sys.argv[2]
@@ -97,9 +97,9 @@ for idx in range(nEntries):
     
     #Get dict of all possible jet combinations                                                                           
     if '2lSS' in inf:
-        combosTop = jetCombos2lSS(nom, 0)
+        combosTop = jetCombosTop2lSS(nom, 0)
     elif '3l' in inf:
-        combosTop = jetCombos3l(nom, 0)
+        combosTop = jetCombosTop3l(nom, 0)
     else:
         'not sure which channel to use'
         break

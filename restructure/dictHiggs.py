@@ -2,6 +2,7 @@
 
 import ROOT
 from rootpy.vector import LorentzVector
+from functionsTop import loretzVecsHiggs, lorentzVecsTop
 
 def lorentzVecsHiggs(nom, jetIdx0, jetIdx1, is3l, isF):
 
@@ -132,12 +133,16 @@ def higgsDict3lF(nom, lepIdx, match=-1):
     k['lep_Pt_T0'] = lepT0.Pt()
     k['lep_Pt_T1'] = lepT1.Pt()
 
+    k['lep_Eta_H'] = lepH.Eta()
+    k['lep_Eta_T0'] = lepT0.Eta()
+    k['lep_Eta_T1'] = lepT1.Eta()
+
     k['MllHT0)'] = (lepH+lepT0).M()
     k['MllHT1'] = (lepH+lepT1).M()
     k['MllT0T1)'] = (lepT0+lepT1).M()
     
-    k['PtllHT0'] = (lepH+lepT0).Pt()
-    k['PtllHT1'] = (lepH+lepT1).Pt()
+    #k['PtllHT0'] = (lepH+lepT0).Pt()
+    #k['PtllHT1'] = (lepH+lepT1).Pt()
 
     k['dRllHT0'] = lepH.DeltaR(lepT0)
     k['dRllHT1'] = lepH.DeltaR(lepT1)
@@ -326,9 +331,66 @@ def higgsTopDict3lS(nom, jet0, jet1, lepIdx, topIdx0, topIdx1, match =-1):
     
     jet0, jet1, met, lep0, lep1, lep2 = lorentzVecsHiggs(nom, jetIdx0, jetIdx1, 1, 0)
     top0, top1 = lorentzVecsTop(nom, topIdx0, topIdx1)
-    
+
+def higgsTopDict3lF(nom, lepIdx, topIdx0, topIdx1, match=-1):
+    '''                                                                                                                      
+    '''
+
+    met, lep0, lep1, lep2 = lorentzVecsHiggs(nom, 0, 0, 1, 1)                                                          
+    top0, top1 = lorentzVecsTop(nom, topIdx0, topIdx1)                                                             
+
+    #Leptons come from top or higgs. Identify which we want to consider to be from the Higgs                               
+    if lepIdx == 1:                                                                                                    
+        lepH = lep1                                                                                               
+        lepT0 = lep0
+        lepT1 = lep2                                                                                                 
+    elif lepIdx == 2:
+        lepH = lep2
+        lepT0 = lep0
+        lepT1 = lep1
+    else:
+        print(f"{lepIdx} is not a valid lep index. Must be 1 or 2")
+        return 0
+        
     k = {}
-    if match!=-1:                                                                                                       
+    if match!=-1:
         k['match'] = match
+
+    k['lep_Pt_H'] = lepH.Pt()
+    k['lep_Pt_T0'] = lepT0.Pt()
+    k['lep_Pt_T1'] = lepT1.Pt()
+
+    k['lep_Eta_H'] = lepH.Eta()                                                                                         
+    k['lep_Eta_T0'] = lepT0.Eta()
+    k['lep_Eta_T1'] = lepT1.Eta()
+
+    k['MllHT0'] = (lepH+lepT0).M()
+    k['MllHT1'] = (lepH+lepT1).M()
+    k['MllT0T)'] = (lepT0+lepT1).M()
+
+    k['dRllHT0'] = lepH.DeltaR(lepT0)
+    k['dRllHT1'] = lepH.DeltaR(lepT1)                                                                                 
+    k['dRllT0T1'] = lepT0.DeltaR(lepT1)
+
+    k['MllHT0Met'] = (lepH+lepT0+met).M()
+    k['MllHT1Met'] = (lepH+lepT1+met).M()
+    k['MllT0T1Met'] = (lepT0+lepT1+met).M()
+  
+    k['dRlHt0'] = lepH.DeltaR(top0) 
+    k['MlHt0'] = (lepH+top0).M()
+    k['dRlHt1'] = lepH.DeltaR(top1)  
+    k['MlHt1'] = (lepH+top1).M()
+
+    k['dRl0t0'] = lepT0.DeltaR(top0)                                                                                     
+    k['Ml0t0'] = (lepT0+top0).M()                                                                                     
+    k['dRl0t1'] = lepT0.DeltaR(top1)                                                                                   
+    k['Ml0t1'] = (lepT0+top1).M()
+
+    k['dRl1t0'] = lepT1.DeltaR(top0)                                                                                        
+    k['Ml1t0'] = (lepT1+top0).M()                                                                                      
+    k['dRl1t1'] = lepT1.DeltaR(top1)                                                                                 
+    k['Ml1t1'] = (lepT1+top1).M()
+ 
+    k['met'] = met.Pt()
 
     return k

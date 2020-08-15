@@ -19,7 +19,7 @@ from rootpy.vector import LorentzVector
 import random
 from dictTop import topDictFlat2lSS, topDictFourVec2lSS, topDictFlat3l, topDictFourVec3l
 import functionsTop
-from functionsTop import selection2lSS, jetCombos2lSS, jetCombos3l
+from functionsTop import selection2lSS, jetCombosTop2lSS, jetCombosTop3l
 
 #Open input file
 inf = sys.argv[1]

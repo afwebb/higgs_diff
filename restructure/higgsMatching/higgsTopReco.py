@@ -5,6 +5,8 @@ Write to csvFiles(2lSS 3l)/{flat, fourVec}/mc16{a,d,e}/<dsid>.csv (assumes input
 Usage: python3.6 higgsTopReco.py <input root file> <channel>
 '''
 
+import keras 
+from keras.models import load_model
 import ROOT
 import pandas as pd
 from sklearn.utils import shuffle
@@ -17,11 +19,9 @@ from numpy import unwrap
 from numpy import arange
 from rootpy.vector import LorentzVector
 import random
-import keras
-from keras.models import load_model
 from dictHiggs import higgsTopDict2lSS, higgsTopDict3lS, higgsTopDict3lF
 import functionsTop
-from functionsTop import jetCombos2lSS, jetCombos3l
+from functionsTop import jetCombosTop2lSS, jetCombosTop3l
 
 #Open input file
 inf = sys.argv[1]
@@ -34,8 +34,8 @@ if outDir=='3l':
     flatDict = higgsTopDict3lS
     is3l = True
 elif outDir=='2lSS':
-    topModel = load_model("/data_ceph/afwebb/higgs_diff/restructure/topMatching/models/keras_model_flat3l.h5")
-    topNormFactors = np.load("/data_ceph/afwebb/higgs_diff/restructure/topMatching/models/flat3l_normFactors.npy")
+    topModel = load_model("/data_ceph/afwebb/higgs_diff/restructure/topMatching/models/keras_model_flat2lSS.h5")
+    topNormFactors = np.load("/data_ceph/afwebb/higgs_diff/restructure/topMatching/models/flat2lSS_normFactors.npy")
     flatDict = higgsTopDict2lSS
     is3l = False
 else:
@@ -63,14 +63,16 @@ for idx in range(nEntries):
     
     #Get all possible combinations of tops
     if outDir=='2lSS':
-        combosTop = jetCombos2lSS(nom, 0)
+        combosTop = jetCombosTop2lSS(nom, 0)
     elif outDir=='3l':
-        combosTop = jetCombos3l(nom, 0)
+        combosTop = jetCombosTop3l(nom, 0)
     else:
         'not sure which channel to use'
         break
 
     topDF = pd.DataFrame.from_dict(combosTop['flatDicts']) #Convert dict to dataframe
+    if len(list(topDF)) == 0: 
+        continue
     topDF=(topDF - topMinVals)/(topDiff) #Normalize dataframe
     topPred = topModel.predict(topDF.values) #Feed df into NN, predict which pair is best
     topIdx0, topIdx1 = combosTop['jetIdx'][np.argmax(topPred)] #Get the indices of the pair with the highest score
@@ -78,8 +80,11 @@ for idx in range(nEntries):
     #identify which lepton came from the Higgs
     lepIdx = -1
     if nom.lep_Parent_0 == 25: 
-        isF = True
-        if not is3l: lepIdx = 0 #lep0 is always from the Higgs in 3l case
+        if is3l: 
+            isF = True
+        else: 
+            lepIdx = 0 #lep0 is always from the Higgs in 3l case
+            isF = False
     else:
         isF = False
     if nom.lep_Parent_1 == 25: lepIdx = 1
