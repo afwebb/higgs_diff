@@ -13,7 +13,7 @@ from rootpy.vector import LorentzVector
 import xgboost as xgb
 from dictTop2lSS import topDictFlat2lSS
 import matplotlib.pyplot as plt
-from functionsTop import selection2lSS, jetCombosTop2lSS
+from functionsMatch import selection2lSS, jetCombosTop2lSS
 
 inputFile = sys.argv[1]
 modelPath = sys.argv[2]

@@ -17,7 +17,7 @@ import random
 import keras
 from keras.models import load_model
 import pickle
-from functionsTop import selection2lSS, jetCombosTop2lSS, jetCombosTop3l
+from functionsMatch import selection2lSS, jetCombosTop2lSS, jetCombosTop3l
 
 #Load in the input file
 inf = sys.argv[1]

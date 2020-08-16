@@ -18,8 +18,8 @@ from numpy import arange
 from rootpy.vector import LorentzVector
 import random
 from dictHiggs import higgsDict2lSS, higgsDict3lS, higgsDict3lF
-#import functionsTop
-#from functionsTop import selection2lSS, jetCombos2lSS, jetCombos3l
+#import functionsMatch
+#from functionsMatch import selection2lSS, jetCombos2lSS, jetCombos3l
 
 #Open input file
 inf = sys.argv[1]
