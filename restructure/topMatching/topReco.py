@@ -17,7 +17,7 @@ from numpy import unwrap
 from numpy import arange
 from rootpy.vector import LorentzVector
 import random
-from dictTop import topDictFlat2lSS, topDictFourVec2lSS, topDictFlat3l, topDictFourVec3l
+from dictTop import topDict2lSS, topDict3l
 import functionsMatch
 from functionsMatch import selection2lSS, jetCombosTop2lSS, jetCombosTop3l
 
@@ -25,12 +25,10 @@ from functionsMatch import selection2lSS, jetCombosTop2lSS, jetCombosTop3l
 inf = sys.argv[1]
 
 if '3l' in inf:
-    fourVecDict = topDictFourVec3l
-    flatDict = topDictFlat3l
+    topDict = topDict3l
     is3l = True
 elif '2lSS' in inf:
-    fourVecDict = topDictFourVec2lSS                                                                                        
-    flatDict = topDictFlat2lSS
+    topDict = topDict2lSS
     is3l = False
 else:
     print('Not sure which channel to use')
@@ -40,8 +38,7 @@ f = ROOT.TFile.Open(sys.argv[1])
 nom = f.Get('nominal')
 
 #initialize output dicts
-eventsFourVec = []
-eventsFlat = []
+eventsTop = []
 
 #Loop over all entries
 nEntries = nom.GetEntries()
@@ -51,10 +48,6 @@ for idx in range(nEntries):
 
     nom.GetEntry(idx)
     
-    #Apply 2lSS preselection
-    #if not selection2lSS(nom):
-    #    continue
-
     topJets = []
     badJets = []
 
@@ -68,44 +61,34 @@ for idx in range(nEntries):
         
     if len(topJets)!=2: continue
 
-    k = flatDict( nom, topJets[0], topJets[1], 1 )
+    k = topDict( nom, topJets[0], topJets[1], 1 )
     p = fourVecDict( nom, topJets[0], topJets[1], 1 )
 
-    eventsFlat.append(k)
-    eventsFourVec.append(p)
+    eventsTop.append(k)
 
     for l in range(min([3, len(badJets)]) ):
         j = random.sample(badJets,1)[0]
-        k = flatDict( nom, topJets[0], j, 0 )
+        k = topDict( nom, topJets[0], j, 0 )
         p = fourVecDict( nom, topJets[0], j, 0 ) 
-        eventsFlat.append(k)
-        eventsFourVec.append(p)
+        eventsTop.append(k)
 
     for l in range(min([3, len(badJets)]) ):
         i = random.sample(badJets,1)[0]
-        k = flatDict( nom, i, topJets[1], 0 )
+        k = topDict( nom, i, topJets[1], 0 )
         p = fourVecDict( nom, i, topJets[1], 0 )
-        eventsFlat.append(k)
-        eventsFourVec.append(p)
+        eventsTop.append(k)
 
     for l in range(min([6, len(badJets)]) ):
         if len(badJets)>2:
             i,j = random.sample(badJets,2)
-            k = flatDict( nom, i, j, 0 ) 
-            p = fourVecDict( nom, i, j, 0 )
-            eventsFlat.append(k)
-            eventsFourVec.append(p)
+            k = topDict( nom, i, j, 0 ) 
+            eventsTop.append(k)
 
-dfFlat = pd.DataFrame.from_dict(eventsFlat)
-dfFourVec = pd.DataFrame.from_dict(eventsFourVec)
-
-dfFlat = shuffle(dfFlat)
-dfFourVec = shuffle(dfFourVec)
+dfTop = pd.DataFrame.from_dict(eventsTop)
+dfTop = shuffle(dfTop)
 
 outF = '/'.join(inf.split("/")[-2:]).replace('.root','.csv')
 if is3l:
-    dfFlat.to_csv('csvFiles/top3l/flat/'+outF, index=False)
-    dfFourVec.to_csv('csvFiles/top3l/fourVec/'+outF, index=False)
+    dfTop.to_csv('csvFiles/top3l/'+outF, index=False)
 else:
-    dfFlat.to_csv('csvFiles/top2lSS/flat/'+outF, index=False)        
-    dfFourVec.to_csv('csvFiles/top2lSS/fourVec/'+outF, index=False) 
+    dfTop.to_csv('csvFiles/top2lSS/'+outF, index=False)        

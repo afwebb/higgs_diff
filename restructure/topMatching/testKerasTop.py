@@ -17,12 +17,17 @@ import random
 import keras
 from keras.models import load_model
 import pickle
-from functionsMatch import selection2lSS, jetCombosTop2lSS, jetCombosTop3l
+from functionsMatch import selection2lSS, jetCombosTop2lSS, jetCombosTop3l, findBestTopKeras
 
 #Load in the input file
 inf = sys.argv[1]
 f = ROOT.TFile.Open(inf, "READ")
 nom = f.Get('nominal')
+
+if '2lSS' in inf:
+    channel = '2lSS'
+else:
+    channel = '3l'
 
 #Load in the top matching keras model
 topModel = load_model(sys.argv[2])
@@ -49,42 +54,8 @@ for idx in range(nEntries):
 
     nom.GetEntry(idx)
 
-    #Apply 2lSS preselection                                                                                               
-    #if not selection2lSS(nom): 
-    #    continue
-
-    #truthBs = []
-    #for i in range(len(nom.jet_pt)):
-    #    if abs(nom.jet_parents[i])==6 and abs(nom.jet_truthflav[i])==5:
-    #        truthBs.append(i)
-
-    #if len(truthBs)!=2: continue
-
-    #Get dict of all possible jet combinations
-    if '2lSS' in inf:
-        combosTop = jetCombosTop2lSS(nom, 0)
-    elif '3l' in inf:
-        combosTop = jetCombosTop3l(nom, 0)
-    else:
-        'not sure which channel to use'
-        break
-
-    truthBs = combosTop['truthComb']
-    if len(truthBs)!=2: continue
-
-    if 'flat' in sys.argv[2]:
-        topDF = pd.DataFrame.from_dict(combosTop['flatDicts'])
-    else:
-        topDF = pd.DataFrame.from_dict(combosTop['fourVecDicts'])
-
-    #find combination of jets with highest top score
-    topDF=(topDF - topMinVals)/(topDiff)                                                                           
-    topMat = topDF.values
-
-    topPred = topModel.predict(topMat)
-    topBest = np.argmax(topPred)
-
-    topMatches = combosTop['jetIdx'][topBest]
+    topMatches, truthBs = findBestTopKeras(nom, channel, topModel, topNormFactors, 1)
+    if len(truthBs)!=2: continue 
 
     nEvents+=1
     #if abs(nom.jet_parents[topMatches[0]])==6 and abs(nom.jet_parents[topMatches[1]])==6:
