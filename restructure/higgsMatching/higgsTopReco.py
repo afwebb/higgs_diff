@@ -33,12 +33,14 @@ import multiprocessing
 
 def runReco(inf, channel):
     #Set the channel, load in the top model
-    if channel=='3l':
+    if '3l' in inf:
+        channel='3l'
         topModel = load_model("/data_ceph/afwebb/higgs_diff/restructure/topMatching/models/keras_model_flat3l.h5")
         topNormFactors = np.load("/data_ceph/afwebb/higgs_diff/restructure/topMatching/models/flat3l_normFactors.npy")
         flatDict = higgsTopDict3lS
         is3l = True
-    elif channel=='2lSS':
+    elif '2lSS' in inf:
+        channel='2lSS'
         topModel = load_model("/data_ceph/afwebb/higgs_diff/restructure/topMatching/models/keras_model_flat2lSS.h5")
         topNormFactors = np.load("/data_ceph/afwebb/higgs_diff/restructure/topMatching/models/flat2lSS_normFactors.npy")
         flatDict = higgsTopDict2lSS
@@ -143,4 +145,4 @@ def runReco(inf, channel):
         df3lF.to_csv('csvFiles/higgsTop3lF/'+outF, index=False)
 
 linelist = [line.rstrip() for line in open(sys.argv[1])]
-Parallel(n_jobs=10)(delayed(runReco)(inf, sys.argv[2]) for inf in linelist)
+Parallel(n_jobs=10)(delayed(runReco)(inf) for inf in linelist)

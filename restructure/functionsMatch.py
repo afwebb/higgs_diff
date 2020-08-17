@@ -4,7 +4,7 @@ Functions for various object reconstruction or "match" MVAs
 
 import ROOT
 from rootpy.vector import LorentzVector
-from dictTop import topDictFlat2lSS, topDictFourVec2lSS, topDictFlat3l, topDictFourVec3l
+from dictTop import topDict2lSS, topDictFourVec2lSS, topDict3l, topDictFourVec3l
 import dictHiggs
 from dictHiggs import higgsDict2lSS #higgsDict2lSS, higgsDict3lF, higgsDict3lS
 import pandas as pd
@@ -115,10 +115,10 @@ def jetCombosTop2lSS(nom, withMatch):
             
 
             if withMatch:
-                combosTop['flatDicts'].append( topDictFlat2lSS( nom, i, j, isTop) )
+                combosTop['flatDicts'].append( topDict2lSS( nom, i, j, isTop) )
                 combosTop['fourVecDicts'].append( topDictFourVec2lSS( nom, i, j, isTop) )
             else:
-                combosTop['flatDicts'].append( topDictFlat2lSS( nom, i, j) )
+                combosTop['flatDicts'].append( topDict2lSS( nom, i, j) )
                 combosTop['fourVecDicts'].append( topDictFourVec2lSS( nom, i, j) )
             
     return combosTop #, truthComb
@@ -139,10 +139,10 @@ def jetCombosTop3l(nom, withMatch):
                     combosTop['truthComb'] = [i,j]
                     
             if withMatch:                                                         
-                combosTop['flatDicts'].append( topDictFlat3l( nom, i, j, isTop) )
+                combosTop['flatDicts'].append( topDict3l( nom, i, j, isTop) )
                 combosTop['fourVecDicts'].append( topDictFourVec3l( nom, i, j, isTop) )
             else:
-                combosTop['flatDicts'].append( topDictFlat3l( nom, i, j) )
+                combosTop['flatDicts'].append( topDict3l( nom, i, j) )
                 combosTop['fourVecDicts'].append( topDictFourVec3l( nom, i, j) )
                 
     return combosTop 

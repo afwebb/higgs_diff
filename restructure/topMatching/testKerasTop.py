@@ -65,6 +65,7 @@ for idx in range(nEntries):
     if topMatches[0] in truthBs or topMatches[1] in truthBs:
         oneCorrect+=1
 
-
-print("Both Correct", nCorrect/nEvents)
-print("One Correct", oneCorrect/nEvents)
+outRes = open(f'models/testCorrect{channel}.txt', 'w')
+outRes.write(f"{channel} Top Matching Tested on {inf}")
+outRes.write(f"Correct: {str(round(nCorrect/nEvents, 2))}")                                                                
+outRes.write(f"One Jet Correct: {str(round(oneCorrect/nEvents, 2))}")
