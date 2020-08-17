@@ -45,16 +45,6 @@ def make_plots(alg, model, outDir, y_train, y_test, y_train_pred, y_test_pred):
     plt.legend(loc='upper right')
     plt.savefig(f'plots/{outDir}/{alg}_score.png')
 
-    #Feature importance plot - XGBoost only
-    '''
-    if alg=='xgb':
-        plt.figure()
-        fip = xgb.plot_importance(model)
-        plt.title(f"{alg.capitalize()} feature important")
-        plt.legend(loc='lower right')
-        plt.savefig(f'plots/{outDir}/{alg}_feature_importance.png')
-    '''
-
     # ROC Curve
     plt.figure()
     auc = sk.metrics.roc_auc_score(y_test, y_test_pred)
@@ -85,11 +75,12 @@ def make_plots(alg, model, outDir, y_train, y_test, y_train_pred, y_test_pred):
     ax.set_title(f"{alg.capitalize()} Confusion Matrix")
     plt.savefig(f'plots/{outDir}/{alg}_conf_matrix.png')
 
+    #Loss history - keras 
     if alg == 'keras':
         plt.figure()
         plt.plot(model.history['loss'], label='Train Loss')
         plt.plot(model.history['val_loss'], label='Test Loss')
-        plt.title(f"{alg} Loss")                                                                                           
+        plt.title(f"{alg} Loss")
         plt.xlabel('Epoch')
         plt.ylabel('BCE')                                                                                                
         plt.legend()
@@ -98,11 +89,13 @@ def make_plots(alg, model, outDir, y_train, y_test, y_train_pred, y_test_pred):
         plt.figure()
         plt.plot(model.history['AUC'], label='Train AUC')
         plt.plot(model.history['val_AUC'], label='Test AUC')
+        plt.title("Keras AUC")
         plt.xlabel('Epoch')                                                                                                  
         plt.ylabel('AUC')                                                                         
         plt.legend()
         plt.savefig(f'plots/{outDir}/keras_auc_history.png')
 
+    #Feature importance - XGB
     if alg=='xgb':
         plt.figure()
         fip = xgb.plot_importance(model)
@@ -110,3 +103,13 @@ def make_plots(alg, model, outDir, y_train, y_test, y_train_pred, y_test_pred):
         plt.legend(loc='lower right')
         plt.savefig('plots/'+outDir+'/xgb_feature_importance.png')
         
+        #https://machinelearningmastery.com/avoid-overfitting-by-early-stopping-with-xgboost-in-python/
+        results = model.elavs_result()
+        plt.figure()
+        plt.plot(x_axis, results['validation_0']['auc'], label='Train')
+        plt.plot(x_axis, results['validation_1']['auc'], label='Test')
+        plt.legend()
+        plt.ylabel('AUC')
+        plt.xlabel('Epoch')
+        plt.title('XGBoost AUC')
+        plt.savefig('plots/'+outDir+'/xgb_auc_history.png')
