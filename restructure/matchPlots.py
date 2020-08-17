@@ -17,7 +17,7 @@ import sys
 import torch
 import scipy
 
-def make_plots(alg, outDir, y_train, y_test, y_train_pred, y_test_pred):
+def make_plots(alg, model, outDir, y_train, y_test, y_train_pred, y_test_pred):
     '''
     Given the name of the training algorithm, the truth and predicted y values, plots the performance of the algorithm
     Plots include a histogram of the MVA score, ROC curve, and feature importance for xgb
@@ -31,7 +31,7 @@ def make_plots(alg, outDir, y_train, y_test, y_train_pred, y_test_pred):
     
     trainPredTrue = y_train_pred[y_train==1]
     trainPredFalse = y_train_pred[y_train==0]
-    
+
     # Histogram of MVA output score
     minLen = min([len(testPredTrue), len(testPredFalse), len(trainPredTrue), len(trainPredFalse)])
     plt.figure()
@@ -85,3 +85,28 @@ def make_plots(alg, outDir, y_train, y_test, y_train_pred, y_test_pred):
     ax.set_title(f"{alg.capitalize()} Confusion Matrix")
     plt.savefig(f'plots/{outDir}/{alg}_conf_matrix.png')
 
+    if alg == 'keras':
+        plt.figure()
+        plt.plot(model.history['loss'], label='Train Loss')
+        plt.plot(model.history['val_loss'], label='Test Loss')
+        plt.title(f"{alg} Loss")                                                                                           
+        plt.xlabel('Epoch')
+        plt.ylabel('BCE')                                                                                                
+        plt.legend()
+        plt.savefig(f'plots/{outDir}/keras_BCE_history.png')
+        
+        plt.figure()
+        plt.plot(model.history['AUC'], label='Train AUC')
+        plt.plot(model.history['val_AUC'], label='Test AUC')
+        plt.xlabel('Epoch')                                                                                                  
+        plt.ylabel('AUC')                                                                         
+        plt.legend()
+        plt.savefig(f'plots/{outDir}/keras_auc_history.png')
+
+    if alg=='xgb':
+        plt.figure()
+        fip = xgb.plot_importance(model)
+        plt.title("xgboost feature important")
+        plt.legend(loc='lower right')
+        plt.savefig('plots/'+outDir+'/xgb_feature_importance.png')
+        

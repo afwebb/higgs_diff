@@ -66,6 +66,6 @@ for idx in range(nEntries):
         oneCorrect+=1
 
 outRes = open(f'models/testCorrect{channel}.txt', 'w')
-outRes.write(f"{channel} Top Matching Tested on {inf}")
-outRes.write(f"Correct: {str(round(nCorrect/nEvents, 2))}")                                                                
-outRes.write(f"One Jet Correct: {str(round(oneCorrect/nEvents, 2))}")
+outRes.write(f"{channel} Top Matching Tested on {inf}\n")
+outRes.write(f"Correct: {str(round(nCorrect/nEvents, 2))}\n")                                                                
+outRes.write(f"One Jet Correct: {str(round(oneCorrect/nEvents, 2))}\n")
