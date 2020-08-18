@@ -14,8 +14,9 @@ from numpy import unwrap
 from numpy import arange
 from rootpy.vector import LorentzVector
 import random
-import keras
-from keras.models import load_model
+import tensorflow as tf
+import tensorflow.keras
+from tensorflow.keras.models import load_model
 import pickle
 from functionsMatch import selection2lSS, jetCombosTop2lSS, jetCombosTop3l, findBestTopKeras
 
@@ -65,7 +66,7 @@ for idx in range(nEntries):
     if topMatches[0] in truthBs or topMatches[1] in truthBs:
         oneCorrect+=1
 
-outRes = open(f'models/testCorrect{channel}.txt', 'w')
+outRes = open(f'models/testCorrect{channel}.txt', 'a')
 outRes.write(f"{channel} Top Matching Tested on {inf}\n")
 outRes.write(f"Correct: {str(round(nCorrect/nEvents, 2))}\n")                                                                
 outRes.write(f"One Jet Correct: {str(round(oneCorrect/nEvents, 2))}\n")

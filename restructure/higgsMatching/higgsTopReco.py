@@ -31,7 +31,7 @@ import multiprocessing
 #inf = sys.argv[1]
 #outDir = sys.argv[2]
 
-def runReco(inf, channel):
+def runReco(inf):
     #Set the channel, load in the top model
     if '3l' in inf:
         channel='3l'
@@ -145,4 +145,4 @@ def runReco(inf, channel):
         df3lF.to_csv('csvFiles/higgsTop3lF/'+outF, index=False)
 
 linelist = [line.rstrip() for line in open(sys.argv[1])]
-Parallel(n_jobs=10)(delayed(runReco)(inf) for inf in linelist)
+Parallel(n_jobs=15)(delayed(runReco)(inf) for inf in linelist)

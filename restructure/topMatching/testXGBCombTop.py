@@ -11,9 +11,9 @@ from numpy import unwrap
 from numpy import arange
 from rootpy.vector import LorentzVector
 import xgboost as xgb
-from dictTop2lSS import topDictFlat2lSS
+from dictTop import topDict2lSS, topDict3l
 import matplotlib.pyplot as plt
-from functionsMatch import selection2lSS, jetCombosTop2lSS
+from functionsMatch import selection2lSS, jetCombosTop2lSS, jetCombosTop3l
 
 inputFile = sys.argv[1]
 modelPath = sys.argv[2]
@@ -96,9 +96,9 @@ for idx in range(nEntries):
     if len(truthComb)!=2: continue
     
     #Get dict of all possible jet combinations                                                                           
-    if '2lSS' in inf:
+    if '2lSS' in inputFile:
         combosTop = jetCombosTop2lSS(nom, 0)
-    elif '3l' in inf:
+    elif '3l' in inputFile:
         combosTop = jetCombosTop3l(nom, 0)
     else:
         'not sure which channel to use'
@@ -107,12 +107,12 @@ for idx in range(nEntries):
     truthBs = combosTop['truthComb']
     if len(truthBs)!=2: continue
 
-    if 'flat' in sys.argv[2]:
-        topDF = pd.DataFrame.from_dict(combosTop['flatDicts'])   
-    else:
-        topDF = pd.DataFrame.from_dict(combosTop['fourVecDicts'])
+    #if 'flat' in sys.argv[2]:
+    topDF = pd.DataFrame.from_dict(combosTop['flatDicts'])   
+    #else:
+    #    topDF = pd.DataFrame.from_dict(combosTop['fourVecDicts'])
 
-    topDF = pd.DataFrame.from_dict([x[0] for x in combos])
+    #topDF = pd.DataFrame.from_dict([x[0] for x in combos])
     xgbMat = xgb.DMatrix(topDF, feature_names=list(topDF))
 
     #print([x[1] for x in combos])
