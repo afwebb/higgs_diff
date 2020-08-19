@@ -20,7 +20,7 @@ from namePlot import name
 inFile = sys.argv[1]
 outDir = sys.argv[2]
 
-inDF = pd.read_csv(inFile)#, nrows=100000)
+inDF = pd.read_csv(inFile, nrows=1e6)
 inDF = inDF.dropna()
 
 good = inDF[inDF['match']==1]
@@ -52,13 +52,13 @@ for c in inDF:
     plt.legend()
     plt.xlabel(xName)
     plt.ylabel('NEvts')
-    plt.savefig('plots/'+outDir+'/'+c+".pdf")
+    plt.savefig('plots/'+outDir+'/features/'+c+".pdf")
     plt.close()
 
     if icount % 4 == 1:
         print ('\\frame{\\frametitle{Validation Plots - '+outDir+'}\n', file=texfile)
 
-    print (r'\includegraphics[width=.42\linewidth]{%s}' % (outDir+'/'+c+".pdf") + ('%'if (icount % 2 == 1) else r'\\'), file=texfile)
+    print (r'\includegraphics[width=.42\linewidth]{%s}' % ('features/'+c+".pdf") + ('%'if (icount % 2 == 1) else r'\\'), file=texfile)
 
     if icount % 4 == 0:
         print ('}\n', file=texfile)
@@ -77,12 +77,12 @@ plt.yticks(range(inDF.shape[1]), inDF.columns, fontsize=14)
 cb = plt.colorbar()
 #cb.ax.tick
 #plt.title('Top Match Feature Correlations', fontsize=16)
-plt.savefig('plots/'+outDir+'/CorrMat.pdf')
+plt.savefig('plots/'+outDir+'/features/CorrMat.pdf')
 #plt.savefig(outDir+"CorrMat.png")
 #plt.close()
 
 print ('\\frame{\\frametitle{Validation Plots - '+outDir+'}\n', file=texfile)
-print (r'\includegraphics[width=.92\linewidth]{%s}' % (outDir+'/CorrMat.pdf'), file=texfile)
+print (r'\includegraphics[width=.92\linewidth]{%s}' % ('features/CorrMat.pdf'), file=texfile)
 print ('}\n', file=texfile)
 
 print ('\end{document}', file=texfile)
