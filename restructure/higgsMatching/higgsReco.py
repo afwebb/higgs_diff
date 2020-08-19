@@ -97,10 +97,10 @@ def runReco(inf):
                 events.append( flatDict( nom, higgsJets[0], random.sample(badJets,1)[0], lepIdx, 0 ) ) 
                 events.append( flatDict( nom, random.sample(badJets,1)[0], higgsJets[1], lepIdx, 0 ) )
                 
-            #wrong lepton, one correct jet
-            events.append( flatDict( nom, higgsJets[0], random.sample(badJets,1)[0], wrongLep, 0 ) ) 
-            events.append( flatDict( nom, random.sample(badJets,1)[0], higgsJets[1], wrongLep, 0 ) )
-
+                #wrong lepton, one correct jet
+                events.append( flatDict( nom, higgsJets[0], random.sample(badJets,1)[0], wrongLep, 0 ) ) 
+                events.append( flatDict( nom, random.sample(badJets,1)[0], higgsJets[1], wrongLep, 0 ) )
+                
             #Right lepton, wrong jets
             for l in range(min([2, len(badJets)]) ):
                 if len(badJets)>2:

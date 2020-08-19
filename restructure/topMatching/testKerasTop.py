@@ -18,7 +18,8 @@ import tensorflow as tf
 import tensorflow.keras
 from tensorflow.keras.models import load_model
 import pickle
-from functionsMatch import selection2lSS, jetCombosTop2lSS, jetCombosTop3l, findBestTopKeras
+#from functionsMatch import selection2lSS, jetCombosTop2lSS, jetCombosTop3l, findBestTopKeras
+from functionsMatch import jetCombosTop, findBestTopKeras
 
 #Load in the input file
 inf = sys.argv[1]
@@ -42,9 +43,9 @@ topDiff = topMaxVals - topMinVals
 events = []
 nEntries = nom.GetEntries()
 
-nEvents=0
-nCorrect=0
-oneCorrect=0
+nEvents, nCorrect,oneCorrect=0,0,0
+nGood,nGoodCorrect,nGoodOne=0,0,0
+nBad,nBadCorrect,nBadOne=0,0,0
 
 #Loop over each entry, add to events dict
 for idx in range(nEntries):
@@ -55,8 +56,23 @@ for idx in range(nEntries):
 
     nom.GetEntry(idx)
 
-    topMatches, truthBs = findBestTopKeras(nom, channel, topModel, topNormFactors, 1)
+    topRes = findBestTopKeras(nom, channel, topModel, topNormFactors, 1)
+    topMatches, truthBs, topScore = topRes['bestComb'], topRes['truthComb'], topRes['topScore']
+    #topMatches, truthBs = findBestTopKeras(nom, channel, topModel, topNormFactors, 1)
     if len(truthBs)!=2: continue 
+
+    if topScore>0.6:
+        nGood+=1
+        if topMatches[0] in truthBs and topMatches[1] in truthBs:
+            nGoodCorrect+=1
+        if topMatches[0] in truthBs or topMatches[1] in truthBs:
+            nGoodOne+=1
+    if topScore<0.6:
+        nBad+=1
+        if topMatches[0] in truthBs and topMatches[1] in truthBs:
+            nBadCorrect+=1                                                                                                  
+        if topMatches[0] in truthBs or topMatches[1] in truthBs:                                                            
+            nBadOne+=1
 
     nEvents+=1
     #if abs(nom.jet_parents[topMatches[0]])==6 and abs(nom.jet_parents[topMatches[1]])==6:
@@ -67,6 +83,14 @@ for idx in range(nEntries):
         oneCorrect+=1
 
 outRes = open(f'models/testCorrect{channel}.txt', 'a')
-outRes.write(f"{channel} Top Matching Tested on {inf}\n")
-outRes.write(f"Correct: {str(round(nCorrect/nEvents, 2))}\n")                                                                
-outRes.write(f"One Jet Correct: {str(round(oneCorrect/nEvents, 2))}\n")
+outRes.write(f"{channel} Top Matching Tested on {inf}, {nEvents} events\n")
+outRes.write(f"Correct: {str(round(nCorrect/nEvents, 3))}\n")                                                                
+outRes.write(f"One Jet Correct: {str(round(oneCorrect/nEvents, 3))}\n\n")
+
+outRes.write(f"{channel} Top Score > 0.6, {nGood} events\n")
+outRes.write(f"Correct: {str(round(nGoodCorrect/nGood, 3))}\n")
+outRes.write(f"One Jet Correct: {str(round(nGoodOne/nGood, 3))}\n\n")
+
+outRes.write(f"{channel} Top Score < 0.6, {nBad} events\n")
+outRes.write(f"Correct: {str(round(nBadCorrect/nBad, 3))}\n")                                                              
+outRes.write(f"One Jet Correct: {str(round(nBadOne/nBad, 3))}\n\n\n")

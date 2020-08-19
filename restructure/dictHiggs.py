@@ -2,7 +2,6 @@
 
 import ROOT
 from rootpy.vector import LorentzVector
-#from functionsMatch import lorentzVecsTop, lorentzVecsHiggs
 
 def lorentzVecsHiggs(nom, jetIdx0, jetIdx1, is3l, isF):
 

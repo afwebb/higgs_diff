@@ -49,8 +49,6 @@ for c in inDF:
     plt.figure()
     plt.hist(good[c][:nEnt], 30, alpha=0.5, range=r, label="Signal")
     plt.hist(bad[c][:nEnt], 30 ,range = r, alpha=0.5, label="Background")
-    #plt.hist(good[c], 30, alpha=0.5, label="Signal")                                                                       
-    #plt.hist(bad[c][:good.shape[0]], 30, alpha=0.5, label="Background")
     plt.legend()
     plt.xlabel(xName)
     plt.ylabel('NEvts')

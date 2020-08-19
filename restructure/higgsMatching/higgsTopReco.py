@@ -5,24 +5,15 @@ Write to csvFiles(2lSS 3l)/{flat, fourVec}/mc16{a,d,e}/<dsid>.csv (assumes input
 Usage: python3.6 higgsTopReco.py <input root file> <channel>
 '''
 
-import keras 
-from keras.models import load_model
+import pandas as pd
+from tensorflow.keras.models import load_model
 import ROOT
 from ROOT import TFile
-import pandas as pd
 from sklearn.utils import shuffle
 import numpy as np
-import rootpy.io
 import sys
-import math
-from math import sqrt
-from numpy import unwrap
-from numpy import arange
-from rootpy.vector import LorentzVector
 import random
-import dictHiggs
 from dictHiggs import higgsTopDict2lSS, higgsTopDict3lS, higgsTopDict3lF
-import functionsMatch
 from functionsMatch import jetCombosTop2lSS, jetCombosTop3l, findBestTopKeras
 from joblib import Parallel, delayed
 import multiprocessing
@@ -35,20 +26,21 @@ def runReco(inf):
     #Set the channel, load in the top model
     if '3l' in inf:
         channel='3l'
-        topModel = load_model("/data_ceph/afwebb/higgs_diff/restructure/topMatching/models/keras_model_flat3l.h5")
-        topNormFactors = np.load("/data_ceph/afwebb/higgs_diff/restructure/topMatching/models/flat3l_normFactors.npy")
+        topModel = load_model("/data_ceph/afwebb/higgs_diff/restructure/topMatching/models/keras_model_top3l.h5")
+        topNormFactors = np.load("/data_ceph/afwebb/higgs_diff/restructure/topMatching/models/top3l_normFactors.npy")
         flatDict = higgsTopDict3lS
         is3l = True
     elif '2lSS' in inf:
         channel='2lSS'
-        topModel = load_model("/data_ceph/afwebb/higgs_diff/restructure/topMatching/models/keras_model_flat2lSS.h5")
-        topNormFactors = np.load("/data_ceph/afwebb/higgs_diff/restructure/topMatching/models/flat2lSS_normFactors.npy")
+        topModel = load_model("/data_ceph/afwebb/higgs_diff/restructure/topMatching/models/keras_model_top2lSS.h5")
+        topNormFactors = np.load("/data_ceph/afwebb/higgs_diff/restructure/topMatching/models/top2lSS_normFactors.npy")
         flatDict = higgsTopDict2lSS
         is3l = False
     else:
         print(f'Channel {channel} is invalid. Should be 2lSS or 3l')
         exit()
         
+    print('loaded')
     topMaxVals = topNormFactors[0]                                                                                      
     topMinVals = topNormFactors[1]
     topDiff = topMaxVals - topMinVals
@@ -68,7 +60,9 @@ def runReco(inf):
             
         nom.GetEntry(idx)
 
-        topIdx0, topIdx1 = findBestTopKeras(nom, channel, topModel, topNormFactors, 0)
+        topRes = findBestTopKeras(nom, channel, topModel, topNormFactors)
+        topIdx0, topIdx1 = topRes['bestComb']
+        topScore = topRes['topScore']
 
         #identify which lepton came from the Higgs
         lepIdx = -1
@@ -90,8 +84,8 @@ def runReco(inf):
         else: wrongLep = (lepIdx+1)%2
 
         if isF:
-            events3lF.append( higgsTopDict3lF(nom, lepIdx, topIdx0, topIdx1, 1) ) #Correct combination
-            events3lF.append( higgsTopDict3lF(nom, wrongLep, topIdx0, topIdx1, 0) ) #Incorrect combination - swaps 2 and 1
+            events3lF.append( higgsTopDict3lF(nom, lepIdx, topIdx0, topIdx1, topScore, 1) ) #Correct combination
+            events3lF.append( higgsTopDict3lF(nom, wrongLep, topIdx0, topIdx1, topScore, 0) ) #Incorrect combination - swaps 2 and 1
         else:
             higgsJets = []
             badJets = []
@@ -107,30 +101,30 @@ def runReco(inf):
         
             if len(higgsJets)!=2: continue #Only include events where both jets are truth matched to the Higgs
             
-            events.append( flatDict( nom, higgsJets[0], higgsJets[1], lepIdx, topIdx0, topIdx1, 1 ) ) #Correct combination
-            events.append( flatDict( nom, higgsJets[0], higgsJets[1], wrongLep, topIdx0, topIdx1, 0 ) ) #Wrong lepton, right jets
+            events.append( flatDict( nom, higgsJets[0], higgsJets[1], lepIdx, topIdx0, topIdx1, topScore, 1 ) ) #Correct combination
+            events.append( flatDict( nom, higgsJets[0], higgsJets[1], wrongLep, topIdx0, topIdx1, topScore, 0 ) ) #Wrong lepton, right jets
             
             #for l in range(min([1, len(badJets)]) ):
             if len(badJets)>1:
                 #right lepton, one correct jet
-                events.append( flatDict( nom, higgsJets[0], random.sample(badJets,1)[0], lepIdx, topIdx0, topIdx1, 0 ) ) 
-                events.append( flatDict( nom, random.sample(badJets,1)[0], higgsJets[1], lepIdx, topIdx0, topIdx1, 0 ) )
+                events.append( flatDict( nom, higgsJets[0], random.sample(badJets,1)[0], lepIdx, topIdx0, topIdx1, topScore, 0 ) ) 
+                events.append( flatDict( nom, random.sample(badJets,1)[0], higgsJets[1], lepIdx, topIdx0, topIdx1, topScore, 0 ) )
                 
                 #wrong lepton, one correct jet
-                events.append( flatDict( nom, higgsJets[0], random.sample(badJets,1)[0], wrongLep, topIdx0, topIdx1, 0 ) ) 
-                events.append( flatDict( nom, random.sample(badJets,1)[0], higgsJets[1], wrongLep, topIdx0, topIdx1, 0 ) )
+                events.append( flatDict( nom, higgsJets[0], random.sample(badJets,1)[0], wrongLep, topIdx0, topIdx1, topScore, 0 ) ) 
+                events.append( flatDict( nom, random.sample(badJets,1)[0], higgsJets[1], wrongLep, topIdx0, topIdx1, topScore, 0 ) )
 
             #Right lepton, wrong jets
             for l in range(min([2, len(badJets)]) ):
                 if len(badJets)>2:
                     i,j = random.sample(badJets,2)
-                    events.append( flatDict( nom, i, j, lepIdx, topIdx0, topIdx1, 0 ) )
+                    events.append( flatDict( nom, i, j, lepIdx, topIdx0, topIdx1, topScore, 0 ) )
 
             #Wrong leptons, wrong jets
             for l in range(min([4, len(badJets)]) ):
                 if len(badJets)>2:
                     i,j = random.sample(badJets,2)
-                    events.append( flatDict( nom, i, j, wrongLep, topIdx0, topIdx1, 0 ) )
+                    events.append( flatDict( nom, i, j, wrongLep, topIdx0, topIdx1, topScore, 0 ) )
 
     dfFlat = pd.DataFrame.from_dict(events)
     dfFlat = shuffle(dfFlat)

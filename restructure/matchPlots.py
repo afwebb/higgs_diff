@@ -63,9 +63,8 @@ def make_plots(alg, model, outDir, y_train, y_test, y_train_pred, y_test_pred):
     print(len(testPredFalse[:minLen]), testPredFalse[:minLen])
     print(len(small_pred), small_pred)
     small_test = [1 for x in range(minLen)]+[0 for x in range(minLen)]
-    #y_test_bin = np.where(y_test_pred > 0.5, 1, 0)
-    y_test_bin = np.where(small_pred > 0.2, 1, 0) 
-    print(len(small_test), minLen)
+    if '3lF' in outDir: y_test_bin = np.where(small_pred > 0.5, 1, 0)
+    else: y_test_bin = np.where(small_pred > 0.2, 1, 0) 
     confMat = sklearn.metrics.confusion_matrix(small_test, y_test_bin)/(len(small_test))
     plt.figure()
     ax = plt.subplot()
