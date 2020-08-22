@@ -67,7 +67,7 @@ def jetCombosTop(channel, nom, withMatch):
             
     return combosTop
 
-def combosHiggs(channel, nom, withMatch):
+def higgsCombos(channel, nom, withMatch):
     '''
     For a given channel - 2lSS, 3lF or 3lS - return dict of all possible Higgs decay products, and which of those 
     is the correct pairing
@@ -120,7 +120,7 @@ def combosHiggs(channel, nom, withMatch):
 
     return combosHiggs    
 
-def combosHiggsTop(channel, nom, topIdx0, topIdx1, topScore, withMatch):
+def higgsTopCombos(channel, nom, topIdx0, topIdx1, topScore, withMatch):
     '''                                                                                                                 
     Take a ttree, return a dict with all possible combinations of higgs decay candidates. In the 2lSS case, 2 jets, 1 lepton.
     Includes b-jets from tops                                                                                        
@@ -197,23 +197,23 @@ def findBestHiggs(nom, channel, model, normFactors):
     higgsDF = pd.DataFrame.from_dict(combos['higgsDicts'])
 
     #find combination of jets with highest higgs score                                                                       
-    higgsDF=(higgsDF - higgsMinVals)/(higgsDiff)
+    higgsDF=(higgsDF - normFactors[1])/(normFactors[0]-normFactors[1])
     higgsPred = higgsModel.predict(higgsDF.values)      
     higgsBest = np.argmax(higgsPred)  
 
-    return {'bestComb':combos['pairIdx'][higgsBest], 'truthComb':combos['truthComb'], 'higgsScore':max(topPred)[0]}
+    return {'bestComb':combos['pairIdx'][higgsBest], 'truthComb':combos['truthComb'], 'higgsScore':max(higgsPred)[0]}
 
 def findBestHiggsTop(nom, channel, model, normFactors, topIdx0, topIdx1, topScore):
     '''                                                                                                               
     Use a keras model to predict which physics objects in an event came from a Higgs decay                       
     '''
 
-    combos = higgsTopCombos(channel, nom, topIdx0, topIdx1, 0)
+    combos = higgsTopCombos(channel, nom, topIdx0, topIdx1, topScore, 0)
     higgsDF = pd.DataFrame.from_dict(combos['higgsDicts'])
 
     #find combination of jets with highest higgs score
-    higgsDF=(higgsDF - higgsMinVals)/(higgsDiff)                                                                             
-    higgsPred = higgsModel.predict(higgsDF.values)                                                                    
+    higgsDF=(higgsDF - normFactors[1])/(normFactors[0]-normFactors[1])
+    higgsPred = model.predict(higgsDF.values)                                                                    
     higgsBest = np.argmax(higgsPred)                                                                   
     
-    return {'bestComb':combos['pairIdx'][higgsBest], 'truthComb':combos['truthComb'], 'higgsTopScore':max(topPred)[0]} 
+    return {'bestComb':combos['pairIdx'][higgsBest], 'truthComb':combos['truthComb'], 'higgsTopScore':max(higgsPred)[0]} 

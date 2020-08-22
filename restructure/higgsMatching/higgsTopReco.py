@@ -14,7 +14,7 @@ import numpy as np
 import sys
 import random
 from dictHiggs import higgsTopDict2lSS, higgsTopDict3lS, higgsTopDict3lF
-from functionsMatch import jetCombosTop2lSS, jetCombosTop3l, findBestTopKeras
+from functionsMatch import jetCombosTop, findBestTopKeras
 from joblib import Parallel, delayed
 import multiprocessing
 
