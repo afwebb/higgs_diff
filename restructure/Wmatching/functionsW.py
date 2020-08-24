@@ -87,7 +87,7 @@ def WTopCombos(channel, nom, topIdx0, topIdx1, topScore, withMatch):
     combosW = {'WTopDicts':[],'lepIdx':[],'truthComb':[]}
 
     for l in lepRange:                                                                                       
-        combosW['pairIdx'].append([l])                                                                     
+        combosW['lepIdx'].append([l])                                                                     
         if (l == 0 and abs(nom.lep_Parent_0)==24) or (l == 1 and abs(nom.lep_Parent_1)==24) or (l == 2 and abs(nom.lep_Parent_2) == 24):
             isW = 1                                                                 
             combosW['truthComb'] = [l]
@@ -124,11 +124,11 @@ def findBestWTop(nom, channel, model, normFactors, topIdx0, topIdx1, topScore):
     '''
 
     combos = WTopCombos(channel, nom, topIdx0, topIdx1, topScore, 0)
-    WDF = pd.DataFrame.from_dict(combos['WDicts'])
+    WDF = pd.DataFrame.from_dict(combos['WTopDicts'])
 
     #find combination of jets with highest W score
     WDF=(WDF - normFactors[1])/(normFactors[0]-normFactors[1])
     WPred = model.predict(WDF.values)                                                                    
     WBest = np.argmax(WPred)                                                                   
     
-    return {'bestLep':combos['pairIdx'][WBest], 'truthLep':combos['truthComb'], 'WTopScore':max(WPred)[0]} 
+    return {'bestLep':combos['lepIdx'][WBest], 'truthLep':combos['truthComb'], 'WTopScore':max(WPred)[0]} 

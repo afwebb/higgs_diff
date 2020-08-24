@@ -107,6 +107,8 @@ def WTopDict3l(nom, lepIdx, topIdx0, topIdx1, topScore, match=-1):
     k['met'] = met.Pt()
     k['topScore'] = topScore     
     k['HT'] = nom.HT
+    k['nJets_OR'] = nom.nJets_OR                                                                                           
+    k['nJets_OR_DL1r_70'] = nom.nJets_OR_DL1r_70
 
     return k
 
@@ -136,10 +138,14 @@ def WTopDict2lSS(nom, lepIdx, topIdx0, topIdx1, topScore, match=-1):
     k['lep_Pt_T'] = lepT.Pt()
     k['lep_Eta_W'] = lepW.Eta()
     k['lep_Eta_T'] = lepT.Eta()                                                                                      
+    k['lep_Phi_W'] = lepW.Phi()-met.Phi()
+    k['lep_Phi_T'] = lepT.Phi()-met.Phi()
     
     k['top_Pt_0'] = top0.Pt()                                                                                         
     k['top_Pt_1'] = top1.Pt()
-    
+    k['top_Eta_0'] = top0.Eta()                                                                                            
+    k['top_Eta_1'] = top1.Eta()
+
     k['dRlWt0'] = lepW.DeltaR(top0)                                                                                    
     k['MlWt0'] = (lepW+top0).M()                                                                                      
     k['dRlWt1'] = lepW.DeltaR(top1)                                                                                    
@@ -149,12 +155,12 @@ def WTopDict2lSS(nom, lepIdx, topIdx0, topIdx1, topScore, match=-1):
     k['MlTt0'] = (lepT+top0).M()                                                                                    
     k['dRlTt1'] = lepT.DeltaR(top1)
     k['MlTt1'] = (lepT+top1).M()
-    
-    k['dPhi_lW_met'] = lepW.Phi()-met.Phi()
-    k['dPhi_lT_met'] = lepT.Phi()-met.Phi()                                                                         
                                                                                                                
     k['met'] = met.Pt()                                                                                             
     k['topScore'] = topScore                                                                                      
     k['HT'] = nom.HT
+
+    k['nJets_OR'] = nom.nJets_OR
+    k['nJets_OR_DL1r_70'] = nom.nJets_OR_DL1r_70
     
     return k

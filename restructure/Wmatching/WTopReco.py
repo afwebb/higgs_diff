@@ -7,8 +7,6 @@ Usage: python3.6 higgsTopReco.py <input root file> <channel>
 
 import pandas as pd
 from tensorflow.keras.models import load_model
-import ROOT
-from ROOT import TFile
 from sklearn.utils import shuffle
 import numpy as np
 import sys
@@ -17,6 +15,8 @@ from dictW import WTopDict2lSS, WTopDict3l
 from functionsW import jetCombosTop, findBestTopKeras
 from joblib import Parallel, delayed
 import multiprocessing
+import ROOT
+from ROOT import TFile
 
 #Open input file
 #inf = sys.argv[1]
@@ -78,11 +78,11 @@ def runReco(inf):
         else: wrongLep = (lepIdx+1)%2
 
         if is3l:
-            events.append( WTopDict3l(nom, lepIdx, topIdx0, topIdx1, topScore, 1) ) #Correct combination
-            events.append( WTopDict3l(nom, wrongLep, topIdx0, topIdx1, topScore, 0) ) #Incorrect combination - swaps 2 and 1
+            events.append( WTopDict3l(nom, lepIdx, topIdx0, topIdx1, topScore, lepIdx-1) ) #Correct combination
+            #events.append( WTopDict3l(nom, wrongLep, topIdx0, topIdx1, topScore, 0) ) #Incorrect combination - swaps 2 and 1
         else:                                                                                                  
-            events.append( WTopDict2lSS(nom, lepIdx, topIdx0, topIdx1, topScore, 1) ) #Correct combination        
-            events.append( WTopDict2lSS(nom, wrongLep, topIdx0, topIdx1, topScore, 0) ) #Incorrect combination - swaps 2 and\ 1  
+            events.append( WTopDict2lSS(nom, lepIdx, topIdx0, topIdx1, topScore, lepIdx) ) #Correct combination        
+            #events.append( WTopDict2lSS(nom, wrongLep, topIdx0, topIdx1, topScore, 0) ) #Incorrect combination - swaps 2 and\ 1  
 
     dfFlat = pd.DataFrame.from_dict(events)
     dfFlat = shuffle(dfFlat)
@@ -94,4 +94,5 @@ def runReco(inf):
         dfFlat.to_csv('csvFiles/WTop3l/'+outF, index=False)
 
 linelist = [line.rstrip() for line in open(sys.argv[1])]
-Parallel(n_jobs=8)(delayed(runReco)(inf) for inf in linelist)
+#runReco(linelist[0])
+Parallel(n_jobs=10)(delayed(runReco)(inf) for inf in linelist)

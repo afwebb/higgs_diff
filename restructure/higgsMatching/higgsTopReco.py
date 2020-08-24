@@ -84,8 +84,9 @@ def runReco(inf):
         else: wrongLep = (lepIdx+1)%2
 
         if isF:
-            events3lF.append( higgsTopDict3lF(nom, lepIdx, topIdx0, topIdx1, topScore, 1) ) #Correct combination
-            events3lF.append( higgsTopDict3lF(nom, wrongLep, topIdx0, topIdx1, topScore, 0) ) #Incorrect combination - swaps 2 and 1
+            events3lF.append( higgsTopDict3lF(nom, lepIdx, topIdx0, topIdx1, topScore, lepIdx-1) ) #Correct combination
+            #events3lF.append( higgsTopDict3lF(nom, lepIdx, topIdx0, topIdx1, topScore, 1) )
+            #events3lF.append( higgsTopDict3lF(nom, wrongLep, topIdx0, topIdx1, topScore, 0) ) #Incorrect combination - swaps 2 and 1
         else:
             higgsJets = []
             badJets = []
