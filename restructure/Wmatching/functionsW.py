@@ -4,8 +4,8 @@ Functions for various object reconstruction or "match" MVAs
 
 import ROOT
 from rootpy.vector import LorentzVector
-from dictTop import topDict2lSS, topDictFourVec2lSS, topDict3l, topDictFourVec3l
-from dictHiggs import higgsDict2lSS, higgsDict3lF, higgsDict3lS, higgsTopDict2lSS, higgsTopDict3lF, higgsTopDict3lS
+from dictTop import topDict2lSS, topDict3l, topDictFourVec2lSS, topDictFourVec3l
+from dictW import WTopDict2lSS, WTopDict3l
 import pandas as pd
 import numpy as np
 
@@ -110,6 +110,8 @@ def findBestTopKeras(nom, channel, topModel, topNormFactors):
     combosTop = jetCombosTop(channel, nom, 0)
 
     topDF = pd.DataFrame.from_dict(combosTop['flatDicts']) #convert dict to DF
+    if len(list(topDF))<len(topNormFactors[1]):
+        return 
     topDF=(topDF - topNormFactors[1])/(topNormFactors[0] - topNormFactors[1]) # Normalize DF
     topPred = topModel.predict(topDF.values) #feed pairings to the 
     topBest = np.argmax(topPred) # take the pairing with the highest score

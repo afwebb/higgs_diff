@@ -26,7 +26,11 @@ def name(c):
     elif 'nJets' in c and 'DL1r' in c:
         r = (0,5)
     elif c=='HT': 
-        r = (0,1800)
+        r = (0,1500)
+    elif c=='HT_jets':
+        r = (0,800)
+    elif c[0]=='M' and c[-3:]=='met':
+        r = (0, 1200)
     elif 'type' in c:
         r = (0, 5)                                                                                           
     elif 'numTrk' in c:
@@ -36,45 +40,51 @@ def name(c):
     
     #Transform the input variable name to a display name with correct units - generally GeV
     c = c.replace('_', ' ')
-    c = c.replace('l0','l_0').replace('l1','l_1').replace('l3','l_3')
-    
-    #if c == 'scale_nom' or c == 'match' or c == 'decay': continue
+    c = c.replace('l0','l_0').replace('l1','l_1').replace('l2','l_2')
+    c = c.replace('j0','j_0').replace('j1','j_1')
+    c = c.replace('t0','t_0').replace('t1','t_1')
+    c = c.replace('lT0','l_{T0}').replace('lT1','l_{T1}')
+    c = c.replace('lH0','l_{H0}').replace('lH1','l_{H1}')
+    c = c.replace('lT','l_{T}').replace('lH','l_{H}').replace('lW', 'l_W')
 
+    #if c == 'scale_nom' or c == 'match' or c == 'decay': continue
     if 'MhiggsCand' in c:
         c = 'M(ljj) [GeV]'
-    if 'Ptll' in c:
-        c = c.replace('Pt', ' $p_T$(')
-        c = c + ') [GeV]'
-    if 'Pt' in c:
-        c = c.replace('Pt', ' $p_T$')
+    if 'Pt ' in c:
+        c = c.replace('Pt ', ' $p_T$ ')
         c = c + ' [GeV]'
-    if 'pt' in c:
-        c = c.replace('pt', ' $p_T$')
-        c = c + ' [GeV]'
+    if 'pt' in c or 'Pt' in c:
+        c = c.replace('pt', ' $p_T(')
+        c = c.replace('Pt', ' $p_T(')
+        c = c + ')$ [GeV]'
     if 'lep' in c:
         c = c.replace("lep", "Lepton")
     if 'DR' in c:
-        c = c.replace('DR', '$\Delta R(')
+        c = c.replace(' ', ')(')
+        c = c.replace('DR', '$\Delta R(').replace('()', '')
         c = c + ')$'
     if 'dR' in c:
-        c = c.replace('dR', '$\Delta R(')
+        c = c.replace(' ', ')(')
+        c = c.replace('dR', '$\Delta R(').replace('()', '')
         c = c + ')$'
     if 'Eta' in c:
         c = c.replace('Eta', ' $\eta$')
-    if 'Phi' in c:
-        c = c.replace('Phi', ' $\phi$')
-    if 'Mll' in c or 'Mlt' in c or 'Mlj' in c or 'Mjj' in c:
+    if 'dPhi' in c:
+        c = c.replace('dPhi', '$\Delta\phi(')
+        c = c.replace(' ', ')(').replace('()', '') + ')$'
+    if 'Ml' in c or 'Mt' in c or 'Mj' in c:
         c = c.replace('M', '$M(')
         c = c + ')$ [GeV]'
     if 'HT' in c:
         c = c + ' [GeV]'
-    if c == 'MET RefFinal et' or c=='met met':
+    if c == 'MET RefFinal et' or c=='met':
         c = '$E_T^{miss}$ [GeV]'
     if c == 'MET RefFinal phi' or c=='met phi':
         c = '$E_T^{miss}$ $\phi$'
-    if c == 'nJets OR T':
+    if c == 'nJets OR T' or c == 'nJets OR':
         c = 'nJets'
-    if c == 'nJets OR T MV2c10 70' or c=='nJets MV2c10 70':
-        c = 'n b-jets'
+    c = c.replace('met', 'E_T^{miss}')
+    #if 'nJets DL1r' in c:
+    #    c = 'n b-jets'
 
     return c, r

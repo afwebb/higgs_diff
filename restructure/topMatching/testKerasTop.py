@@ -56,7 +56,7 @@ for idx in range(nEntries):
 
     nom.GetEntry(idx)
 
-    topRes = findBestTopKeras(nom, channel, topModel, topNormFactors, 1)
+    topRes = findBestTopKeras(nom, channel, topModel, topNormFactors)
     topMatches, truthBs, topScore = topRes['bestComb'], topRes['truthComb'], topRes['topScore']
     #topMatches, truthBs = findBestTopKeras(nom, channel, topModel, topNormFactors, 1)
     if len(truthBs)!=2: continue 

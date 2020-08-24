@@ -13,8 +13,8 @@ from sklearn.utils import shuffle
 import numpy as np
 import sys
 import random
-from dictHiggs import higgsTopDict2lSS, higgsTopDict3lS, higgsTopDict3lF
-from functionsMatch import jetCombosTop, findBestTopKeras
+from dictW import WTopDict2lSS, WTopDict3l
+from functionsW import jetCombosTop, findBestTopKeras
 from joblib import Parallel, delayed
 import multiprocessing
 
@@ -59,6 +59,8 @@ def runReco(inf):
         nom.GetEntry(idx)
 
         topRes = findBestTopKeras(nom, channel, topModel, topNormFactors)
+        if not topRes:
+            continue
         topIdx0, topIdx1 = topRes['bestComb']
         topScore = topRes['topScore']
 
@@ -87,12 +89,9 @@ def runReco(inf):
 
     outF = '/'.join(inf.split("/")[-2:]).replace('.root','.csv')
     if channel=='2lSS':
-        dfFlat.to_csv('csvFiles/higgsTop2lSS/'+outF, index=False)
+        dfFlat.to_csv('csvFiles/WTop2lSS/'+outF, index=False)
     elif channel=='3l':
-        dfFlat.to_csv('csvFiles/higgsTop3lS/'+outF, index=False)
-        df3lF = pd.DataFrame.from_dict(events3lF)
-        df3lF = shuffle(df3lF)
-        df3lF.to_csv('csvFiles/higgsTop3lF/'+outF, index=False)
+        dfFlat.to_csv('csvFiles/WTop3l/'+outF, index=False)
 
 linelist = [line.rstrip() for line in open(sys.argv[1])]
-Parallel(n_jobs=15)(delayed(runReco)(inf) for inf in linelist)
+Parallel(n_jobs=8)(delayed(runReco)(inf) for inf in linelist)

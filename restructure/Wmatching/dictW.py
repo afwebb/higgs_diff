@@ -47,7 +47,7 @@ def WTopDict3l(nom, lepIdx, topIdx0, topIdx1, topScore, match=-1):
     '''                                                                                                                      
     '''
 
-    lep0, lep1, lep2, met = lorentzVecsHiggs(nom, 1)                                                          
+    lep0, lep1, lep2, met = lorentzVecsLeps(nom, 1)                                                          
     top0, top1 = lorentzVecsTop(nom, topIdx0, topIdx1)                                                             
 
     #Set which lepton is from the W, which from top
@@ -114,17 +114,16 @@ def WTopDict2lSS(nom, lepIdx, topIdx0, topIdx1, topScore, match=-1):
     '''
     '''
 
-    lep0, lep1, met = lorentzVecsHiggs(nom, 0)    
+    lep0, lep1, met = lorentzVecsLeps(nom, 0)    
     top0, top1 = lorentzVecsTop(nom, topIdx0, topIdx1)
     
     #Set which lepton is from the W, which from top                                                                    
-    lepT0 = lep0                                                                                                        
     if lepIdx == 1:                                                                                                     
         lepW = lep1                                                                                                  
-        lepT1 = lep2                                                                                                 
-    elif lepIdx == 2:                                                                                        
-        lepW = lep2                                                                                               
-        lepT1 = lep1                                                                                                
+        lepT = lep0                                                                                                 
+    elif lepIdx == 0:  
+        lepW = lep0                                                                                               
+        lepT = lep1                                                                                                
     else:                                                                                                           
         print(f"{lepIdx} is not a valid lep index. Must be 1 or 2")
         return 0
@@ -134,9 +133,9 @@ def WTopDict2lSS(nom, lepIdx, topIdx0, topIdx1, topScore, match=-1):
         k['match'] = match
     
     k['lep_Pt_W'] = lepW.Pt()                                                                                           
-    k['lep_Pt_T0'] = lepT0.Pt()
+    k['lep_Pt_T'] = lepT.Pt()
     k['lep_Eta_W'] = lepW.Eta()
-    k['lep_Eta_T0'] = lepT0.Eta()                                                                                      
+    k['lep_Eta_T'] = lepT.Eta()                                                                                      
     
     k['top_Pt_0'] = top0.Pt()                                                                                         
     k['top_Pt_1'] = top1.Pt()
@@ -146,13 +145,13 @@ def WTopDict2lSS(nom, lepIdx, topIdx0, topIdx1, topScore, match=-1):
     k['dRlWt1'] = lepW.DeltaR(top1)                                                                                    
     k['MlWt1'] = (lepW+top1).M()
     
-    k['dRlT0t0'] = lepT0.DeltaR(top0)                                                                                 
-    k['MlT0t0'] = (lepT0+top0).M()                                                                                    
-    k['dRlT0t1'] = lepT0.DeltaR(top1)
-    k['MlT0t1'] = (lepT0+top1).M()
+    k['dRlTt0'] = lepT.DeltaR(top0)                                                                                 
+    k['MlTt0'] = (lepT+top0).M()                                                                                    
+    k['dRlTt1'] = lepT.DeltaR(top1)
+    k['MlTt1'] = (lepT+top1).M()
     
     k['dPhi_lW_met'] = lepW.Phi()-met.Phi()
-    k['dPhi_lT0_met'] = lepT0.Phi()-met.Phi()                                                                         
+    k['dPhi_lT_met'] = lepT.Phi()-met.Phi()                                                                         
                                                                                                                
     k['met'] = met.Pt()                                                                                             
     k['topScore'] = topScore                                                                                      
