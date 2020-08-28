@@ -19,8 +19,8 @@ import scipy
 inFile = sys.argv[1]
 inDF = pd.read_csv(inFile)
 
-inDF = inDF.drop(['lep_Parent_0'], axis=1)
-inDF = inDF.drop(['lep_Parent_1'], axis=1)
+#inDF = inDF.drop(['lep_Parent_0'], axis=1)
+#inDF = inDF.drop(['lep_Parent_1'], axis=1)
 
 
 maxDepth = 8

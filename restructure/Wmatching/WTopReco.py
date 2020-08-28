@@ -5,8 +5,9 @@ Write to csvFiles(2lSS 3l)/{flat, fourVec}/mc16{a,d,e}/<dsid>.csv (assumes input
 Usage: python3.6 higgsTopReco.py <input root file> <channel>
 '''
 
-import pandas as pd
+#import pandas as pd
 from tensorflow.keras.models import load_model
+import pandas as pd
 from sklearn.utils import shuffle
 import numpy as np
 import sys
@@ -58,30 +59,31 @@ def runReco(inf):
             
         nom.GetEntry(idx)
 
+        #identify which lepton came from the Higgs                                                                           
+        lepIdx = -1                                                                                                      
+        if abs(nom.lep_Parent_0) == 24:                                                                                   
+            if not is3l: lepIdx = 0 #lep0 is always from the Higgs in 3l case                                          
+        if abs(nom.lep_Parent_1) == 24: lepIdx = 1
+        if is3l and abs(nom.lep_Parent_2) == 24: lepIdx = 2
+        if lepIdx == -1: continue #Exclude events where none of the leptons are from the W 
+
         topRes = findBestTopKeras(nom, channel, topModel, topNormFactors)
         if not topRes:
             continue
         topIdx0, topIdx1 = topRes['bestComb']
         topScore = topRes['topScore']
 
-        #identify which lepton came from the Higgs
-        lepIdx = -1
-        if abs(nom.lep_Parent_0) == 24: 
-            if not is3l: lepIdx = 0 #lep0 is always from the Higgs in 3l case
-        if abs(nom.lep_Parent_1) == 24: lepIdx = 1
-        if is3l and abs(nom.lep_Parent_2) == 24: lepIdx = 2
-
-        if lepIdx == -1: continue #Exclude events where none of the leptons are from the W
-
         #Get index of the non-higgs decay lepton
         if is3l: wrongLep = (lepIdx)%2+1
         else: wrongLep = (lepIdx+1)%2
 
         if is3l:
-            events.append( WTopDict3l(nom, lepIdx, topIdx0, topIdx1, topScore, lepIdx-1) ) #Correct combination
+            events.append( WTopDict3l(nom, topIdx0, topIdx1, topScore, lepIdx-1) )
+            #events.append( WTopDict3l(nom, lepIdx, topIdx0, topIdx1, topScore, lepIdx-1) ) #Correct combination
             #events.append( WTopDict3l(nom, wrongLep, topIdx0, topIdx1, topScore, 0) ) #Incorrect combination - swaps 2 and 1
         else:                                                                                                  
-            events.append( WTopDict2lSS(nom, lepIdx, topIdx0, topIdx1, topScore, lepIdx) ) #Correct combination        
+            events.append( WTopDict2lSS(nom, topIdx0, topIdx1, topScore, lepIdx) )
+            #events.append( WTopDict2lSS(nom, lepIdx, topIdx0, topIdx1, topScore, lepIdx) ) #Correct combination        
             #events.append( WTopDict2lSS(nom, wrongLep, topIdx0, topIdx1, topScore, 0) ) #Incorrect combination - swaps 2 and\ 1  
 
     dfFlat = pd.DataFrame.from_dict(events)
@@ -95,4 +97,4 @@ def runReco(inf):
 
 linelist = [line.rstrip() for line in open(sys.argv[1])]
 #runReco(linelist[0])
-Parallel(n_jobs=10)(delayed(runReco)(inf) for inf in linelist)
+Parallel(n_jobs=8)(delayed(runReco)(inf) for inf in linelist)

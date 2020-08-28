@@ -45,12 +45,15 @@ def jetCombosTop(channel, nom, withMatch):
         flatDict = topDict3l
         fourVecDict = topDictFourVec3l
 
-    combosTop = {'flatDicts':[],'fourVecDicts':[],'jetIdx':[],'truthComb':[]}
+    combosTop = {'flatDicts':[],'fourVecDicts':[],'jetIdx':[],'truthComb':[], 'higgsIdx':[]}
     for i in range(len(nom.jet_pt)-1):
         if nom.jet_jvt[i]<0.59: continue #Only include jets that pass JVT cut
+        if nom.jet_parents[i]==25:
+            combosTop['higgsIdx'].append(i)
         for j in range(i+1, len(nom.jet_pt)):
             combosTop['jetIdx'].append([i,j])
-
+            if nom.jet_parents[j]==25:
+                combosTop['higgsIdx'].append(j)
             #Check if this combination of jets are truth Bs
             isTop = 0
             if abs(nom.jet_parents[i])==6 and abs(nom.jet_truthPartonLabel[i])==5:
@@ -185,7 +188,7 @@ def findBestTopKeras(nom, channel, topModel, topNormFactors):
     topPred = topModel.predict(topDF.values) #feed pairings to the 
     topBest = np.argmax(topPred) # take the pairing with the highest score
 
-    return {'bestComb':combosTop['jetIdx'][topBest], 'truthComb':combosTop['truthComb'], 'topScore':max(topPred)[0]}
+    return {'bestComb':combosTop['jetIdx'][topBest], 'truthComb':combosTop['truthComb'], 'topScore':max(topPred)[0], 'higgsIdx':combosTop['higgsIdx']}
 
 def findBestHiggs(nom, channel, model, normFactors):
     '''
@@ -198,7 +201,7 @@ def findBestHiggs(nom, channel, model, normFactors):
 
     #find combination of jets with highest higgs score                                                                       
     higgsDF=(higgsDF - normFactors[1])/(normFactors[0]-normFactors[1])
-    higgsPred = higgsModel.predict(higgsDF.values)      
+    higgsPred = model.predict(higgsDF.values)      
     higgsBest = np.argmax(higgsPred)  
 
     return {'bestComb':combos['pairIdx'][higgsBest], 'truthComb':combos['truthComb'], 'higgsScore':max(higgsPred)[0]}

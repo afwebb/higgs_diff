@@ -44,6 +44,7 @@ def lorentzVecsTop(nom, topIdx0, topIdx1):
     return (top0, top1)
 
 def WTopDict3l(nom, lepIdx, topIdx0, topIdx1, topScore, match=-1):
+#def WTopDict3l(nom, topIdx0, topIdx1, topScore, match=-1):
     '''                                                                                                                      
     '''
 
@@ -112,7 +113,8 @@ def WTopDict3l(nom, lepIdx, topIdx0, topIdx1, topScore, match=-1):
 
     return k
 
-def WTopDict2lSS(nom, lepIdx, topIdx0, topIdx1, topScore, match=-1):                                                         
+def WTopDict2lSS(nom, lepIdx, topIdx0, topIdx1, topScore, match=-1):                                                 
+#def WTopDict2lSS(nom, topIdx0, topIdx1, topScore, match=-1): 
     '''
     '''
 

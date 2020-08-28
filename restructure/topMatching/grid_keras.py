@@ -84,7 +84,7 @@ param_grid = {'layers':[3,5,7,9],
 }
 model=KerasClassifier(build_fn=create_model, verbose=1)
 #model=KerasRegressor(build_fn=create_model, verbose=1)
-grid = GridSearchCV(estimator=model, param_grid=param_grid, scoring='roc_auc', cv=3, n_jobs=8)
+grid = GridSearchCV(estimator=model, param_grid=param_grid, scoring='roc_auc', cv=3, n_jobs=12)
 grid_result = grid.fit(train, y_train)
 
 resultFile.write('Best params: ')

@@ -5,7 +5,7 @@ Functions for various object reconstruction or "match" MVAs
 import ROOT
 from rootpy.vector import LorentzVector
 from dictTop import topDict2lSS, topDict3l, topDictFourVec2lSS, topDictFourVec3l
-from dictW import WTopDict2lSS, WTopDict3l
+from dictWtest import WTopDict2lSS, WTopDict3l
 import pandas as pd
 import numpy as np
 
@@ -94,9 +94,11 @@ def WTopCombos(channel, nom, topIdx0, topIdx1, topScore, withMatch):
         else:                                                                   
             isW = 0                                                                                     
         if withMatch:                                                                       
-            combosW['WTopDicts'].append( flatDict( nom, l, topIdx0, topIdx1, topScore, isW) )
+            #combosW['WTopDicts'].append( flatDict( nom, l, topIdx0, topIdx1, topScore, isW) )
+            combosW['WTopDicts'].append( flatDict( nom, topIdx0, topIdx1, topScore, isW) ) 
         else:
-            combosW['WTopDicts'].append( flatDict( nom, l, topIdx0, topIdx1, topScore) )
+            #combosW['WTopDicts'].append( flatDict( nom, l, topIdx0, topIdx1, topScore) )
+            combosW['WTopDicts'].append( flatDict( nom, topIdx0, topIdx1, topScore) )
 
     return combosW
 
