@@ -1,0 +1,13 @@
+3l Top Matching Tested on ../truthMatching/3l/mc16d/413000.root, 4033 events
+Correct: 0.894
+One Jet Correct: 1.0
+
+3l Top Score > 0.6, 3760 events
+Correct: 0.916
+One Jet Correct: 0.999
+
+3l Top Score < 0.6, 273 events
+Correct: 0.593
+One Jet Correct: 1.0
+
+
