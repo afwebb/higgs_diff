@@ -1,0 +1,15 @@
+3lS Higgs Matching Tested on ../truthMatching/3l/mc16d/345874.root3lS Higgs Matching Tested on ../truthMatching/3l/mc16d/345874.root
+Correct: 0.23
+Lepton Correct: 0.77
+Lepton, One Jet Correct: {str(round(oneCorrect/nEvents, 2))}
+
+3lS Higgs Matching Tested on ../truthMatching/3l/mc16d/345874.root
+Correct: 0.23
+Lepton Correct: 0.77
+Lepton, One Jet Correct: 0.59
+
+3lS Higgs Top Matching Tested on ../truthMatching/3l/mc16e/346345.root
+Correct: 0.45
+Lepton Correct: 0.8
+Lepton, One Jet Correct: 0.75
+
