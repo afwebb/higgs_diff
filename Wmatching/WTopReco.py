@@ -12,7 +12,7 @@ from sklearn.utils import shuffle
 import numpy as np
 import sys
 import random
-from dictW import WTopDict2lSS, WTopDict3l
+from dictW import WTopDict2lSS, WTopDict3l, fourVecWTopDict2lSS, fourVecWTopDict3l
 from functionsW import jetCombosTop, findBestTopKeras
 from joblib import Parallel, delayed
 import multiprocessing
@@ -27,13 +27,13 @@ def runReco(inf):
     #Set the channel, load in the top model
     if '3l' in inf:
         channel='3l'
-        topModel = load_model("/data_ceph/afwebb/higgs_diff/restructure/Wmatching/models/keras_model_top3l.h5")
-        topNormFactors = np.load("/data_ceph/afwebb/higgs_diff/restructure/Wmatching/models/top3l_normFactors.npy")
+        topModel = load_model("/data_ceph/afwebb/higgs_diff/Wmatching/models/keras_model_top3l.h5")
+        topNormFactors = np.load("/data_ceph/afwebb/higgs_diff/Wmatching/models/top3l_normFactors.npy")
         is3l = True
     elif '2lSS' in inf:
         channel='2lSS'
-        topModel = load_model("/data_ceph/afwebb/higgs_diff/restructure/Wmatching/models/keras_model_top2lSS.h5")
-        topNormFactors = np.load("/data_ceph/afwebb/higgs_diff/restructure/Wmatching/models/top2lSS_normFactors.npy")
+        topModel = load_model("/data_ceph/afwebb/higgs_diff/Wmatching/models/keras_model_top2lSS.h5")
+        topNormFactors = np.load("/data_ceph/afwebb/higgs_diff/Wmatching/models/top2lSS_normFactors.npy")
         is3l = False
     else:
         print(f'Channel {channel} is invalid. Should be 2lSS or 3l')
@@ -49,7 +49,7 @@ def runReco(inf):
     
     #initialize output dicts
     events = []
-    events3lF = []
+    eventsFourVec = []
     
     #Loop over all entries
     nEntries = nom.GetEntries()
@@ -78,23 +78,25 @@ def runReco(inf):
         else: wrongLep = (lepIdx+1)%2
 
         if is3l:
-            events.append( WTopDict3l(nom, topIdx0, topIdx1, topScore, lepIdx-1) )
-            #events.append( WTopDict3l(nom, lepIdx, topIdx0, topIdx1, topScore, lepIdx-1) ) #Correct combination
-            #events.append( WTopDict3l(nom, wrongLep, topIdx0, topIdx1, topScore, 0) ) #Incorrect combination - swaps 2 and 1
+            eventsFourVec.append( fourVecWTopDict3l(nom, topIdx0, topIdx1, topScore, lepIdx-1) )
+            events.append( WTopDict3l(nom, lepIdx, topIdx0, topIdx1, topScore, 1) ) #Correct combination
+            events.append( WTopDict3l(nom, wrongLep, topIdx0, topIdx1, topScore, 0) ) #Incorrect combination - swaps 2 and 1
         else:                                                                                                  
-            events.append( WTopDict2lSS(nom, topIdx0, topIdx1, topScore, lepIdx) )
-            #events.append( WTopDict2lSS(nom, lepIdx, topIdx0, topIdx1, topScore, lepIdx) ) #Correct combination        
-            #events.append( WTopDict2lSS(nom, wrongLep, topIdx0, topIdx1, topScore, 0) ) #Incorrect combination - swaps 2 and\ 1  
+            eventsFourVec.append( fourVecWTopDict2lSS(nom, topIdx0, topIdx1, topScore, lepIdx) )
+            events.append( WTopDict2lSS(nom, lepIdx, topIdx0, topIdx1, topScore, 1) ) #Correct combination        
+            events.append( WTopDict2lSS(nom, wrongLep, topIdx0, topIdx1, topScore, 0) ) #Incorrect combination - swaps 2 and\ 1  
 
-    dfFlat = pd.DataFrame.from_dict(events)
-    dfFlat = shuffle(dfFlat)
+    dfFlat = shuffle(pd.DataFrame.from_dict(events))
+    dfFourVec = shuffle(pd.DataFrame.from_dict(eventsFourVec))
 
     outF = '/'.join(inf.split("/")[-2:]).replace('.root','.csv')
     if channel=='2lSS':
-        dfFlat.to_csv('csvFiles/WTop2lSS/'+outF, index=False)
+        dfFlat.to_csv('csvFiles/WTop2lSSboth/'+outF, index=False)
+        dfFourVec.to_csv('csvFiles/fourVecWTop2lSS/'+outF, index=False)
     elif channel=='3l':
-        dfFlat.to_csv('csvFiles/WTop3l/'+outF, index=False)
+        dfFlat.to_csv('csvFiles/WTop3lboth/'+outF, index=False)
+        dfFourVec.to_csv('csvFiles/fourVecWTop3l/'+outF, index=False)
 
 linelist = [line.rstrip() for line in open(sys.argv[1])]
 #runReco(linelist[0])
-Parallel(n_jobs=8)(delayed(runReco)(inf) for inf in linelist)
+Parallel(n_jobs=15)(delayed(runReco)(inf) for inf in linelist)

@@ -86,19 +86,19 @@ def WTopDict3l(nom, lepIdx, topIdx0, topIdx1, topScore, match=-1):
     k['dR_lW_lT1'] = lepW.DeltaR(lepT1)
     k['dR_lT0_lT1'] = lepT0.DeltaR(lepT1)
 
-    k['dRlWt0'] = lepW.DeltaR(top0) 
+    k['dR_lW_t0'] = lepW.DeltaR(top0) 
     k['MlWt0'] = (lepW+top0).M()                                                                                    
-    k['dRlWt1'] = lepW.DeltaR(top1)                                                                                  
+    k['dR_lW_t1'] = lepW.DeltaR(top1)                                                                                  
     k['MlWt1'] = (lepW+top1).M() 
 
-    k['dRlT0t0'] = lepT0.DeltaR(top0) 
+    k['dR_lT0_t0'] = lepT0.DeltaR(top0) 
     k['MlT0t0'] = (lepT0+top0).M()
-    k['dRlT0t1'] = lepT0.DeltaR(top1)  
+    k['dR_lT0_t1'] = lepT0.DeltaR(top1)  
     k['MlT0t1'] = (lepT0+top1).M()
 
-    k['dRlT1t0'] = lepT1.DeltaR(top0)
+    k['dR_lT1_t0'] = lepT1.DeltaR(top0)
     k['MlT1t0'] = (lepT1+top0).M()                                                                                     
-    k['dRlT1Ht1'] = lepT1.DeltaR(top1)                                                                                  
+    k['dR_lT1_t1'] = lepT1.DeltaR(top1)                                                                                  
     k['MlT1t1'] = (lepT1+top1).M()
 
     k['dR_lW_lT0lT1'] = lepW.DeltaR(lepT0+lepT1)
@@ -106,6 +106,7 @@ def WTopDict3l(nom, lepIdx, topIdx0, topIdx1, topScore, match=-1):
     k['dR_lT0t1_lT1t0'] = (lepT0+top1).DeltaR(lepT1+top0)
 
     k['MlT0lT1t0t1'] = (lepT0+lepT1+top0+top1).M()
+    k['PtlT0lT1t0t1'] = (lepT0+lepT1+top0+top1).Pt()
     k['dR_lW_lT0lT1t0t1'] = (lepT0+lepT1+top0+top1).DeltaR(lepW)
 
     k['dPhi_lW_met'] = lepW.Phi()-met.Phi()
@@ -154,20 +155,22 @@ def WTopDict2lSS(nom, lepIdx, topIdx0, topIdx1, topScore, match=-1):
     k['top_Pt_1'] = top1.Pt()
     k['top_Eta_0'] = top0.Eta()                                                                                            
     k['top_Eta_1'] = top1.Eta()
+    k['top_Phi_0'] = top0.Phi()-met.Phi()
+    k['top_Phi_1'] = top1.Phi()-met.Phi()
 
-    k['dRlWt0'] = lepW.DeltaR(top0)                                                                                    
+    k['dR_lW_t0'] = lepW.DeltaR(top0)                                                                                    
     k['MlWt0'] = (lepW+top0).M()                                                                                      
-    k['dRlWt1'] = lepW.DeltaR(top1)                                                                                    
+    k['dR_lW_t1'] = lepW.DeltaR(top1)                                                                                    
     k['MlWt1'] = (lepW+top1).M()
     
-    k['dRlTt0'] = lepT.DeltaR(top0)                                                                                 
+    k['dR_lT_t0'] = lepT.DeltaR(top0)                                                                                 
     k['MlTt0'] = (lepT+top0).M()                                                                                    
-    k['dRlTt1'] = lepT.DeltaR(top1)
+    k['dR_lT_t1'] = lepT.DeltaR(top1)
     k['MlTt1'] = (lepT+top1).M()
 
     k['dR_lW_lTt0'] = lepW.DeltaR(top0+lepT)
     k['dR_lW_lTt1'] = lepW.DeltaR(top1+lepT)
-    k['dR_lW_lTt0t1'] = lepW.DetaR(lepT+top0+top1)
+    k['dR_lW_lTt0t1'] = lepW.DeltaR(lepT+top0+top1)
                                                                                                                
     k['met'] = met.Pt()                                                                                             
     k['topScore'] = topScore                                                                                      
@@ -177,18 +180,7 @@ def WTopDict2lSS(nom, lepIdx, topIdx0, topIdx1, topScore, match=-1):
     
     return k
 
-def fourVecWTopDict2lSS(nom, lepIdx, topIdx0, topIdx1, topScore, match=-1):
-
-    #Set which lepton is from the W, which from top                                                               
-    if lepIdx == 1:                                                                                               
-        lepW = lep1                                                                                               
-        lepT = lep0
-    elif lepIdx == 0:                                                                                           
-        lepW = lep0                                                                                               
-        lepT = lep1                                                                                     
-    else:                                                                                              
-        print(f"{lepIdx} is not a valid lep index. Must be 1 or 2")
-        return 0
+def fourVecWTopDict2lSS(nom, topIdx0, topIdx1, topScore, match=-1):
 
     k = {}                                                                                           
     k['lep_Pt_0'] = nom.lep_Pt_0                                                                               
@@ -201,12 +193,60 @@ def fourVecWTopDict2lSS(nom, lepIdx, topIdx0, topIdx1, topScore, match=-1):
     k['met_phi'] = nom.met_phi
     k['nJets_OR'] = nom.nJets_OR                                                                              
     k['nJets_OR_DL1r_70'] = nom.nJets_OR_DL1r_70
-    k['bjet_pt_0'] = nom.jet_pt[topMatches[0]]
-    k['bjet_eta_0'] = nom.jet_eta[topMatches[0]]
-    k['bjet_phi_0'] = nom.jet_phi[topMatches[0]]
-    k['bjet_DL1r_0'] = nom.jet_DL1r[topMatches[0]]                                                             
-    k['bjet_pt_1'] = nom.jet_pt[topMatches[1]]
-    k['bjet_eta_1'] = nom.jet_eta[topMatches[1]]
-    k['bjet_phi_1'] = nom.jet_phi[topMatches[1]]
-    k['bjet_DL1r_1'] = nom.jet_DL1r[topMatches[1]]
-    k['topScore'] = topPred[topBest][0]
+    k['bjet_pt_0'] = nom.jet_pt[topIdx0]
+    k['bjet_eta_0'] = nom.jet_eta[topIdx0]
+    k['bjet_phi_0'] = nom.jet_phi[topIdx0]
+    k['bjet_DL1r_0'] = nom.jet_DL1r[topIdx0]                                                             
+    k['bjet_pt_1'] = nom.jet_pt[topIdx1]
+    k['bjet_eta_1'] = nom.jet_eta[topIdx1]
+    k['bjet_phi_1'] = nom.jet_phi[topIdx1]
+    k['bjet_DL1r_1'] = nom.jet_DL1r[topIdx1]
+    k['topScore'] = topScore
+
+    if match!=-1:
+        if abs(nom.lep_Parent_0)==24:
+            k['match']=1
+        elif abs(nom.lep_Parent_1)==24:
+            k['match']=0
+        else:
+            print('no W match found')                                                                              
+            return
+
+    return k
+
+def fourVecWTopDict3l(nom, topIdx0, topIdx1, topScore, match=-1):
+
+    k = {}
+    k['lep_Pt_0'] = nom.lep_Pt_0
+    k['lep_Eta_0'] = nom.lep_Eta_0
+    k['lep_Phi_0'] = nom.lep_Phi_0
+    k['lep_Pt_1'] = nom.lep_Pt_1
+    k['lep_Eta_1'] = nom.lep_Eta_1
+    k['lep_Phi_1'] = nom.lep_Phi_1
+    k['lep_Pt_2'] = nom.lep_Pt_2                                                                                    
+    k['lep_Eta_2'] = nom.lep_Eta_2                                                                                 
+    k['lep_Phi_2'] = nom.lep_Phi_2 
+    k['met_met'] = nom.met_met
+    k['met_phi'] = nom.met_phi
+    k['nJets_OR'] = nom.nJets_OR
+    k['nJets_OR_DL1r_70'] = nom.nJets_OR_DL1r_70
+    k['bjet_pt_0'] = nom.jet_pt[topIdx0]
+    k['bjet_eta_0'] = nom.jet_eta[topIdx0]
+    k['bjet_phi_0'] = nom.jet_phi[topIdx0]
+    k['bjet_DL1r_0'] = nom.jet_DL1r[topIdx0]
+    k['bjet_pt_1'] = nom.jet_pt[topIdx1]
+    k['bjet_eta_1'] = nom.jet_eta[topIdx1]
+    k['bjet_phi_1'] = nom.jet_phi[topIdx1]
+    k['bjet_DL1r_1'] = nom.jet_DL1r[topIdx1]
+    k['topScore'] = topScore
+
+    if match!=-1:
+        if abs(nom.lep_Parent_1)==24:
+            k['match']=1
+        elif abs(nom.lep_Parent_2)==24:
+            k['match']=0
+        else:
+            print('no W match found')
+            return
+
+    return k

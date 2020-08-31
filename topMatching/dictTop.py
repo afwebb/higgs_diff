@@ -1,11 +1,13 @@
-# Defines dictionaries to be used for top match algorithm
+'''
+Defines input variables to be used for top matching algorithm. Includes "fourVec" and "flat" variations, which include low level variable (pt, eta, phi) for pairs of jets, and higher level variable (dR, M, Pt) for both 2lSS and 3l Channels
+'''
 
 import ROOT
 from rootpy.vector import LorentzVector
 
 def lorentzVecs(nom, jetIdx0, jetIdx1, is3l):
     '''
-    Initialize met, lepton, and jet lorentz vectors                                                                     
+    Initialize met, lepton, and jet lorentz vectors       
     Return jet0, jet1, met, lep0, lep1, (lep2 if is3l)
     '''
 
@@ -35,7 +37,7 @@ def lorentzVecs(nom, jetIdx0, jetIdx1, is3l):
 
 def topDict2lSS(nom, jetIdx0, jetIdx1, match=-1):
     '''
-    Create a dictionary with lepton, jet kinematics to distinguish jets from tops from background jets
+    Create a dictionary with lepton, jet kinematics to distinguish jets from tops from background jets for 2lSS channel
     Truth label "match" =1 if both jets decayed from tops, =0 otherwise
     '''
 
@@ -69,8 +71,6 @@ def topDict2lSS(nom, jetIdx0, jetIdx1, match=-1):
 
     k['jet_DL1r_0'] = nom.jet_tagWeightBin_DL1r_Continuous[jetIdx0]
     k['jet_DL1r_1'] = nom.jet_tagWeightBin_DL1r_Continuous[jetIdx1]
-    #k['jet_DL1r_0'] = nom.jet_DL1r[jetIdx0]                                                              
-    #k['jet_DL1r_1'] = nom.jet_DL1r[jetIdx1]
     k['nJets_OR_DL1r_85'] = nom.nJets_OR_DL1r_85                                                                  
     k['nJets_OR_DL1r_60'] = nom.nJets_OR_DL1r_60
 
@@ -93,6 +93,11 @@ def topDict2lSS(nom, jetIdx0, jetIdx1, match=-1):
     return k
     
 def topDictFourVec2lSS(nom, jetIdx0, jetIdx1, match=-1):#(jet0, jet1, lep0, lep1, met, jet0_DL1r, jet1_DL1r, match=-1):
+    '''
+    Return a dictionary of low level varibles for a jet pairing. match = 1 -> both jets are b-jets from top decay, match=0 
+    otherwise
+    '''
+
     p = {}
     if match!=-1:
         p['match'] = match
@@ -122,6 +127,12 @@ def topDictFourVec2lSS(nom, jetIdx0, jetIdx1, match=-1):#(jet0, jet1, lep0, lep1
 
     p['jet_DL1r_0'] = nom.jet_tagWeightBin_DL1r_Continuous[jetIdx0]
     p['jet_DL1r_1'] = nom.jet_tagWeightBin_DL1r_Continuous[jetIdx1]
+    p['nJets_OR_DL1r_85'] = nom.nJets_OR_DL1r_85
+    p['nJets_OR_DL1r_60'] = nom.nJets_OR_DL1r_60
+
+    p['HT_lep'] = nom.HT_lep                                                      
+    p['HT_jets'] = nom.HT_jets                                                                            
+    p['nJets_OR'] = nom.nJets_OR
 
     return p
 
@@ -231,7 +242,11 @@ def topDictFourVec3l(nom, jetIdx0, jetIdx1, match=-1):#(jet0, jet1, lep0, lep1, 
     p['jet_DL1r_0'] = nom.jet_tagWeightBin_DL1r_Continuous[jetIdx0]                                                          
     p['jet_DL1r_1'] = nom.jet_tagWeightBin_DL1r_Continuous[jetIdx1]
 
+    p['nJets_OR'] = nom.nJets_OR
     p['nJets_OR_DL1r_85'] = nom.nJets_OR_DL1r_85                                                                             
     p['nJets_OR_DL1r_60'] = nom.nJets_OR_DL1r_60
+
+    p['HT_lep'] = nom.HT_lep                 
+    p['HT_jets'] = nom.HT_jets
     
     return p

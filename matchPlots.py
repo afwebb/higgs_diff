@@ -1,3 +1,5 @@
+#Plot the performance of truth matching algorithms
+
 import pandas as pd
 import numpy as np
 import re
@@ -11,7 +13,6 @@ import sklearn as sk
 from sklearn.metrics import confusion_matrix
 from sklearn.decomposition import PCA
 from sklearn.model_selection import train_test_split
-#from sklearn.metrics import plot_confusion_matrix
 import pickle
 import sys
 import torch
@@ -78,7 +79,7 @@ def make_plots(alg, model, outDir, y_train, y_test, y_train_pred, y_test_pred):
     if alg == 'keras':
         plt.figure()
         plt.plot(model.history['loss'], label='Train Loss')
-        plt.plot(model.history['val_loss'], label='Test Loss')
+        #plt.plot(model.history['val_loss'], label='Test Loss')
         plt.title(f"{alg} Loss")
         plt.xlabel('Epoch')
         plt.ylabel('BCE')                                                                                                
@@ -87,7 +88,7 @@ def make_plots(alg, model, outDir, y_train, y_test, y_train_pred, y_test_pred):
         
         plt.figure()
         plt.plot(model.history['AUC'], label='Train AUC')
-        plt.plot(model.history['val_AUC'], label='Test AUC')
+        #plt.plot(model.history['val_AUC'], label='Test AUC')
         plt.title("Keras AUC")
         plt.xlabel('Epoch')                                                                                                  
         plt.ylabel('AUC')                                                                         

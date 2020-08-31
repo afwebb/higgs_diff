@@ -5,7 +5,7 @@ Functions for various object reconstruction or "match" MVAs
 import ROOT
 from rootpy.vector import LorentzVector
 from dictTop import topDict2lSS, topDict3l, topDictFourVec2lSS, topDictFourVec3l
-from dictW import WTopDict2lSS, WTopDict3l
+from dictW import WTopDict2lSS, WTopDict3l, fourVecWTopDict2lSS, fourVecWTopDict3l
 import pandas as pd
 import numpy as np
 

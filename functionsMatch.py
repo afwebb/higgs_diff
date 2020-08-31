@@ -38,6 +38,7 @@ def jetCombosTop(channel, nom, withMatch):
     Takes a ttree, returns an array of tuples of (dict, jet indices) for top2lSS matching for all combinations of jets 
     varType should be either flat or fourVec
     '''
+
     if channel=='2lSS': 
         flatDict = topDict2lSS
         fourVecDict = topDictFourVec2lSS

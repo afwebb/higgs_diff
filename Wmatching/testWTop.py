@@ -30,12 +30,12 @@ WModel.compile(loss="binary_crossentropy", optimizer='adam')
 
 if '2lSS' in sys.argv[2]:
     channel = '2lSS'
-    topModel = load_model("/data_ceph/afwebb/higgs_diff/restructure/Wmatching/models/keras_model_top2lSS.h5")
-    topNormFactors = np.load("/data_ceph/afwebb/higgs_diff/restructure/Wmatching/models/top2lSS_normFactors.npy")
+    topModel = load_model("/data_ceph/afwebb/higgs_diff/Wmatching/models/keras_model_top2lSS.h5")
+    topNormFactors = np.load("/data_ceph/afwebb/higgs_diff/Wmatching/models/top2lSS_normFactors.npy")
 elif '3l' in sys.argv[2]:
     channel = '3l'
-    topModel = load_model("/data_ceph/afwebb/higgs_diff/restructure/Wmatching/models/keras_model_top3l.h5")
-    topNormFactors = np.load("/data_ceph/afwebb/higgs_diff/restructure/Wmatching/models/top3l_normFactors.npy")
+    topModel = load_model("/data_ceph/afwebb/higgs_diff/Wmatching/models/keras_model_top3l.h5")
+    topNormFactors = np.load("/data_ceph/afwebb/higgs_diff/Wmatching/models/top3l_normFactors.npy")
 else:
     print('Cannot determine which channel to use')
     exit

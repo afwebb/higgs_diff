@@ -2,25 +2,33 @@
 Correct: 0.781
 One Jet Correct: 0.997
 
-2lSS Top Score > 0.6, 3590 events
-Correct: 0.82
-One Jet Correct: 0.999
-
-2lSS Top Score < 0.6, 366 events
-Correct: 0.399
-One Jet Correct: 0.981
-
-
 2lSS Top Matching Tested on ../truthMatching/2lSS/mc16d/413008.root, 3600 events
 Correct: 0.755
 One Jet Correct: 0.995
 
-2lSS Top Score > 0.6, 3160 events
-Correct: 0.804
-One Jet Correct: 0.996
+2lSS Top Matching Tested on ../truthMatching/2lSS/mc16d/413008.root, 3600 events
+Correct: 0.736
+One Jet Correct: 0.995
 
-2lSS Top Score < 0.6, 440 events
-Correct: 0.402
-One Jet Correct: 0.984
+2lSS Top Matching Tested on ../truthMatching/2lSS/mc16d/413008.root, 3600 events
+Correct: 0.739
+One Jet Correct: 0.995
+2lSS Top Matching Tested on ../truthMatching/2lSS/mc16d/413008.root, 3600 events
+model: models/keras_model_top2lSS.h5
+Correct: 0.735
+One Jet Correct: 0.995
 
+2lSS Top Matching Tested on ../truthMatching/2lSS/mc16d/413008.root, 3600 events
+model: models/keras_model_top2lSStest.h5
+Correct: 0.747
+One Jet Correct: 0.995
+
+2lSS Top Matching Tested on ../truthMatching/2lSS/mc16d/413008.root, 3600 events
+model: models/keras_model_top2lSSold.h5
+Correct: 0.759
+One Jet Correct: 0.995
+2lSS Top Matching Tested on ../truthMatching/2lSS/mc16d/413000.root, 3956 events
+model: models/keras_model_top2lSSold.h5
+Correct: 0.78
+One Jet Correct: 0.997
 

@@ -23,7 +23,7 @@ inFile = sys.argv[1]
 outDir = sys.argv[2]
 
 #Use optimal parameters obtained from grid search
-if outDir=='top2lSS' or outDir=='test2lSS':
+if outDir=='top2lSS':
     best_params = {"epochs": 60, "layers": 5, "nodes": 40}
 if outDir=='top3l':
     best_params = {"epochs": 50, "layers": 4, "nodes": 60}
@@ -32,7 +32,7 @@ elif outDir=='higgsTop2lSS':
 elif outDir=='higgsTop3lF':
     best_params = {'epochs': 80, 'layers': 5, 'nodes': 30}
 else:
-    best_params = {"epochs": 80, "layers": 5, "nodes": 75}
+    best_params = {"epochs": 120, "layers": 6, "nodes": 75}
 
 print(best_params)
 
