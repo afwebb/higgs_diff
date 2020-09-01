@@ -129,7 +129,7 @@ def findBestWTop(nom, channel, model, normFactors, topIdx0, topIdx1, topScore):
     WDF = pd.DataFrame.from_dict(combos['WTopDicts'])
 
     #find combination of jets with highest W score
-    WDF=(WDF - normFactors[1])/(normFactors[0]-normFactors[1])
+    WDF=(WDF - normFactors[2])/(normFactors[0]-normFactors[1])
     WPred = model.predict(WDF.values)                                                                    
     WBest = np.argmax(WPred)                                                                   
     

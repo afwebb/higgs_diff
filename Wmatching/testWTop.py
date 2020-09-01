@@ -63,9 +63,9 @@ for idx in range(nEntries):
 
     #Get dict of all possible jet combinations
     Wres = findBestWTop(nom, channel, WModel, WNormFactors, topIdx0, topIdx1, topScore)
-    
     if len(Wres['truthLep'])!=1 or len(Wres['bestLep'])!=1:
         continue
+    print(Wres)
     '''
     if channel=='2lSS':
         if Wres['WTopScore']<0.5 and Wres['truthLep'][0]==0:

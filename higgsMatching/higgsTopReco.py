@@ -26,14 +26,14 @@ def runReco(inf):
     #Set the channel, load in the top model
     if '3l' in inf:
         channel='3l'
-        topModel = load_model("/data_ceph/afwebb/higgs_diff/restructure/topMatching/models/keras_model_top3l.h5")
-        topNormFactors = np.load("/data_ceph/afwebb/higgs_diff/restructure/topMatching/models/top3l_normFactors.npy")
+        topModel = load_model("/data_ceph/afwebb/higgs_diff/topMatching/models/keras_model_top3l.h5")
+        topNormFactors = np.load("/data_ceph/afwebb/higgs_diff/topMatching/models/top3l_normFactors.npy")
         flatDict = higgsTopDict3lS
         is3l = True
     elif '2lSS' in inf:
         channel='2lSS'
-        topModel = load_model("/data_ceph/afwebb/higgs_diff/restructure/topMatching/models/keras_model_top2lSS.h5")
-        topNormFactors = np.load("/data_ceph/afwebb/higgs_diff/restructure/topMatching/models/top2lSS_normFactors.npy")
+        topModel = load_model("/data_ceph/afwebb/higgs_diff/topMatching/models/keras_model_top2lSS.h5")
+        topNormFactors = np.load("/data_ceph/afwebb/higgs_diff/topMatching/models/top2lSS_normFactors.npy")
         flatDict = higgsTopDict2lSS
         is3l = False
     else:

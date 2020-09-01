@@ -26,25 +26,25 @@ def runReco(inf):
         is3l = True
         ptDict = ptDictHiggsTop3lS
 
-        topModel = load_model("/data_ceph/afwebb/higgs_diff/restructure/topMatching/models/keras_model_top3l.h5")
-        topNormFactors = np.load("/data_ceph/afwebb/higgs_diff/restructure/topMatching/models/top3l_normFactors.npy")
+        topModel = load_model("/data_ceph/afwebb/higgs_diff/topMatching/models/keras_model_top3l.h5")
+        topNormFactors = np.load("/data_ceph/afwebb/higgs_diff/topMatching/models/top3l_normFactors.npy")
 
-        model3lF = load_model("/data_ceph/afwebb/higgs_diff/restructure/higgsMatching/models/keras_model_higgsTop3lF.h5")
-        normFactors3lF = np.load("/data_ceph/afwebb/higgs_diff/restructure/higgsMatching/models/higgsTop3lF_normFactors.npy")
+        model3lF = load_model("/data_ceph/afwebb/higgs_diff/higgsMatching/models/keras_model_higgsTop3lF.h5")
+        normFactors3lF = np.load("/data_ceph/afwebb/higgs_diff/higgsMatching/models/higgsTop3lF_normFactors.npy")
 
-        model3lS = load_model("/data_ceph/afwebb/higgs_diff/restructure/higgsMatching/models/keras_model_higgsTop3lS.h5")
-        normFactors3lS = np.load("/data_ceph/afwebb/higgs_diff/restructure/higgsMatching/models/higgsTop3lS_normFactors.npy")
+        model3lS = load_model("/data_ceph/afwebb/higgs_diff/higgsMatching/models/keras_model_higgsTop3lS.h5")
+        normFactors3lS = np.load("/data_ceph/afwebb/higgs_diff/higgsMatching/models/higgsTop3lS_normFactors.npy")
 
     elif '2lSS' in inf:
         channel='2lSS'
         ptDict = ptDictHiggsTop2lSS
         is3l = False
 
-        topModel = load_model("/data_ceph/afwebb/higgs_diff/restructure/topMatching/models/keras_model_top2lSS.h5")
-        topNormFactors = np.load("/data_ceph/afwebb/higgs_diff/restructure/topMatching/models/top2lSS_normFactors.npy")
+        topModel = load_model("/data_ceph/afwebb/higgs_diff/topMatching/models/keras_model_top2lSS.h5")
+        topNormFactors = np.load("/data_ceph/afwebb/higgs_diff/topMatching/models/top2lSS_normFactors.npy")
         
-        model2lSS = load_model("/data_ceph/afwebb/higgs_diff/restructure/higgsMatching/models/keras_model_higgsTop2lSS.h5")
-        normFactors2lSS = np.load("/data_ceph/afwebb/higgs_diff/restructure/higgsMatching/models/higgsTop2lSS_normFactors.npy")
+        model2lSS = load_model("/data_ceph/afwebb/higgs_diff/higgsMatching/models/keras_model_higgsTop2lSS.h5")
+        normFactors2lSS = np.load("/data_ceph/afwebb/higgs_diff/higgsMatching/models/higgsTop2lSS_normFactors.npy")
 
     else:
         print(f'Channel {channel} is invalid. Should be 2lSS or 3l')
@@ -112,4 +112,5 @@ def runReco(inf):
         df3lF.to_csv('results/higgsTop3lF/'+outF, index=False)
 
 linelist = [line.rstrip() for line in open(sys.argv[1])]
-Parallel(n_jobs=15)(delayed(runReco)(inf) for inf in linelist)
+runReco(linelist[0])
+#Parallel(n_jobs=15)(delayed(runReco)(inf) for inf in linelist)

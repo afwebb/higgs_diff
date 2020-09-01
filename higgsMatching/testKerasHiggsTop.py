@@ -17,7 +17,7 @@ from numpy import arange
 from rootpy.vector import LorentzVector
 import random
 import pickle
-from functionsMatch import selection2lSS, higgsTopCombos, findBestTopKeras
+from functionsMatch import selection2lSS, higgsTopCombos, findBestTopKeras, findBestHiggsTop
 
 #Load in the input file
 inf = sys.argv[1]
@@ -30,16 +30,16 @@ higgsModel.compile(loss="binary_crossentropy", optimizer='adam')
 
 if '2lSS' in sys.argv[2]:
     channel = '2lSS'
-    topModel = load_model("/data_ceph/afwebb/higgs_diff/restructure/topMatching/models/keras_model_top2lSS.h5")
-    topNormFactors = np.load("/data_ceph/afwebb/higgs_diff/restructure/topMatching/models/top2lSS_normFactors.npy")
+    topModel = load_model("/data_ceph/afwebb/higgs_diff/topMatching/models/keras_model_top2lSS.h5")
+    topNormFactors = np.load("/data_ceph/afwebb/higgs_diff/topMatching/models/top2lSS_normFactors.npy")
 elif '3lF' in sys.argv[2]:
     channel = '3lF'
-    topModel = load_model("/data_ceph/afwebb/higgs_diff/restructure/topMatching/models/keras_model_top3l.h5")
-    topNormFactors = np.load("/data_ceph/afwebb/higgs_diff/restructure/topMatching/models/top3l_normFactors.npy")
+    topModel = load_model("/data_ceph/afwebb/higgs_diff/topMatching/models/keras_model_top3l.h5")
+    topNormFactors = np.load("/data_ceph/afwebb/higgs_diff/topMatching/models/top3l_normFactors.npy")
 elif '3lS' in sys.argv[2]:
     channel = '3lS'
-    topModel = load_model("/data_ceph/afwebb/higgs_diff/restructure/topMatching/models/keras_model_top3l.h5")
-    topNormFactors = np.load("/data_ceph/afwebb/higgs_diff/restructure/topMatching/models/top3l_normFactors.npy")
+    topModel = load_model("/data_ceph/afwebb/higgs_diff/topMatching/models/keras_model_top3l.h5")
+    topNormFactors = np.load("/data_ceph/afwebb/higgs_diff/topMatching/models/top3l_normFactors.npy")
 else:
     print('Cannot determine which channel to use')
     exit
@@ -73,23 +73,17 @@ for idx in range(nEntries):
 
     topIdx0, topIdx1 = topRes['bestComb']
     topScore = topRes['topScore']
-
+    print(topScore)
     #Get dict of all possible jet combinations
-    combos = higgsTopCombos(channel, nom, topIdx0, topIdx1, topScore, 0)
+    higgsRes = findBestHiggsTop(nom, channel, higgsModel, higgsNormFactors, topIdx0, topIdx1, topScore)
+    higgsMatches = higgsRes['bestComb']
+    truthPair = higgsRes['truthComb']
+    if channel == '3lF' and len(truthPair)!=1:                                                                                 
+        continue                                                                                                               
+    elif channel!='3lF' and len(truthPair)!=3:                                                                                 
+        continue 
 
-    truthPair = combos['truthComb']
-    if channel == '3lF' and len(truthPair)!=1:
-        continue
-    elif channel!='3lF' and len(truthPair)!=3: 
-        continue
-
-    higgsDF = pd.DataFrame.from_dict(combos['higgsDicts'])
-    #find combination of jets with highest higgs score
-    higgsDF=(higgsDF - higgsMinVals)/(higgsDiff)                                                                           
-    higgsMat = higgsDF.values
-    higgsPred = higgsModel.predict(higgsMat)
-    higgsBest = np.argmax(higgsPred)
-    higgsMatches = combos['pairIdx'][higgsBest]
+    print(higgsRes['higgsTopScore'])
 
     nEvents+=1
     if higgsMatches == truthPair:

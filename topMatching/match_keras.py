@@ -51,7 +51,7 @@ np.save('models/'+outDir+'_normFactors.npy', normFactors)
 
 nFeatures = len(list(inDF))-1
 print(list(inDF))
-train, test = train_test_split(inDF, test_size=0.2)
+train, test = train_test_split(inDF, test_size=0.1)
  
 y_train = train['match']
 y_test = test['match']
@@ -78,7 +78,7 @@ def create_model(layers=best_params['layers'], nodes=best_params['nodes'], activ
 
 #model=KerasClassifier(build_fn=create_model, verbose=1)
 model=KerasRegressor(build_fn=create_model, verbose=1)
-result=model.fit(train, y_train, validation_split=0.2, epochs=best_params['epochs'])
+result=model.fit(train, y_train, validation_split=0.1, epochs=best_params['epochs'])
 
 model.model.save("models/keras_model_"+outDir+".h5")
 
