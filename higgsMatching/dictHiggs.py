@@ -272,12 +272,15 @@ def higgsTopDict2lSS(nom, jetIdx0, jetIdx1, lepIdx, topIdx0, topIdx1, topScore, 
         k['match'] = match
 
     k['lep_Pt_H'] = lepH.Pt()
+    k['lep_Pt_T'] = lepT.Pt()
     k['jet_Pt_0'] = jet0.Pt()
     k['jet_Pt_1'] = jet1.Pt()
-    k['lep_Pt_T'] = lepT.Pt()
+
     k['top_Pt_0'] = top0.Pt()   
     k['top_Pt_1'] = top1.Pt()  
 
+    k['lep_Eta_H'] = lepH.Eta()
+    k['lep_Eta_T'] = lepT.Eta()
     k['jet_Eta_0'] = jet0.Eta()
     k['jet_Eta_1'] = jet1.Eta()
 

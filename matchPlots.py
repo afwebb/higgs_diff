@@ -43,7 +43,7 @@ def make_plots(alg, model, outDir, y_train, y_test, y_train_pred, y_test_pred):
     plt.title(f"{alg} Output")
     plt.xlabel(f'{alg} Score')
     plt.ylabel('NEvents')
-    plt.legend(loc='upper right')
+    plt.legend()
     plt.savefig(f'plots/{outDir}/{alg}_score.png')
 
     # ROC Curve
@@ -55,7 +55,7 @@ def make_plots(alg, model, outDir, y_train, y_test, y_train_pred, y_test_pred):
     auc = sk.metrics.roc_auc_score(y_train, y_train_pred)
     fpr, tpr, _ = sk.metrics.roc_curve(y_train, y_train_pred)
     plt.plot(fpr, tpr, label='train AUC = %.3f' %(auc))
-    plt.legend(loc='lower right')
+    plt.legend()
     plt.title(f'{alg.capitalize()} Match ROC')
     plt.savefig(f'plots/{outDir}/{alg}_roc.png')
     

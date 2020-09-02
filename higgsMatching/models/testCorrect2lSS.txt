@@ -29,3 +29,16 @@ Correct: 0.31
 Lepton Correct: 0.8
 Lepton, One Jet Correct: 0.68
 
+
+
+2lSS Higgs Top Matching Tested on ../truthMatching/2lSS/mc16d/346344.root
+Correct: 0.4
+Lepton Correct: 0.81
+Lepton, One Jet Correct: 0.72
+
+2lSS Higgs Matching (no top) Tested on ../truthMatching/2lSS/mc16d/346344.root, 929 events
+using models/keras_model_higgs2lSS.h5
+Correct: 0.41
+Lepton Correct: 0.81
+Lepton, One Jet Correct: 0.71
+

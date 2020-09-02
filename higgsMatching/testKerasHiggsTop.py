@@ -67,23 +67,24 @@ for idx in range(nEntries):
     nom.GetEntry(idx)
 
     if '3l' in channel:
+        if channel=='3lF' and nom.lep_Parent_0!=25: continue
+        if channel=='3lS' and nom.lep_Parent_0==25: continue
         topRes = findBestTopKeras(nom, '3l', topModel, topNormFactors)
     else:
         topRes = findBestTopKeras(nom, '2lSS', topModel, topNormFactors)
 
     topIdx0, topIdx1 = topRes['bestComb']
     topScore = topRes['topScore']
-    print(topScore)
     #Get dict of all possible jet combinations
     higgsRes = findBestHiggsTop(nom, channel, higgsModel, higgsNormFactors, topIdx0, topIdx1, topScore)
+    
+    if not higgsRes: continue
     higgsMatches = higgsRes['bestComb']
     truthPair = higgsRes['truthComb']
-    if channel == '3lF' and len(truthPair)!=1:                                                                                 
-        continue                                                                                                               
-    elif channel!='3lF' and len(truthPair)!=3:                                                                                 
+    if channel == '3lF' and len(truthPair)!=1:                                                                   
+        continue                                                                                            
+    elif channel!='3lF' and len(truthPair)!=3:                                                                   
         continue 
-
-    print(higgsRes['higgsTopScore'])
 
     nEvents+=1
     if higgsMatches == truthPair:

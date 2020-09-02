@@ -149,7 +149,9 @@ def higgsTopCombos(channel, nom, topIdx0, topIdx1, topScore, withMatch):
     if channel=='2lSS' or channel=='3lS':
         for l in lepRange:
             for i in range(len(nom.jet_pt)-1):
+                if i in [topIdx0, topIdx1]: continue
                 for j in range(i+1, len(nom.jet_pt)):
+                    if j in [topIdx0, topIdx1]: continue
                     combosHiggs['pairIdx'].append([l, i,j])
                     isHiggs = 0
                     if abs(nom.jet_parents[i])==25 and abs(nom.jet_parents[j])==25:
@@ -214,10 +216,11 @@ def findBestHiggsTop(nom, channel, model, normFactors, topIdx0, topIdx1, topScor
 
     combos = higgsTopCombos(channel, nom, topIdx0, topIdx1, topScore, 0)
     higgsDF = pd.DataFrame.from_dict(combos['higgsDicts'])
+    if len(list(higgsDF))==0: return 
 
     #find combination of jets with highest higgs score
     higgsDF=(higgsDF - normFactors[1])/(normFactors[0]-normFactors[1])
     higgsPred = model.predict(higgsDF.values)                                                                    
     higgsBest = np.argmax(higgsPred)                                                                   
-    
+
     return {'bestComb':combos['pairIdx'][higgsBest], 'truthComb':combos['truthComb'], 'higgsTopScore':max(higgsPred)[0]} 
