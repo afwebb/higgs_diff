@@ -279,8 +279,6 @@ def higgsTopDict2lSS(nom, jetIdx0, jetIdx1, lepIdx, topIdx0, topIdx1, topScore, 
     k['top_Pt_0'] = top0.Pt()   
     k['top_Pt_1'] = top1.Pt()  
 
-    k['lep_Eta_H'] = lepH.Eta()
-    k['lep_Eta_T'] = lepT.Eta()
     k['jet_Eta_0'] = jet0.Eta()
     k['jet_Eta_1'] = jet1.Eta()
 
@@ -516,4 +514,96 @@ def higgsTopDict3lFtest(nom, topIdx0, topIdx1, topScore, match=-1):
     k['met'] = met.Pt()                                                                                                      
     k['topScore'] = topScore
     k['HT'] = nom.HT
+    return k
+
+def higgsTopDictBig2lSS(nom, jetIdx0, jetIdx1, lepIdx, topIdx0, topIdx1, topScore, match=-1):
+    '''
+    Given the indices at two jets and a lepton, plus the indices of top jets, return a dict for predicting whether than
+    pairing of jets+lepton came from a Higgs decay
+    '''
+
+    #Get Lorentz vectors of the physics objects
+    jet0, jet1, met, lep0, lep1 = lorentzVecsHiggs(nom, jetIdx0, jetIdx1, 0, 0)
+    top0, top1 = lorentzVecsTop(nom, topIdx0, topIdx1)
+
+    #Leptons come from top or higgs. Identify which we want to consider to be from the Higgs
+    if lepIdx == 0:
+        lepH = lep0
+        lepT = lep1
+    elif lepIdx == 1:
+        lepH = lep1
+        lepT = lep0
+    else:
+        print(f"{lepIdx} is not a valid lep index. Must be 0 or 1")
+        return 0
+
+    k = {}
+    if match!=-1:
+        k['match'] = match
+
+    k['lep_Pt_H'] = lepH.Pt()
+    k['lep_Pt_T'] = lepT.Pt()
+    k['jet_Pt_0'] = jet0.Pt()
+    k['jet_Pt_1'] = jet1.Pt()
+    k['top_Pt_0'] = top0.Pt()
+    k['top_Pt_1'] = top1.Pt()
+
+    k['lep_Eta_H'] = lepH.Eta() 
+    k['lep_Eta_T'] = lepT.Eta()
+    k['jet_Eta_0'] = jet0.Eta()                                                                                           
+    k['jet_Eta_1'] = jet1.Eta()
+    k['top_Eta_0'] = top0.Eta()                                                                                         
+    k['top_Eta_1'] = top1.Eta()
+
+    k['lep_E_H'] = lepH.E()
+    k['lep_E_T'] = lepT.E()
+    k['jet_E_0'] = jet0.E()
+    k['jet_E_1'] = jet1.E()
+    k['top_E_0'] = top0.E()                                                                                              
+    k['top_E_1'] = top1.E()
+
+    k['lep_Phi_H'] = lepH.Phi() - met.Phi()
+    k['lep_Phi_T'] = lepT.Phi() - met.Phi()
+    k['jet_Phi_0'] = jet0.Phi() - met.Phi()
+    k['jet_Phi_1'] = jet1.Phi() - met.Phi()
+    k['top_Phi_0'] = top0.Phi() - met.Phi()
+    k['top_Phi_1'] = top1.Phi() - met.Phi()
+
+    k['dR_j0_j1'] = jet0.DeltaR(jet1)
+    k['dR_lH_j0'] = lepH.DeltaR(jet0)
+    k['dR_lH_j1'] = lepH.DeltaR(jet1)
+
+    k['Mj0j1'] = (jet0+jet1).M()
+    k['MlHj0'] = (lepH+jet0).M()
+    k['MlHj1'] = (lepH+jet1).M()
+
+    k['MlHt0'] = (lepH+top0).M()
+    k['MlHt1'] = (lepH+top1).M()
+    k['Mt0lT'] = (top0+lepT).M()
+    k['Mt1lT'] = (top1+lepT).M()
+    k['Mj0j1t0'] = (jet0+jet1+top0).M()
+    k['Mj0j1t1'] = (jet0+jet1+top1).M()
+
+    k['dR_lH_t0'] = lepH.DeltaR(top0)
+    k['dR_lH_t1'] = lepH.DeltaR(top1)
+    k['dR_lT_t0'] = lepT.DeltaR(top0)
+    k['dR_lT_t1'] = lepT.DeltaR(top1)
+    k['dR_j0j1_lH'] = (jet0 + jet1).DeltaR(lepH)
+    k['dR_j0j1_lT'] = (jet0 + jet1).DeltaR(lepT)
+
+    higgsCand = jet0+jet1+lepH
+    k['Mj0j1lH'] = higgsCand.M()
+    k['dR_j0j1lH_t0'] = higgsCand.DeltaR(top0)
+    k['dR_j0j1lH_t1'] = higgsCand.DeltaR(top1)
+    k['dR_j0j1lH_lT'] = higgsCand.DeltaR(lepT)
+    k['dPhi_j0j1lH_met'] = higgsCand.Phi() - met.Phi()
+
+    k['Ptj0j1lHlTt0t1met'] = (top0+top1+jet0+jet1+lepT+lepH+met).Pt()
+    k['Ptj0j1lHlTt0t1met'] = (top0+top1+jet0+jet1+lepT+lepH+met).M()
+
+    k['topScore'] = topScore
+    k['met'] = met.Pt()
+    k['nJets_OR'] = nom.nJets_OR
+    k['HT_jets'] = nom.HT_jets
+
     return k

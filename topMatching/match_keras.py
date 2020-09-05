@@ -32,7 +32,7 @@ if outDir=='top3l':
 #elif outDir=='higgsTop3lF':
 #    best_params = {'epochs': 80, 'layers': 5, 'nodes': 30}
 else:
-    best_params = {"epochs": 120, "layers": 8, "nodes": 90}
+    best_params = {"epochs": 120, "layers": 6, "nodes": 90}
 
 print(best_params)
 

@@ -56,6 +56,10 @@ for idx in range(nEntries):
         break
 
     nom.GetEntry(idx)
+    if channel=='2lSS':
+        if nom.lep_Pt_0 < 30e3 or nom.lep_Pt_1 < 30e3: continue
+    if channel=='3l':
+        if nom.lep_Pt_0 < 20e3 or nom.lep_Pt_1 < 30e3 or nom.lep_Pt_2 < 30e3: continue
 
     topRes = findBestTopKeras(nom, channel, topModel, topNormFactors)
     topIdx0, topIdx1 = topRes['bestComb']
@@ -83,7 +87,7 @@ for idx in range(nEntries):
         nCorrect+=1
 
 outRes = open(f'models/testCorrect{channel}.txt', 'a')
-outRes.write('\n\n')
+outRes.write('\n increased lep cut')
 outRes.write(f"{channel} W Top Matching Tested on {inf}\n")
 outRes.write(f"Correct: {str(round(nCorrect/nEvents, 2))}\n\n")
     

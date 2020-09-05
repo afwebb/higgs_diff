@@ -74,6 +74,7 @@ def runReco(inf):
             continue
             
         topRes = findBestTopKeras(nom, channel, topModel, topNormFactors)
+        if not topRes: continue
         topIdx0, topIdx1 = topRes['bestComb']
         topScore = topRes['topScore']
 
@@ -83,6 +84,7 @@ def runReco(inf):
 
         if isF:
             res3lF = findBestHiggsTop(nom, '3lF', model3lF, normFactors3lF, topIdx0, topIdx1, topScore)
+            if not res3lF: continue
             higgsTopScore = res3lF['higgsTopScore']
             lepIdx = res3lF['bestComb'][0]
 
@@ -93,6 +95,7 @@ def runReco(inf):
             else:
                 res = findBestHiggsTop(nom, '2lSS', model2lSS, normFactors2lSS, topIdx0, topIdx1, topScore)
                 
+            if not res: continue
             higgsTopScore = res['higgsTopScore']
             lepIdx, jetIdx0, jetIdx1 = res['bestComb']
             events.append( ptDict(nom, jetIdx0, jetIdx1, lepIdx, higgsTopScore, topIdx0, topIdx1, topScore, higgs_pt) )
@@ -109,8 +112,8 @@ def runReco(inf):
         dfFlat.to_csv('inputFiles/higgsTop3lS/'+outF, index=False)
         df3lF = pd.DataFrame.from_dict(events3lF)
         df3lF = shuffle(df3lF)
-        df3lF.to_csv('results/higgsTop3lF/'+outF, index=False)
+        df3lF.to_csv('inputFiles/higgsTop3lF/'+outF, index=False)
 
 linelist = [line.rstrip() for line in open(sys.argv[1])]
-runReco(linelist[0])
-#Parallel(n_jobs=15)(delayed(runReco)(inf) for inf in linelist)
+#runReco(linelist[0])
+Parallel(n_jobs=15)(delayed(runReco)(inf) for inf in linelist)

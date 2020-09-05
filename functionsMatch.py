@@ -187,6 +187,7 @@ def findBestTopKeras(nom, channel, topModel, topNormFactors):
     combosTop = jetCombosTop(channel, nom, 0)
 
     topDF = pd.DataFrame.from_dict(combosTop['flatDicts']) #convert dict to DF
+    if len(list(topDF))==0: return
     topDF=(topDF - topNormFactors[1])/(topNormFactors[0] - topNormFactors[1]) # Normalize DF
     topPred = topModel.predict(topDF.values) #feed pairings to the 
     topBest = np.argmax(topPred) # take the pairing with the highest score

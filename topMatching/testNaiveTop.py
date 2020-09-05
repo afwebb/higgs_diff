@@ -36,6 +36,7 @@ for idx in range(nEntries):
         break
 
     nom.GetEntry(idx)
+    #if nom.nJets_OR_DL1r_70!=2: continue
 
     #Apply 2lSS preselection                                                                                               
     #if not selection2lSS(nom): 
@@ -48,6 +49,8 @@ for idx in range(nEntries):
         if abs(nom.jet_parents[i])==6 and abs(nom.jet_truthflav[i])==5:
             truthBs.append(i)
         if nom.jet_DL1r[i]>btag1:
+            if btag1>btag2:
+                top2, btag2 = top1, btag1
             top1 = i
             btag1 = nom.jet_DL1r[i]
         elif nom.jet_DL1r[i]>btag2:
@@ -57,7 +60,7 @@ for idx in range(nEntries):
     if len(truthBs)!=2: continue
 
     topMatches = [top1, top2]
-
+    #print('truth scores: ', [nom.jet_DL1r[x] for x in truthBs], '\t tag scores: ', [nom.jet_DL1r[x] for x in topMatches])
     nEvents+=1
     #if abs(nom.jet_parents[topMatches[0]])==6 and abs(nom.jet_parents[topMatches[1]])==6:
     if topMatches[0] in truthBs and topMatches[1] in truthBs:
@@ -65,7 +68,7 @@ for idx in range(nEntries):
     #if abs(nom.jet_parents[topMatches[0]])==6 or abs(nom.jet_parents[topMatches[1]])==6:
     if topMatches[0] in truthBs or topMatches[1] in truthBs:
         oneCorrect+=1
-
+        
 
 print("Both Correct", nCorrect/nEvents)
 print("One Correct", oneCorrect/nEvents)

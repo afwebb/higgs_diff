@@ -387,7 +387,7 @@ def ptDictHiggsTop3lS(nom, jetIdx0, jetIdx1, lepIdx, higgsScore, topIdx0, topIdx
 
     return k
 
-def ptDictHiggsTop3lF(nom, lepIdx, topIdx0, topIdx1, topScore, higgs_pt=-1):
+def ptDictHiggsTop3lF(nom, lepIdx, higgsScore, topIdx0, topIdx1, topScore, higgs_pt=-1):
     '''           
     To be added
     '''
@@ -444,6 +444,7 @@ def ptDictHiggsTop3lF(nom, lepIdx, topIdx0, topIdx1, topScore, higgs_pt=-1):
 
     k['met'] = met.Pt()
     k['topScore'] = topScore     
+    k['higgsScore'] = higgsScore
     k['HT'] = nom.HT
 
     return k

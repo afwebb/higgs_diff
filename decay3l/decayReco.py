@@ -27,19 +27,19 @@ import multiprocessing
 def runReco(inf):
 
     #load in the top model - not picklable, can't do outside the function 
-    topModel = load_model("/data_ceph/afwebb/higgs_diff/restructure/topMatching/models/keras_model_top3l.h5")
-    topNormFactors = np.load("/data_ceph/afwebb/higgs_diff/restructure/topMatching/models/top3l_normFactors.npy")
+    topModel = load_model("/data_ceph/afwebb/higgs_diff/topMatching/models/keras_model_top3l.h5")
+    topNormFactors = np.load("/data_ceph/afwebb/higgs_diff/topMatching/models/top3l_normFactors.npy")
     topMaxVals = topNormFactors[0]
     topMinVals = topNormFactors[1]
     topDiff = topMaxVals - topMinVals
 
-    model3lF = load_model("/data_ceph/afwebb/higgs_diff/restructure/higgsMatching/models/keras_model_higgsTop3lF.h5")
-    normFactors3lF = np.load("/data_ceph/afwebb/higgs_diff/restructure/higgsMatching/models/higgsTop3lF_normFactors.npy")
+    model3lF = load_model("/data_ceph/afwebb/higgs_diff/higgsMatching/models/keras_model_higgsTop3lF.h5")
+    normFactors3lF = np.load("/data_ceph/afwebb/higgs_diff/higgsMatching/models/higgsTop3lF_normFactors.npy")
     maxVals3lF, minVals3lF = normFactors3lF
     diff3lF = maxVals3lF - minVals3lF
 
-    model3lS = load_model("/data_ceph/afwebb/higgs_diff/restructure/higgsMatching/models/keras_model_higgsTop3lS.h5")        
-    normFactors3lS = np.load("/data_ceph/afwebb/higgs_diff/restructure/higgsMatching/models/higgsTop3lS_normFactors.npy")
+    model3lS = load_model("/data_ceph/afwebb/higgs_diff/higgsMatching/models/keras_model_higgsTop3lS.h5")        
+    normFactors3lS = np.load("/data_ceph/afwebb/higgs_diff/higgsMatching/models/higgsTop3lS_normFactors.npy")
     maxVals3lS, minVals3lS = normFactors3lS                                                                    
     diff3lS = maxVals3lS - minVals3lS
 
@@ -59,6 +59,7 @@ def runReco(inf):
 
         #Perform top matching. Get top candidates, topScore
         topRes = findBestTopKeras(nom, '3l', topModel, topNormFactors)
+        if not topRes: continue
         topIdx0, topIdx1 = topRes['bestComb']
         topScore = topRes['topScore']
 
@@ -66,6 +67,7 @@ def runReco(inf):
         res3lF = findBestHiggsTop(nom, '3lF', model3lF, normFactors3lF, topIdx0, topIdx1, topScore)
         res3lS = findBestHiggsTop(nom, '3lS', model3lS, normFactors3lS, topIdx0, topIdx1, topScore)
 
+        if not res3lF or not res3lS: continue
         #identify which lepton came from the Higgs
         lepIdx = -1
         if nom.lep_Parent_0 == 25: 

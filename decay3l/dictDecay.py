@@ -2,7 +2,7 @@
 
 import ROOT
 from rootpy.vector import LorentzVector
-from functionsMatch import lorentzVecsTop, lorentzVecsHiggs
+from dictHiggs import lorentzVecsTop, lorentzVecsHiggs
 
 def decayDict(nom, score3lF, score3lS, topIdx0, topIdx1, topScore, match=-1):
     '''      
