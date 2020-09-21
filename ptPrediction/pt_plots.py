@@ -160,6 +160,16 @@ def makePlots(alg, model, outDir, y_train, y_test, y_train_pred, y_test_pred):
         plt.ylabel('NEvents')
         plt.legend(loc='upper right')                                                                  
         plt.savefig(f'plots/{outDir}/{alg}_score.png')
+
+        if alg == 'keras':
+            plt.figure()
+            plt.plot(model.history['loss'], label='Train Loss')
+            #plt.plot(model.history['val_loss'], label='Test Loss')                                                          
+            plt.title(f"{alg} Loss")                                                                                
+            plt.xlabel('Epoch')
+            plt.ylabel('MSE')
+            plt.legend()
+            plt.savefig(f'plots/{outDir}/keras_MSE_history.png')
     
     if binned:
         #Histogram of scores

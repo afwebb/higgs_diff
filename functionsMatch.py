@@ -49,25 +49,26 @@ def jetCombosTop(channel, nom, withMatch):
     combosTop = {'flatDicts':[],'fourVecDicts':[],'jetIdx':[],'truthComb':[], 'higgsIdx':[]}
     for i in range(len(nom.jet_pt)-1):
         if nom.jet_jvt[i]<0.59: continue #Only include jets that pass JVT cut
-        if nom.jet_parents[i]==25:
-            combosTop['higgsIdx'].append(i)
+        #if nom.jet_parents[i]==25:
+        #    combosTop['higgsIdx'].append(i)
         for j in range(i+1, len(nom.jet_pt)):
             combosTop['jetIdx'].append([i,j])
-            if nom.jet_parents[j]==25:
-                combosTop['higgsIdx'].append(j)
+            #if nom.jet_parents[j]==25:
+            #    combosTop['higgsIdx'].append(j)
             #Check if this combination of jets are truth Bs
-            isTop = 0
-            if abs(nom.jet_parents[i])==6 and abs(nom.jet_truthPartonLabel[i])==5:
-                if abs(nom.jet_parents[j])==6 and abs(nom.jet_truthPartonLabel[j])==5:
-                    isTop = 1
-                    combosTop['truthComb'] = [i,j]
+            if withMatch:
+                isTop = 0
+                if abs(nom.jet_parents[i])==6 and abs(nom.jet_truthPartonLabel[i])==5:
+                    if abs(nom.jet_parents[j])==6 and abs(nom.jet_truthPartonLabel[j])==5:
+                        isTop = 1
+                        combosTop['truthComb'] = [i,j]
 
             if withMatch:
                 combosTop['flatDicts'].append( flatDict( nom, i, j, isTop) )
-                combosTop['fourVecDicts'].append( fourVecDict( nom, i, j, isTop) )
+                #combosTop['fourVecDicts'].append( fourVecDict( nom, i, j, isTop) )
             else:
                 combosTop['flatDicts'].append( flatDict( nom, i, j) )
-                combosTop['fourVecDicts'].append( fourVecDict( nom, i, j) )
+                #combosTop['fourVecDicts'].append( fourVecDict( nom, i, j) )
             
     return combosTop
 

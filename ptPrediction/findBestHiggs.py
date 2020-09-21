@@ -11,7 +11,7 @@ import numpy as np
 import sys
 import random
 from functionsMatch import jetCombosTop, findBestTopKeras, findBestHiggs
-from dictPt import ptDictHiggsTop2lSS, ptDictHiggsTop3lF, ptDictHiggsTop3lS
+from dictPt import ptDictHiggs2lSS, ptDictHiggs3lF, ptDictHiggs3lS
 from joblib import Parallel, delayed
 import multiprocessing
 
@@ -24,27 +24,27 @@ def runReco(inf):
     if '3l' in inf:
         channel='3l'
         is3l = True
-        ptDict = ptDictHiggsTop3lS
+        ptDict = ptDictHiggs3lS
 
-        topModel = load_model("/data_ceph/afwebb/higgs_diff/restructure/topMatching/models/keras_model_top3l.h5")
-        topNormFactors = np.load("/data_ceph/afwebb/higgs_diff/restructure/topMatching/models/top3l_normFactors.npy")
+        #topModel = load_model("/data_ceph/afwebb/higgs_diff/topMatching/models/keras_model_top3l.h5")
+        #topNormFactors = np.load("/data_ceph/afwebb/higgs_diff/topMatching/models/top3l_normFactors.npy")
 
-        model3lF = load_model("/data_ceph/afwebb/higgs_diff/restructure/higgsMatching/models/keras_model_higgs3lF.h5")
-        normFactors3lF = np.load("/data_ceph/afwebb/higgs_diff/restructure/higgsMatching/models/higgs3lF_normFactors.npy")
+        model3lF = load_model("/data_ceph/afwebb/higgs_diff/higgsMatching/models/keras_model_higgs3lF.h5")
+        normFactors3lF = np.load("/data_ceph/afwebb/higgs_diff/higgsMatching/models/higgs3lF_normFactors.npy")
 
-        model3lS = load_model("/data_ceph/afwebb/higgs_diff/restructure/higgsMatching/models/keras_model_higgs3lS.h5")
-        normFactors3lS = np.load("/data_ceph/afwebb/higgs_diff/restructure/higgsMatching/models/higgs3lS_normFactors.npy")
+        model3lS = load_model("/data_ceph/afwebb/higgs_diff/higgsMatching/models/keras_model_higgs3lS.h5")
+        normFactors3lS = np.load("/data_ceph/afwebb/higgs_diff/higgsMatching/models/higgs3lS_normFactors.npy")
 
     elif '2lSS' in inf:
         channel='2lSS'
-        ptDict = ptDictHiggsTop2lSS
+        ptDict = ptDictHiggs2lSS
         is3l = False
 
-        topModel = load_model("/data_ceph/afwebb/higgs_diff/restructure/topMatching/models/keras_model_top2lSS.h5")
-        topNormFactors = np.load("/data_ceph/afwebb/higgs_diff/restructure/topMatching/models/top2lSS_normFactors.npy")
+        #topModel = load_model("/data_ceph/afwebb/higgs_diff/topMatching/models/keras_model_top2lSS.h5")
+        #topNormFactors = np.load("/data_ceph/afwebb/higgs_diff/topMatching/models/top2lSS_normFactors.npy")
         
-        model2lSS = load_model("/data_ceph/afwebb/higgs_diff/restructure/higgsMatching/models/keras_model_higgs2lSS.h5")
-        normFactors2lSS = np.load("/data_ceph/afwebb/higgs_diff/restructure/higgsMatching/models/higgs2lSS_normFactors.npy")
+        model2lSS = load_model("/data_ceph/afwebb/higgs_diff/higgsMatching/models/keras_model_higgs2lSS.h5")
+        normFactors2lSS = np.load("/data_ceph/afwebb/higgs_diff/higgsMatching/models/higgs2lSS_normFactors.npy")
 
     else:
         print(f'Channel {channel} is invalid. Should be 2lSS or 3l')
@@ -73,9 +73,9 @@ def runReco(inf):
         if not higgs_pt:
             continue
             
-        topRes = findBestTopKeras(nom, channel, topModel, topNormFactors)
-        topIdx0, topIdx1 = topRes['bestComb']
-        topScore = topRes['topScore']
+        #topRes = findBestTopKeras(nom, channel, topModel, topNormFactors)
+        #topIdx0, topIdx1 = topRes['bestComb']
+        #topScore = topRes['topScore']
 
         isF = False
         if is3l and nom.lep_Parent_0 == 25: 
@@ -86,7 +86,8 @@ def runReco(inf):
             higgsScore = res3lF['higgsScore']
             lepIdx = res3lF['bestComb'][0]
 
-            events3lF.append( ptDictHiggsTop3lF(nom, lepIdx, higgsScore, topIdx0, topIdx1, topScore, higgs_pt) )
+            #events3lF.append( ptDictHiggsTop3lF(nom, lepIdx, higgsScore, topIdx0, topIdx1, topScore, higgs_pt) )
+            events3lF.append( ptDictHiggs3lF(nom, lepIdx, higgsScore, higgs_pt) )
         else:
             if is3l:
                 res = findBestHiggs(nom, '3lS', model3lS, normFactors3lS)
@@ -95,7 +96,7 @@ def runReco(inf):
                 
             higgsScore = res['higgsScore']
             lepIdx, jetIdx0, jetIdx1 = res['bestComb']
-            events.append( ptDict(nom, jetIdx0, jetIdx1, lepIdx, higgsScore, topIdx0, topIdx1, topScore, higgs_pt) )
+            events.append( ptDict(nom, jetIdx0, jetIdx1, lepIdx, higgsScore, higgs_pt) )
                                     
             
 

@@ -3,11 +3,11 @@ import numpy as np
 import sklearn
 import sklearn as sk
 from sklearn.model_selection import train_test_split
-import keras
+import tensorflow.keras
 from sklearn.metrics import confusion_matrix
 from sklearn.decomposition import PCA
 from sklearn.model_selection import train_test_split
-from keras import losses
+from tensorflow.keras import losses
 import matplotlib
 matplotlib.use('agg')
 import matplotlib.pyplot as plt
@@ -22,22 +22,22 @@ outDir = sys.argv[2]
 #nodes = 75
 #layers = 6
 
-if outDir=='higgs2lSS' or outDir=='higgsTop2lSS':
-    epochs = 100
-    layers = 10
-    nodes = 60
-elif outDir=='higgs3lS' or outDir=='higgsTop3lS':
-    epochs = 120
-    layers = 8
-    nodes = 75
-elif outDir=='higgs3lF' or outDir=='higgsTop3lF':
-    epochs = 100
+if '2lSS' in outDir:
+    epochs = 150
     layers = 6
-    nodes = 80
+    nodes = 60
+elif outDir=='higgs3lS' or outDir=='higgsTop3lS' or outDir=='testHiggsTop3lS':
+    epochs = 120
+    layers = 6
+    nodes = 50
+elif outDir=='higgs3lF' or outDir=='higgsTop3lF':
+    epochs = 120
+    layers = 7
+    nodes = 50
 else:
-    epochs = 5
-    layers = 8
-    nodes=75
+    epochs = 120
+    layers = 5
+    nodes=50
 
 inDF = pd.read_csv(inFile, index_col=False)
 inDF = sk.utils.shuffle(inDF)
@@ -70,7 +70,7 @@ test, train = test.values, train.values
 #layers = (125,125,125,50,50,50,50,50)
 def create_model(layers=layers, nodes=nodes, regularizer=None, activation='relu'):
     from keras.models import Sequential # feed-forward neural network (sequential layers)
-    from keras.layers import Dense, Dropout, LeakyReLU  # fully interconnected layers
+    from keras.layers import Dense, Dropout, LeakyReLU, BatchNormalization  # fully interconnected layers
     model = Sequential()
     #model.add(Dense(layers[0], input_dim = nFeatures, activation=activation, kernel_regularizer=regularizer))
     model.add(Dense(nodes, input_dim = nFeatures, kernel_regularizer=regularizer))

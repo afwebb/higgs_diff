@@ -210,6 +210,12 @@ def higgsDict3lS(nom, jetIdx0, jetIdx1, lepIdx, match=-1):
     k['jet_Pt_0'] = jet0.Pt()
     k['jet_Pt_1'] = jet1.Pt()
 
+    k['lep_Eta_H'] = lepH.Eta()                                                                                
+    k['jet_Eta_0'] = jet0.Eta()                                                                                      
+    k['jet_Eta_1'] = jet1.Eta()
+    k['lep_Eta_T0'] = lepT0.Eta()
+    k['lep_Eta_T1'] = lepT1.Eta()
+
     k['dR_j0_j1'] = jet0.DeltaR(jet1)
     k['Mj0j1'] = (jet0+jet1).M()
 

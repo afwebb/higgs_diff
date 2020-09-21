@@ -35,6 +35,8 @@ def name(c):
         r = (0, 5)                                                                                           
     elif 'numTrk' in c:
         r = (0, 20)
+    elif 'charge' in c:
+        r = (-1, 1)
     else:                                                                                               
         r = (0, 400)
     

@@ -29,8 +29,8 @@ if outDir=='top3l':
     best_params = {"epochs": 50, "layers": 4, "nodes": 60}
 #elif outDir=='higgsTop2lSS':
 #    best_params = {'epochs': 80, 'layers': 7, 'nodes': 50}
-#elif outDir=='higgsTop3lF':
-#    best_params = {'epochs': 80, 'layers': 5, 'nodes': 30}
+elif outDir=='higgsTop3lF':
+    best_params = {'epochs': 120, 'layers': 5, 'nodes': 60}
 else:
     best_params = {"epochs": 120, "layers": 6, "nodes": 90}
 
