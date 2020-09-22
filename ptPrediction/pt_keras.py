@@ -24,8 +24,8 @@ outDir = sys.argv[2]
 
 if '2lSS' in outDir:
     epochs = 150
-    layers = 6
-    nodes = 60
+    layers = 5
+    nodes = 40
 elif outDir=='higgs3lS' or outDir=='higgsTop3lS' or outDir=='testHiggsTop3lS':
     epochs = 120
     layers = 6

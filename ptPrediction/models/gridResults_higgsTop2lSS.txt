@@ -1,0 +1,21 @@
+Best params: {"epochs": 120, "layers": 5, "learning_rate": 0.001, "nodes": 40}
+-0.036 (+/-0.000) for {'epochs': 120, 'layers': 5, 'learning_rate': 0.001, 'nodes': 40} 
+-0.036 (+/-0.000) for {'epochs': 120, 'layers': 5, 'learning_rate': 0.001, 'nodes': 50} 
+-0.037 (+/-0.001) for {'epochs': 120, 'layers': 5, 'learning_rate': 0.001, 'nodes': 70} 
+-0.039 (+/-0.007) for {'epochs': 120, 'layers': 5, 'learning_rate': 0.001, 'nodes': 100} 
+-0.036 (+/-0.001) for {'epochs': 120, 'layers': 6, 'learning_rate': 0.001, 'nodes': 40} 
+-0.037 (+/-0.001) for {'epochs': 120, 'layers': 6, 'learning_rate': 0.001, 'nodes': 50} 
+-0.038 (+/-0.005) for {'epochs': 120, 'layers': 6, 'learning_rate': 0.001, 'nodes': 70} 
+-0.044 (+/-0.000) for {'epochs': 120, 'layers': 6, 'learning_rate': 0.001, 'nodes': 100} 
+-0.037 (+/-0.000) for {'epochs': 120, 'layers': 7, 'learning_rate': 0.001, 'nodes': 40} 
+-0.037 (+/-0.001) for {'epochs': 120, 'layers': 7, 'learning_rate': 0.001, 'nodes': 50} 
+-0.041 (+/-0.006) for {'epochs': 120, 'layers': 7, 'learning_rate': 0.001, 'nodes': 70} 
+-0.044 (+/-0.000) for {'epochs': 120, 'layers': 7, 'learning_rate': 0.001, 'nodes': 100} 
+-0.037 (+/-0.001) for {'epochs': 120, 'layers': 8, 'learning_rate': 0.001, 'nodes': 40} 
+-0.040 (+/-0.006) for {'epochs': 120, 'layers': 8, 'learning_rate': 0.001, 'nodes': 50} 
+-0.044 (+/-0.000) for {'epochs': 120, 'layers': 8, 'learning_rate': 0.001, 'nodes': 70} 
+-0.044 (+/-0.000) for {'epochs': 120, 'layers': 8, 'learning_rate': 0.001, 'nodes': 100} 
+-0.039 (+/-0.005) for {'epochs': 120, 'layers': 10, 'learning_rate': 0.001, 'nodes': 40} 
+-0.044 (+/-0.000) for {'epochs': 120, 'layers': 10, 'learning_rate': 0.001, 'nodes': 50} 
+-0.044 (+/-0.000) for {'epochs': 120, 'layers': 10, 'learning_rate': 0.001, 'nodes': 70} 
+-0.044 (+/-0.000) for {'epochs': 120, 'layers': 10, 'learning_rate': 0.001, 'nodes': 100} 
