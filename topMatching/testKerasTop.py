@@ -59,6 +59,7 @@ for idx in range(nEntries):
     topRes = findBestTopKeras(nom, channel, topModel, topNormFactors)
     topMatches, truthBs, topScore = topRes['bestComb'], topRes['truthComb'], topRes['topScore']
     #topMatches, truthBs = findBestTopKeras(nom, channel, topModel, topNormFactors, 1)
+
     if len(truthBs)!=2: continue 
 
     if topScore>0.6:

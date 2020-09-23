@@ -24,8 +24,8 @@ outDir = sys.argv[2]
 
 #Use optimal parameters obtained from grid search
 if outDir=='top2lSS':
-    best_params = {"epochs": 60, "layers": 5, "nodes": 40}
-if outDir=='top3l':
+    best_params = {"epochs": 60, "layers": 5, "nodes": 50}
+elif outDir=='top3l':
     best_params = {"epochs": 50, "layers": 4, "nodes": 60}
 #elif outDir=='higgsTop2lSS':
 #    best_params = {'epochs': 80, 'layers': 7, 'nodes': 50}

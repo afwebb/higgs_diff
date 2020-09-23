@@ -52,8 +52,6 @@ def runReco(inf):
     for idx in range(nEntries):
         if idx%10000==0:
             print(str(idx)+'/'+str(nEntries))
-        if idx==15000:
-            break
         
         nom.GetEntry(idx)
     
@@ -96,7 +94,7 @@ def runReco(inf):
     if is3l:
         dfTop.to_csv('csvFiles/top3l/'+outF, index=False)
     else:
-        dfTop.to_csv('csvFiles/testTop2lSS/'+outF, index=False)        
+        dfTop.to_csv('csvFiles/top2lSS/'+outF, index=False)        
 
 #Run in parallel
 linelist = [line.rstrip() for line in open(sys.argv[1])]

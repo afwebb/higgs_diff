@@ -36,7 +36,7 @@ for idx in range(nEntries):
         break
 
     nom.GetEntry(idx)
-    #if nom.nJets_OR_DL1r_70!=2: continue
+    if nom.nJets_OR_DL1r_70<3: continue
 
     #Apply 2lSS preselection                                                                                               
     #if not selection2lSS(nom): 
