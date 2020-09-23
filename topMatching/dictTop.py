@@ -52,11 +52,14 @@ def topDict2lSS(nom, jetIdx0, jetIdx1, match=-1):
     k['jet_Pt_0'] = jet0.Pt()
     k['jet_Pt_1'] = jet1.Pt()
 
+    k['lep_Pt_0'] = lep0.Pt()
+    k['lep_Pt_1'] = lep1.Pt()
+
     k['jet_Eta_0'] = jet0.Eta()
     k['jet_Eta_1'] = jet1.Eta()
 
     k['dR_j0_j1'] = jet0.DeltaR(jet1)
-    k['Ptj0j1'] = (jet0+jet1).Pt()
+    #k['Ptj0j1'] = (jet0+jet1).Pt()
     k['Mj0j1'] = (jet0+jet1).M()
 
     k['dR_l0_j0'] = lep0.DeltaR(jet0)
@@ -69,26 +72,29 @@ def topDict2lSS(nom, jetIdx0, jetIdx1, match=-1):
     k['Ml1j0'] = (lep1+jet0).M()
     k['Ml1j1'] = (lep1+jet1).M()
 
-    k['jet_DL1r_0'] = nom.jet_tagWeightBin_DL1r_Continuous[jetIdx0]
-    k['jet_DL1r_1'] = nom.jet_tagWeightBin_DL1r_Continuous[jetIdx1]
+    #k['jet_DL1r_0'] = nom.jet_tagWeightBin_DL1r_Continuous[jetIdx0]
+    #k['jet_DL1r_1'] = nom.jet_tagWeightBin_DL1r_Continuous[jetIdx1]
     rDL1r = [len(nom.jet_DL1r)-sorted(nom.jet_DL1r).index(x) for x in nom.jet_DL1r]
     k['jet_rankDL1r_0'] = rDL1r[jetIdx0]
     k['jet_rankDL1r_1'] = rDL1r[jetIdx1]
-    k['nJets_OR_DL1r_85'] = nom.nJets_OR_DL1r_85                                                                  
-    k['nJets_OR_DL1r_60'] = nom.nJets_OR_DL1r_60
+    #k['nJets_OR_DL1r_85'] = nom.nJets_OR_DL1r_85                                                                  
+    #k['nJets_OR_DL1r_60'] = nom.nJets_OR_DL1r_60
 
-    k['dR_j0j1_l0'] = (jet0+jet1).DeltaR(lep0)
-    k['dR_j0j1_l1'] = (jet0+jet1).DeltaR(lep1)
+    #k['dR_j0j1_l0'] = (jet0+jet1).DeltaR(lep0)
+    #k['dR_j0j1_l1'] = (jet0+jet1).DeltaR(lep1)
+
+    k['dRj0l0j1l1'] = (jet0+lep0).DeltaR(jet1+lep1)
+    k['dRj0l1j1l0'] = (jet0+lep1).DeltaR(jet1+lep0)
 
     k['Ptj0j1l0l1met'] = (jet0+jet1+lep0+lep1+met).Pt()
     k['Mj0j1l0l1met'] = (jet0+jet1+lep0+lep1+met).M()
-    k['Mj0j1l0'] = (jet0+jet1+lep0).M()
-    k['Mj0j1l1'] = (jet0+jet1+lep1).M()
+    #k['Mj0j1l0'] = (jet0+jet1+lep0).M()
+    #k['Mj0j1l1'] = (jet0+jet1+lep1).M()
 
-    k['dPhij0met'] = jet0.Phi() - met.Phi()
-    k['dPhij1met'] = jet1.Phi() - met.Phi()
+    k['dPhi_j0_met'] = jet0.Phi() - met.Phi()
+    k['dPhi_j1_met'] = jet1.Phi() - met.Phi()
 
-    k['HT_lep'] = nom.HT_lep
+    #k['HT_lep'] = nom.HT_lep
     k['HT_jets'] = nom.HT_jets
     k['nJets_OR'] = nom.nJets_OR
     k['met'] = nom.met_met
@@ -158,8 +164,12 @@ def topDict3l(nom, jetIdx0, jetIdx1, match=-1):
     k['jet_Eta_0'] = jet0.Eta()
     k['jet_Eta_1'] = jet1.Eta()
 
+    k['lep_Pt_0'] = lep0.Pt()                                                                                       
+    k['lep_Pt_1'] = lep1.Pt() 
+    k['lep_Pt_2'] = lep2.Pt() 
+
     k['dR_j0_j1'] = jet0.DeltaR(jet1)
-    k['Ptj0j1'] = (jet0+jet1).Pt()
+    #k['Ptj0j1'] = (jet0+jet1).Pt()
     k['Mj0j1'] = (jet0+jet1).M()
 
     k['dR_l0_j0'] = lep0.DeltaR(jet0)
@@ -179,19 +189,19 @@ def topDict3l(nom, jetIdx0, jetIdx1, match=-1):
     k['Ml2j1'] = (lep2+jet1).M()
 
     #Both tops -> l+j. dR(tt) should be large. Consider dR of all l+j combos? Maybe Pt(lj,lj)?
-    k['dRj0l0j1l1'] = (jet0+lep0).DeltaR(jet1+lep1)
-    k['dRj0l0j1l2'] = (jet0+lep0).DeltaR(jet1+lep2) 
-    k['dRj0l1j1l0'] = (jet0+lep1).DeltaR(jet1+lep0)                                               
-    k['dRj0l2j1l0'] = (jet0+lep2).DeltaR(jet1+lep0)
+    k['dR_j0l0_j1l1'] = (jet0+lep0).DeltaR(jet1+lep1)
+    k['dR_j0l0_j1l2'] = (jet0+lep0).DeltaR(jet1+lep2) 
+    k['dR_j0l1_j1l0'] = (jet0+lep1).DeltaR(jet1+lep0)                                               
+    k['dR_j0l2_j1l0'] = (jet0+lep2).DeltaR(jet1+lep0)
 
     #Could be h->2l, t->lb, t->jjb. Lep 1 is closer to lep 2
-    k['dR_j0_l0l1'] = jet0.DeltaR(lep0+lep1)
-    k['dR_j1_l0l1'] = jet1.DeltaR(lep0+lep1)
-    k['dR_j0_l0l2'] = jet0.DeltaR(lep0+lep2)                                                                               
-    k['dR_j1_l0l2'] = jet1.DeltaR(lep0+lep2)
+    #k['dR_j0_l0l1'] = jet0.DeltaR(lep0+lep1)
+    #k['dR_j1_l0l1'] = jet1.DeltaR(lep0+lep1)
+    #k['dR_j0_l0l2'] = jet0.DeltaR(lep0+lep2)                                                                               
+    #k['dR_j1_l0l2'] = jet1.DeltaR(lep0+lep2)
 
-    k['jet_DL1r_0'] = nom.jet_tagWeightBin_DL1r_Continuous[jetIdx0]                                                          
-    k['jet_DL1r_1'] = nom.jet_tagWeightBin_DL1r_Continuous[jetIdx1]
+    #k['jet_DL1r_0'] = nom.jet_tagWeightBin_DL1r_Continuous[jetIdx0]                                         
+    #k['jet_DL1r_1'] = nom.jet_tagWeightBin_DL1r_Continuous[jetIdx1]
     rDL1r = [len(nom.jet_DL1r)-sorted(nom.jet_DL1r).index(x) for x in nom.jet_DL1r]                                    
     k['jet_rankDL1r_0'] = rDL1r[jetIdx0]                                                                                  
     k['jet_rankDL1r_1'] = rDL1r[jetIdx1]
@@ -199,16 +209,16 @@ def topDict3l(nom, jetIdx0, jetIdx1, match=-1):
     k['Ptj0j1l0l1l2met'] = (jet0+jet1+lep0+lep1+lep2+met).Pt()
     k['Mtj0j1l0l1l2met'] = (jet0+jet1+lep0+lep1+lep2+met).M()
 
-    k['dPhij0met'] = jet0.Phi() - met.Phi()                                                                         
-    k['dPhij1met'] = jet1.Phi() - met.Phi()                                                                     
+    k['dPhi_j0_met'] = jet0.Phi() - met.Phi()                                                                         
+    k['dPhi_j1_met'] = jet1.Phi() - met.Phi()                                                                     
     
-    k['HT_lep'] = nom.HT_lep   
+    #k['HT_lep'] = nom.HT_lep   
     k['HT_jets'] = nom.HT_jets
     k['nJets_OR'] = nom.nJets_OR
     k['met'] = nom.met_met
 
-    k['nJets_OR_DL1r_85'] = nom.nJets_OR_DL1r_85 
-    k['nJets_OR_DL1r_60'] = nom.nJets_OR_DL1r_60
+    #k['nJets_OR_DL1r_85'] = nom.nJets_OR_DL1r_85 
+    #k['nJets_OR_DL1r_60'] = nom.nJets_OR_DL1r_60
 
     return k
 
