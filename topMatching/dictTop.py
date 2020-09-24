@@ -83,8 +83,8 @@ def topDict2lSS(nom, jetIdx0, jetIdx1, match=-1):
     #k['dR_j0j1_l0'] = (jet0+jet1).DeltaR(lep0)
     #k['dR_j0j1_l1'] = (jet0+jet1).DeltaR(lep1)
 
-    k['dRj0l0j1l1'] = (jet0+lep0).DeltaR(jet1+lep1)
-    k['dRj0l1j1l0'] = (jet0+lep1).DeltaR(jet1+lep0)
+    k['dR_j0l0_j1l1'] = (jet0+lep0).DeltaR(jet1+lep1)
+    k['dR_j0l1_j1l0'] = (jet0+lep1).DeltaR(jet1+lep0)
 
     k['Ptj0j1l0l1met'] = (jet0+jet1+lep0+lep1+met).Pt()
     k['Mj0j1l0l1met'] = (jet0+jet1+lep0+lep1+met).M()
@@ -94,7 +94,7 @@ def topDict2lSS(nom, jetIdx0, jetIdx1, match=-1):
     k['dPhi_j0_met'] = jet0.Phi() - met.Phi()
     k['dPhi_j1_met'] = jet1.Phi() - met.Phi()
 
-    k['HT_lep'] = nom.HT_lep
+    #k['HT_lep'] = nom.HT_lep
     k['HT_jets'] = nom.HT_jets
     k['nJets_OR'] = nom.nJets_OR
     k['met'] = nom.met_met
@@ -139,7 +139,7 @@ def topDictFourVec2lSS(nom, jetIdx0, jetIdx1, match=-1):#(jet0, jet1, lep0, lep1
     p['nJets_OR_DL1r_85'] = nom.nJets_OR_DL1r_85
     p['nJets_OR_DL1r_60'] = nom.nJets_OR_DL1r_60
 
-    p['HT_lep'] = nom.HT_lep                                                      
+    #p['HT_lep'] = nom.HT_lep                                                      
     p['HT_jets'] = nom.HT_jets                                                                            
     p['nJets_OR'] = nom.nJets_OR
 
