@@ -72,13 +72,13 @@ def topDict2lSS(nom, jetIdx0, jetIdx1, match=-1):
     k['Ml1j0'] = (lep1+jet0).M()
     k['Ml1j1'] = (lep1+jet1).M()
 
-    #k['jet_DL1r_0'] = nom.jet_tagWeightBin_DL1r_Continuous[jetIdx0]
-    #k['jet_DL1r_1'] = nom.jet_tagWeightBin_DL1r_Continuous[jetIdx1]
+    k['jet_DL1r_0'] = nom.jet_tagWeightBin_DL1r_Continuous[jetIdx0]
+    k['jet_DL1r_1'] = nom.jet_tagWeightBin_DL1r_Continuous[jetIdx1]
     rDL1r = [len(nom.jet_DL1r)-sorted(nom.jet_DL1r).index(x) for x in nom.jet_DL1r]
     k['jet_rankDL1r_0'] = rDL1r[jetIdx0]
     k['jet_rankDL1r_1'] = rDL1r[jetIdx1]
-    #k['nJets_OR_DL1r_85'] = nom.nJets_OR_DL1r_85                                                                  
-    #k['nJets_OR_DL1r_60'] = nom.nJets_OR_DL1r_60
+    k['nJets_OR_DL1r_85'] = nom.nJets_OR_DL1r_85                                                                  
+    k['nJets_OR_DL1r_60'] = nom.nJets_OR_DL1r_60
 
     #k['dR_j0j1_l0'] = (jet0+jet1).DeltaR(lep0)
     #k['dR_j0j1_l1'] = (jet0+jet1).DeltaR(lep1)
@@ -94,7 +94,7 @@ def topDict2lSS(nom, jetIdx0, jetIdx1, match=-1):
     k['dPhi_j0_met'] = jet0.Phi() - met.Phi()
     k['dPhi_j1_met'] = jet1.Phi() - met.Phi()
 
-    #k['HT_lep'] = nom.HT_lep
+    k['HT_lep'] = nom.HT_lep
     k['HT_jets'] = nom.HT_jets
     k['nJets_OR'] = nom.nJets_OR
     k['met'] = nom.met_met
@@ -200,8 +200,8 @@ def topDict3l(nom, jetIdx0, jetIdx1, match=-1):
     #k['dR_j0_l0l2'] = jet0.DeltaR(lep0+lep2)                                                                               
     #k['dR_j1_l0l2'] = jet1.DeltaR(lep0+lep2)
 
-    #k['jet_DL1r_0'] = nom.jet_tagWeightBin_DL1r_Continuous[jetIdx0]                                         
-    #k['jet_DL1r_1'] = nom.jet_tagWeightBin_DL1r_Continuous[jetIdx1]
+    k['jet_DL1r_0'] = nom.jet_tagWeightBin_DL1r_Continuous[jetIdx0]                                         
+    k['jet_DL1r_1'] = nom.jet_tagWeightBin_DL1r_Continuous[jetIdx1]
     rDL1r = [len(nom.jet_DL1r)-sorted(nom.jet_DL1r).index(x) for x in nom.jet_DL1r]                                    
     k['jet_rankDL1r_0'] = rDL1r[jetIdx0]                                                                                  
     k['jet_rankDL1r_1'] = rDL1r[jetIdx1]
@@ -212,13 +212,13 @@ def topDict3l(nom, jetIdx0, jetIdx1, match=-1):
     k['dPhi_j0_met'] = jet0.Phi() - met.Phi()                                                                         
     k['dPhi_j1_met'] = jet1.Phi() - met.Phi()                                                                     
     
-    #k['HT_lep'] = nom.HT_lep   
+    k['HT_lep'] = nom.HT_lep   
     k['HT_jets'] = nom.HT_jets
     k['nJets_OR'] = nom.nJets_OR
     k['met'] = nom.met_met
 
-    #k['nJets_OR_DL1r_85'] = nom.nJets_OR_DL1r_85 
-    #k['nJets_OR_DL1r_60'] = nom.nJets_OR_DL1r_60
+    k['nJets_OR_DL1r_85'] = nom.nJets_OR_DL1r_85 
+    k['nJets_OR_DL1r_60'] = nom.nJets_OR_DL1r_60
 
     return k
 
