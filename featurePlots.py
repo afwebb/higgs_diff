@@ -20,7 +20,7 @@ from namePlot import name
 inFile = sys.argv[1]
 outDir = sys.argv[2]
 
-inDF = pd.read_csv(inFile, nrows=1e6)
+inDF = pd.read_csv(inFile, nrows=1e5)
 inDF = inDF.dropna()
 
 good = inDF[inDF['match']==1]
@@ -39,6 +39,7 @@ icount = 1
 for c in inDF:
 
     xName, r = name(c)
+    print(xName)
 
     if 'GeV' in xName: # Convert MeV to GeV
         good[c] = good[c]/1000

@@ -74,9 +74,9 @@ def topDict2lSS(nom, jetIdx0, jetIdx1, match=-1):
 
     k['jet_DL1r_0'] = nom.jet_tagWeightBin_DL1r_Continuous[jetIdx0]
     k['jet_DL1r_1'] = nom.jet_tagWeightBin_DL1r_Continuous[jetIdx1]
-    rDL1r = [len(nom.jet_DL1r)-sorted(nom.jet_DL1r).index(x) for x in nom.jet_DL1r]
-    k['jet_rankDL1r_0'] = rDL1r[jetIdx0]
-    k['jet_rankDL1r_1'] = rDL1r[jetIdx1]
+    #rDL1r = [len(nom.jet_DL1r)-sorted(nom.jet_DL1r).index(x) for x in nom.jet_DL1r]
+    #k['jet_rankDL1r_0'] = rDL1r[jetIdx0]
+    #k['jet_rankDL1r_1'] = rDL1r[jetIdx1]
     k['nJets_OR_DL1r_85'] = nom.nJets_OR_DL1r_85                                                                  
     k['nJets_OR_DL1r_60'] = nom.nJets_OR_DL1r_60
 
@@ -202,9 +202,9 @@ def topDict3l(nom, jetIdx0, jetIdx1, match=-1):
 
     k['jet_DL1r_0'] = nom.jet_tagWeightBin_DL1r_Continuous[jetIdx0]                                         
     k['jet_DL1r_1'] = nom.jet_tagWeightBin_DL1r_Continuous[jetIdx1]
-    rDL1r = [len(nom.jet_DL1r)-sorted(nom.jet_DL1r).index(x) for x in nom.jet_DL1r]                                    
-    k['jet_rankDL1r_0'] = rDL1r[jetIdx0]                                                                                  
-    k['jet_rankDL1r_1'] = rDL1r[jetIdx1]
+    #rDL1r = [len(nom.jet_DL1r)-sorted(nom.jet_DL1r).index(x) for x in nom.jet_DL1r]                                    
+    #k['jet_rankDL1r_0'] = rDL1r[jetIdx0]                                                                                  
+    #k['jet_rankDL1r_1'] = rDL1r[jetIdx1]
 
     k['Ptj0j1l0l1l2met'] = (jet0+jet1+lep0+lep1+lep2+met).Pt()
     k['Mtj0j1l0l1l2met'] = (jet0+jet1+lep0+lep1+lep2+met).M()

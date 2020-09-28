@@ -21,8 +21,7 @@ import random
 from dictTop import topDict2lSS, topDict3l
 from joblib import Parallel, delayed
 import multiprocessing 
-#import functionsMatch
-#from functionsMatch import selection2lSS, jetCombosTop2lSS, jetCombosTop3l
+from functionsMatch import selection2lSS, jetCombosTop
 
 def runReco(inf):
     ''' 
@@ -31,11 +30,9 @@ def runReco(inf):
 
     #Figure out which channel to use
     if '3l' in inf:
-        topDict = topDict3l
-        is3l = True
+        channel='3l'
     elif '2lSS' in inf:
-        topDict = topDict2lSS
-        is3l = False
+        channel='2lSS'
     else:
         print('Not sure which channel to use')
         exit()
@@ -45,7 +42,7 @@ def runReco(inf):
     nom = f.Get('nominal')
     
     #initialize output dicts
-    eventsTop = []
+    eventsTop = 0
     
     #Loop over all entries
     nEntries = nom.GetEntries()
@@ -58,6 +55,22 @@ def runReco(inf):
         #Separate jets into tops and others, add their indices
         topJets = []
         badJets = []
+
+        #Include all possible combos
+        topCombos = jetCombosTop(channel, nom, 1)
+        if len(topCombos['flatDicts'])==0:
+            continue
+        #eventsTop.append(topCombos['flatDicts'])
+        #print(topCombos['flatDicts'])
+        if eventsTop==0:
+            eventsTop=topCombos['flatDicts']
+        else:
+            for k in eventsTop:                                                           
+                eventsTop[k].extend(topCombos['flatDicts'][k])
+
+        '''
+        for k in eventsTop:
+            eventsTop[k]+=(x[k] for x in topCombos['floatDicts'])
 
         for i in range(len(nom.jet_pt)):
             if nom.jet_jvt[i]<0.59: continue
@@ -84,18 +97,18 @@ def runReco(inf):
             if len(badJets)>2:
                 i,j = random.sample(badJets,2)
                 eventsTop.append( topDict( nom, i, j, 0 ) )
-
+        '''
     # Convert to dataframe, shuffle entries
     dfTop = pd.DataFrame.from_dict(eventsTop)
     dfTop = shuffle(dfTop)
 
     #Write output to csv file
     outF = '/'.join(inf.split("/")[-2:]).replace('.root','.csv')
-    if is3l:
-        dfTop.to_csv('csvFiles/top3l/'+outF, index=False)
+    if channel=='3l':
+        dfTop.to_csv('csvFiles/top3l/'+outF, index=False, float_format='%.3f')
     else:
-        dfTop.to_csv('csvFiles/top2lSS/'+outF, index=False)        
+        dfTop.to_csv('csvFiles/top2lSS/'+outF, index=False, float_format='%.3f')        
 
 #Run in parallel
 linelist = [line.rstrip() for line in open(sys.argv[1])]
-Parallel(n_jobs=15)(delayed(runReco)(inf) for inf in linelist)
+Parallel(n_jobs=10)(delayed(runReco)(inf) for inf in linelist)

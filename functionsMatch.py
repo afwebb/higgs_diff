@@ -46,12 +46,13 @@ def jetCombosTop(channel, nom, withMatch):
         flatDict = topDict3l
         fourVecDict = topDictFourVec3l
 
-    combosTop = {'flatDicts':[],'fourVecDicts':[],'jetIdx':[],'truthComb':[], 'higgsIdx':[]}
+    combosTop = {'flatDicts':{},'fourVecDicts':[],'jetIdx':[],'truthComb':[], 'higgsIdx':[]}
     for i in range(len(nom.jet_pt)-1):
-        if nom.jet_jvt[i]<0.59: continue #Only include jets that pass JVT cut
+        if nom.jet_jvt[i]<0.59 or abs(nom.jet_eta[i])>4: continue #Only include jets that pass JVT cut
         if nom.jet_parents[i]==25 and i not in combosTop['higgsIdx']:
             combosTop['higgsIdx'].append(i)
         for j in range(i+1, len(nom.jet_pt)):
+            if nom.jet_jvt[j]<0.59 or abs(nom.jet_eta[j])>4: continue 
             combosTop['jetIdx'].append([i,j])
             if nom.jet_parents[j]==25 and j not in combosTop['higgsIdx']:
                 combosTop['higgsIdx'].append(j)
@@ -64,10 +65,24 @@ def jetCombosTop(channel, nom, withMatch):
                     combosTop['truthComb'] = [i,j]
 
             if withMatch:
-                combosTop['flatDicts'].append( flatDict( nom, i, j, isTop) )
+                fd = flatDict(nom, i, j, isTop)
+                if combosTop['flatDicts']=={}:
+                    for k in fd:
+                        combosTop['flatDicts'][k]=[(fd[k])]
+                else:
+                    for k in fd:
+                        combosTop['flatDicts'][k]+=[(fd[k])]
+                #combosTop['flatDicts'].append( flatDict( nom, i, j, isTop) )
                 #combosTop['fourVecDicts'].append( fourVecDict( nom, i, j, isTop) )
             else:
-                combosTop['flatDicts'].append( flatDict( nom, i, j) )
+                fd = flatDict(nom, i, j)                                                                         
+                if combosTop['flatDicts']=={}:
+                    for k in fd:                                                                                          
+                        combosTop['flatDicts'][k]=[(fd[k])]
+                else:
+                    for k in fd:
+                        combosTop['flatDicts'][k]+=[(fd[k])]
+                #combosTop['flatDicts'].append( flatDict( nom, i, j) )
                 #combosTop['fourVecDicts'].append( fourVecDict( nom, i, j) )
             
     return combosTop
@@ -96,8 +111,10 @@ def higgsCombos(channel, nom, withMatch):
 
     if channel=='2lSS' or channel=='3lS': # for these channel, need 2 jets, 1 lepton
         for l in lepRange:
-            for i in range(len(nom.jet_pt)-1):                                                                           
+            for i in range(len(nom.jet_pt)-1):         
+                if nom.jet_jvt[i]<0.59 or abs(nom.jet_eta[i])>3: continue 
                 for j in range(i+1, len(nom.jet_pt)): #loop over leptons and jet combos
+                    if nom.jet_jvt[j]<0.59 or abs(nom.jet_eta[j])>3: continue 
                     combosHiggs['pairIdx'].append([l, i, j]) # Keep track of indices of this combo                      
                     isHiggs = 0                                  
                     #Only from Higgs if all three particles are matched to the Higgs
@@ -190,10 +207,21 @@ def findBestTopKeras(nom, channel, topModel, topNormFactors):
     topDF = pd.DataFrame.from_dict(combosTop['flatDicts']) #convert dict to DF
     if len(list(topDF))==0: return
     topDF=(topDF - topNormFactors[1])/(topNormFactors[0] - topNormFactors[1]) # Normalize DF
+    #print(topDF)
     topPred = topModel.predict(topDF.values) #feed pairings to the 
     topBest = np.argmax(topPred) # take the pairing with the highest score
 
-    return {'bestComb':combosTop['jetIdx'][topBest], 'truthComb':combosTop['truthComb'], 'topScore':max(topPred)[0], 'higgsIdx':combosTop['higgsIdx']}
+    if combosTop['truthComb']==[]:
+        truthDF={}
+    else:
+        truthDF = topDF.iloc[combosTop['jetIdx'].index(combosTop['truthComb'])].T
+        truthDF = truthDF*(topNormFactors[0] - topNormFactors[1]) + topNormFactors[1]
+        truthDF['match']=1
+    bestDF = topDF.iloc[topBest].T
+    bestDF = bestDF*(topNormFactors[0] - topNormFactors[1]) + topNormFactors[1]
+    bestDF['match']=0
+
+    return {'bestComb':combosTop['jetIdx'][topBest], 'truthComb':combosTop['truthComb'], 'topScore':max(topPred)[0], 'higgsIdx':combosTop['higgsIdx'], 'truthDF':truthDF, 'bestDF':bestDF}
 
 def findBestHiggs(nom, channel, model, normFactors):
     '''

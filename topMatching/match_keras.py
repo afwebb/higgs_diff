@@ -19,14 +19,16 @@ import sys
 import scipy
 from matchPlots import make_plots
 
+tf.keras.backend.set_floatx('float32')
+
 inFile = sys.argv[1]
 outDir = sys.argv[2]
 
 #Use optimal parameters obtained from grid search
-if outDir=='top2lSS':
-    best_params = {"epochs": 60, "layers": 5, "nodes": 50}
-elif outDir=='top3l':
-    best_params = {"epochs": 50, "layers": 4, "nodes": 60}
+if outDir=='top2lSS' or outDir=='all2lSS':
+    best_params = {"epochs": 40, "layers": 5, "nodes": 50}
+elif outDir=='top3l' or outDir=='all3l':
+    best_params = {"epochs": 30, "layers": 4, "nodes": 40}
 #elif outDir=='higgsTop2lSS':
 #    best_params = {'epochs': 80, 'layers': 7, 'nodes': 50}
 elif outDir=='higgsTop3lF':
