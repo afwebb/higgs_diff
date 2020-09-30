@@ -28,13 +28,15 @@ outDir = sys.argv[2]
 if outDir=='top2lSS' or outDir=='all2lSS':
     best_params = {"epochs": 40, "layers": 5, "nodes": 50}
 elif outDir=='top3l' or outDir=='all3l':
-    best_params = {"epochs": 30, "layers": 4, "nodes": 40}
+    best_params = {'epochs': 40, 'layers': 6, 'nodes': 50}
+    #best_params = {"epochs": 30, "layers": 4, "nodes": 40}
 #elif outDir=='higgsTop2lSS':
 #    best_params = {'epochs': 80, 'layers': 7, 'nodes': 50}
 elif outDir=='higgsTop3lF':
     best_params = {'epochs': 120, 'layers': 5, 'nodes': 60}
 else:
-    best_params = {"epochs": 120, "layers": 6, "nodes": 90}
+    best_params = {"epochs": 30, "layers": 5, "nodes": 50}
+    #best_params = {"epochs": 120, "layers": 6, "nodes": 90}
 
 print(best_params)
 

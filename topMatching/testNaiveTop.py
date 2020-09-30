@@ -41,13 +41,6 @@ for idx in range(nEntries):
     nom.GetEntry(idx)
     #if nom.nJets_OR_DL1r_70<3: continue
 
-    if nom.nJets_OR_DL1r_70==1:
-        n1b+=1
-    elif nom.nJets_OR_DL1r_70==2:
-        n2b+=1
-    else:
-        n3b+=1
-
     #Apply 2lSS preselection                                                                                               
     #if not selection2lSS(nom): 
     #    continue
@@ -73,6 +66,13 @@ for idx in range(nEntries):
  
             #print(btag1, btag2)
     if len(truthBs)!=2: continue
+
+    if nom.nJets_OR_DL1r_70==1:
+        n1b+=1
+    elif nom.nJets_OR_DL1r_70==2:
+        n2b+=1
+    else:
+        n3b+=1
 
     topMatches = [top1, top2]
     #print('truth scores: ', [nom.jet_DL1r[x] for x in truthBs], '\t tag scores: ', [nom.jet_DL1r[x] for x in topMatches])

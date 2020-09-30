@@ -72,12 +72,14 @@ def runReco(inf):
     
         #Get Dataframe of all input features
         combosTop = jetCombosTop(channel, nom, 0)
-        if len(combosTop['flatDicts'])>0:
-            topDF = pd.DataFrame(combosTop['flatDicts'][0], index=[0])
+        #if len(combosTop['flatDicts'])>0:
+        topDF = pd.DataFrame(combosTop['flatDicts'])
+        #topDF = combosTop['flatDicts']
         if 'data1' not in inf:
             topDF['weight'] = nom.weight*nom.weight_leptonSF*nom.weight_bTagSF_DL1r_Continuous
             if '41047' in inf or '410389' in inf:
-                topDF['m_hasMEphoton_DRgt02_nonhad'] = nom.m_hasMEphoton_DRgt02_nonhad
+                #print(nom.m_hasMEphoton_DRgt02_nonhad)
+                topDF['m_hasMEphoton_DRgt02_nonhad'] =  nom.m_hasMEphoton_DRgt02_nonhad
             topDF['mcChannelNumber'] = nom.mcChannelNumber
         if idx==0:
             eventsTop = topDF
@@ -86,11 +88,12 @@ def runReco(inf):
         
     #Write output to root file
     import root_pandas
+    #eventsTop = pd.DataFrame(eventsTop)
     outF = '/'.join(inf.split("/")[-2:])
     if channel=='3l':
         eventsTop.to_root('3l/'+outF, key='nominal')
     else:
-        eventsTop.to_root('small2lSS/'+outF, key='nominal')        
+        eventsTop.to_root('2lSS/'+outF, key='nominal')        
 
 #Run in parallel
 linelist = [line.rstrip() for line in open(sys.argv[1])]
