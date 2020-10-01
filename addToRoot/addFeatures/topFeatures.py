@@ -63,7 +63,7 @@ def runReco(inf):
 
     #Loop over all entries
     nEntries = nom.GetEntries()
-    eventsTop = pd.DataFrame()
+    eventsTop = []#pd.DataFrame()
     for idx in range(nEntries):
         if idx%10000==0:
             print(str(idx)+'/'+str(nEntries))
@@ -71,9 +71,22 @@ def runReco(inf):
         nom.GetEntry(idx)
     
         #Get Dataframe of all input features
+        for i in range(len(nom.jet_pt)-1):                                                                              
+            if nom.jet_jvt[i]<0.59 or abs(nom.jet_eta[i])>4: continue #Only include jets that pass JVT cut                 
+            for j in range(i+1, len(nom.jet_pt)):
+                if nom.jet_jvt[j]<0.59 or abs(nom.jet_eta[j])>4: continue
+                topDF = topDict(nom, i, j) 
+                if 'data1' not in inf:                                                                                
+                    topDF['weight'] = nom.weight*nom.weight_leptonSF*nom.weight_bTagSF_DL1r_Continuous
+                    topDF['mcChannelNumber'] = nom.mcChannelNumber
+                if '41047' in inf or '410389' in inf:                                                                    
+                    topDF['m_hasMEphoton_DRgt02_nonhad'] =  nom.m_hasMEphoton_DRgt02_nonhad
+
+                eventsTop.append(topDF)
+        '''
         combosTop = jetCombosTop(channel, nom, 0)
-        #if len(combosTop['flatDicts'])>0:
-        topDF = pd.DataFrame(combosTop['flatDicts'])
+        if len(combosTop['flatDicts'])>0:
+            topDF = pd.DataFrame(combosTop['flatDicts'])
         #topDF = combosTop['flatDicts']
         if 'data1' not in inf:
             topDF['weight'] = nom.weight*nom.weight_leptonSF*nom.weight_bTagSF_DL1r_Continuous
@@ -85,10 +98,11 @@ def runReco(inf):
             eventsTop = topDF
         else:
             eventsTop = eventsTop.append(topDF)
-        
+        '''
+
     #Write output to root file
     import root_pandas
-    #eventsTop = pd.DataFrame(eventsTop)
+    eventsTop = pd.DataFrame(eventsTop)
     outF = '/'.join(inf.split("/")[-2:])
     if channel=='3l':
         eventsTop.to_root('3l/'+outF, key='nominal')

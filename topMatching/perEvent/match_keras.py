@@ -5,7 +5,7 @@ import sklearn as sk
 from sklearn.model_selection import train_test_split
 import tensorflow as tf
 from tensorflow.keras.models import Sequential # feed-forward neural network (sequential layers)                         
-from tensorflow.keras.layers import Dense, Dropout, LeakyReLU # fully interconnected layers  
+from tensorflow.keras.layers import Dense, Dropout, LeakyReLU, BatchNormalization # fully interconnected layers  
 from tensorflow.keras.wrappers.scikit_learn import KerasClassifier, KerasRegressor
 #import keras
 from sklearn.metrics import confusion_matrix
@@ -17,7 +17,7 @@ matplotlib.use('agg')
 import matplotlib.pyplot as plt
 import sys
 import scipy
-from matchPlots import make_plots
+from catPlots import cat_plots
 from ast import literal_eval
 
 tf.keras.backend.set_floatx('float32')
@@ -106,7 +106,7 @@ print(y_train_pred_best[:10], y_train_best[:10])
 nCorrect1 = [x[0]==y[0] for x, y in zip(y_train_best, y_train_pred_best)]
 nCorrect2 = [x[0]==y[0] for x, y in zip(y_train_best, y_train_pred_best)]
 print('Correct', sum(nCorrect)/len(y_train) )
-
+'''
 confMat = sklearn.metrics.confusion_matrix(y_train, y_train_pred)                                    
 plt.figure()                                                                                                                
 ax = plt.subplot()                                                                                                     
@@ -115,5 +115,5 @@ ax.set_xlabel("Predicted")
 ax.set_ylabel("Truth")
 ax.set_title(f"{alg.capitalize()} Confusion Matrix")
 plt.savefig(f'plots/{outDir}/conf_matrix.png')
-
-#make_plots('keras', result, outDir, y_train, y_test, y_train_pred, y_test_pred)
+'''
+make_plots('keras', result, outDir, y_train, y_test, y_train_pred, y_test_pred)

@@ -18,13 +18,13 @@ matplotlib.use('agg')
 import matplotlib.pyplot as plt
 import sys
 import scipy
-from matchPlots import make_plots
+from catPlots import cat_plots
 from ast import literal_eval
 
 tf.keras.backend.set_floatx('float32')
 
 inFile = sys.argv[1]
-#outDir = sys.argv[2]
+outDir = sys.argv[3]
 
 topModel = load_model(sys.argv[2])
 
@@ -84,13 +84,4 @@ for yT, yP in zip(y_train_best, y_train_pred_best):
         
 print('Correct', nCorrect/len(y_train_best), nCorrect1/len(y_train_best) )
 
-confMat = sklearn.metrics.confusion_matrix(y_train, y_train_pred)                                    
-plt.figure()                                                                                                                
-ax = plt.subplot()                                                                                                     
-sns.heatmap(confMat, annot=True, robust=True)
-ax.set_xlabel("Predicted")
-ax.set_ylabel("Truth")
-ax.set_title(f"{alg.capitalize()} Confusion Matrix")
-plt.savefig(f'plots/{outDir}/conf_matrix.png')
-
-#make_plots('keras', result, outDir, y_train, y_test, y_train_pred, y_test_pred)
+cat_plots('keras', topModel, outDir, y_train, y_test, y_train_pred, y_test_pred)
