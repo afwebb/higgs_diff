@@ -1,0 +1,274 @@
+
+%---------------------------
+
+%         REGIONS           
+
+%---------------------------
+
+
+Region: match
+  Type: VALIDATION
+  Label: "match"
+  TexLabel: "match"
+  VariableTitle: "match"
+  Variable: "match",30,0,1
+
+Region: jet_Pt_0
+  Type: VALIDATION
+  Label: "jet_Pt_0"
+  TexLabel: "jet  $p_T$ 0 [GeV]"
+  VariableTitle: "jet  p_T 0 [GeV]"
+  Variable: "jet_Pt_0/1000",30,0,400
+
+Region: jet_Pt_1
+  Type: VALIDATION
+  Label: "jet_Pt_1"
+  TexLabel: "jet  $p_T$ 1 [GeV]"
+  VariableTitle: "jet  p_T 1 [GeV]"
+  Variable: "jet_Pt_1/1000",30,0,400
+
+Region: jet_Eta_0
+  Type: VALIDATION
+  Label: "jet_Eta_0"
+  TexLabel: "jet  $\eta$ 0"
+  VariableTitle: "jet  \eta 0"
+  Variable: "jet_Eta_0",30,-3.5,3.5
+
+Region: jet_Eta_1
+  Type: VALIDATION
+  Label: "jet_Eta_1"
+  TexLabel: "jet  $\eta$ 1"
+  VariableTitle: "jet  \eta 1"
+  Variable: "jet_Eta_1",30,-3.5,3.5
+
+Region: lep_Pt_0
+  Type: VALIDATION
+  Label: "lep_Pt_0"
+  TexLabel: "Lepton  $p_T$ 0 [GeV]"
+  VariableTitle: "Lepton  p_T 0 [GeV]"
+  Variable: "lep_Pt_0/1000",30,0,400
+
+Region: lep_Pt_1
+  Type: VALIDATION
+  Label: "lep_Pt_1"
+  TexLabel: "Lepton  $p_T$ 1 [GeV]"
+  VariableTitle: "Lepton  p_T 1 [GeV]"
+  Variable: "lep_Pt_1/1000",30,0,400
+
+Region: lep_Pt_2
+  Type: VALIDATION
+  Label: "lep_Pt_2"
+  TexLabel: "Lepton  $p_T$ 2 [GeV]"
+  VariableTitle: "Lepton  p_T 2 [GeV]"
+  Variable: "lep_Pt_2/1000",30,0,400
+
+Region: dR_j0_j1
+  Type: VALIDATION
+  Label: "dR_j0_j1"
+  TexLabel: "$\Delta R(j_0)(j_1)$"
+  VariableTitle: "\Delta R(j_0)(j_1)"
+  Variable: "dR_j0_j1",30,0,6
+
+Region: Mj0j1
+  Type: VALIDATION
+  Label: "Mj0j1"
+  TexLabel: "$M(j_0j_1)$ [GeV]"
+  VariableTitle: "M(j_0j_1) [GeV]"
+  Variable: "Mj0j1/1000",30,0,400
+
+Region: dR_l0_j0
+  Type: VALIDATION
+  Label: "dR_l0_j0"
+  TexLabel: "$\Delta R(l_0)(j_0)$"
+  VariableTitle: "\Delta R(l_0)(j_0)"
+  Variable: "dR_l0_j0",30,0,6
+
+Region: dR_l1_j0
+  Type: VALIDATION
+  Label: "dR_l1_j0"
+  TexLabel: "$\Delta R(l_1)(j_0)$"
+  VariableTitle: "\Delta R(l_1)(j_0)"
+  Variable: "dR_l1_j0",30,0,6
+
+Region: dR_l2_j0
+  Type: VALIDATION
+  Label: "dR_l2_j0"
+  TexLabel: "$\Delta R(l_2)(j_0)$"
+  VariableTitle: "\Delta R(l_2)(j_0)"
+  Variable: "dR_l2_j0",30,0,6
+
+Region: dR_l0_j1
+  Type: VALIDATION
+  Label: "dR_l0_j1"
+  TexLabel: "$\Delta R(l_0)(j_1)$"
+  VariableTitle: "\Delta R(l_0)(j_1)"
+  Variable: "dR_l0_j1",30,0,6
+
+Region: dR_l1_j1
+  Type: VALIDATION
+  Label: "dR_l1_j1"
+  TexLabel: "$\Delta R(l_1)(j_1)$"
+  VariableTitle: "\Delta R(l_1)(j_1)"
+  Variable: "dR_l1_j1",30,0,6
+
+Region: dR_l2_j1
+  Type: VALIDATION
+  Label: "dR_l2_j1"
+  TexLabel: "$\Delta R(l_2)(j_1)$"
+  VariableTitle: "\Delta R(l_2)(j_1)"
+  Variable: "dR_l2_j1",30,0,6
+
+Region: Ml0j0
+  Type: VALIDATION
+  Label: "Ml0j0"
+  TexLabel: "$M(l_0j_0)$ [GeV]"
+  VariableTitle: "M(l_0j_0) [GeV]"
+  Variable: "Ml0j0/1000",30,0,400
+
+Region: Ml1j0
+  Type: VALIDATION
+  Label: "Ml1j0"
+  TexLabel: "$M(l_1j_0)$ [GeV]"
+  VariableTitle: "M(l_1j_0) [GeV]"
+  Variable: "Ml1j0/1000",30,0,400
+
+Region: Ml2j0
+  Type: VALIDATION
+  Label: "Ml2j0"
+  TexLabel: "$M(l_2j_0)$ [GeV]"
+  VariableTitle: "M(l_2j_0) [GeV]"
+  Variable: "Ml2j0/1000",30,0,400
+
+Region: Ml0j1
+  Type: VALIDATION
+  Label: "Ml0j1"
+  TexLabel: "$M(l_0j_1)$ [GeV]"
+  VariableTitle: "M(l_0j_1) [GeV]"
+  Variable: "Ml0j1/1000",30,0,400
+
+Region: Ml1j1
+  Type: VALIDATION
+  Label: "Ml1j1"
+  TexLabel: "$M(l_1j_1)$ [GeV]"
+  VariableTitle: "M(l_1j_1) [GeV]"
+  Variable: "Ml1j1/1000",30,0,400
+
+Region: Ml2j1
+  Type: VALIDATION
+  Label: "Ml2j1"
+  TexLabel: "$M(l_2j_1)$ [GeV]"
+  VariableTitle: "M(l_2j_1) [GeV]"
+  Variable: "Ml2j1/1000",30,0,400
+
+Region: dR_j0l0_j1l1
+  Type: VALIDATION
+  Label: "dR_j0l0_j1l1"
+  TexLabel: "$\Delta R(j_0l_0)(j_1l_1)$"
+  VariableTitle: "\Delta R(j_0l_0)(j_1l_1)"
+  Variable: "dR_j0l0_j1l1",30,0,6
+
+Region: dR_j0l0_j1l2
+  Type: VALIDATION
+  Label: "dR_j0l0_j1l2"
+  TexLabel: "$\Delta R(j_0l_0)(j_1l_2)$"
+  VariableTitle: "\Delta R(j_0l_0)(j_1l_2)"
+  Variable: "dR_j0l0_j1l2",30,0,6
+
+Region: dR_j0l1_j1l0
+  Type: VALIDATION
+  Label: "dR_j0l1_j1l0"
+  TexLabel: "$\Delta R(j_0l_1)(j_1l_0)$"
+  VariableTitle: "\Delta R(j_0l_1)(j_1l_0)"
+  Variable: "dR_j0l1_j1l0",30,0,6
+
+Region: dR_j0l2_j1l0
+  Type: VALIDATION
+  Label: "dR_j0l2_j1l0"
+  TexLabel: "$\Delta R(j_0l_2)(j_1l_0)$"
+  VariableTitle: "\Delta R(j_0l_2)(j_1l_0)"
+  Variable: "dR_j0l2_j1l0",30,0,6
+
+Region: jet_DL1r_0
+  Type: VALIDATION
+  Label: "jet_DL1r_0"
+  TexLabel: "jet DL1r 0"
+  VariableTitle: "jet DL1r 0"
+  Variable: "jet_DL1r_0",30,0,5
+
+Region: jet_DL1r_1
+  Type: VALIDATION
+  Label: "jet_DL1r_1"
+  TexLabel: "jet DL1r 1"
+  VariableTitle: "jet DL1r 1"
+  Variable: "jet_DL1r_1",30,0,5
+
+Region: Ptj0j1l0l1l2met
+  Type: VALIDATION
+  Label: "Ptj0j1l0l1l2met"
+  TexLabel: " $p_T(j_0j_1l_0l_1l_2E_T^{miss})$ [GeV]"
+  VariableTitle: " p_T(j_0j_1l_0l_1l_2E_T^{miss}) [GeV]"
+  Variable: "Ptj0j1l0l1l2met/1000",30,0,400
+
+Region: Mtj0j1l0l1l2met
+  Type: VALIDATION
+  Label: "Mtj0j1l0l1l2met"
+  TexLabel: "$M(tj_0j_1l_0l_1l_2E_T^{miss})$ [GeV]"
+  VariableTitle: "M(tj_0j_1l_0l_1l_2E_T^{miss}) [GeV]"
+  Variable: "Mtj0j1l0l1l2met/1000",30,0,1200
+
+Region: dPhi_j0_met
+  Type: VALIDATION
+  Label: "dPhi_j0_met"
+  TexLabel: "$\Delta\phi(j_0)(E_T^{miss})$"
+  VariableTitle: "\Delta\phi(j_0)(E_T^{miss})"
+  Variable: "dPhi_j0_met",30,-3.5,3.5
+
+Region: dPhi_j1_met
+  Type: VALIDATION
+  Label: "dPhi_j1_met"
+  TexLabel: "$\Delta\phi(j_1)(E_T^{miss})$"
+  VariableTitle: "\Delta\phi(j_1)(E_T^{miss})"
+  Variable: "dPhi_j1_met",30,-3.5,3.5
+
+Region: HT_lep
+  Type: VALIDATION
+  Label: "HT_lep"
+  TexLabel: "HT Lepton [GeV]"
+  VariableTitle: "HT Lepton [GeV]"
+  Variable: "HT_lep/1000",30,0,400
+
+Region: HT_jets
+  Type: VALIDATION
+  Label: "HT_jets"
+  TexLabel: "HT jets [GeV]"
+  VariableTitle: "HT jets [GeV]"
+  Variable: "HT_jets/1000",30,0,800
+
+Region: nJets_OR
+  Type: VALIDATION
+  Label: "nJets_OR"
+  TexLabel: "nJets"
+  VariableTitle: "nJets"
+  Variable: "nJets_OR",30,0,12
+
+Region: met
+  Type: VALIDATION
+  Label: "met"
+  TexLabel: "$E_T^{miss}$ [GeV]"
+  VariableTitle: "E_T^{miss} [GeV]"
+  Variable: "met/1000",30,0,400
+
+Region: nJets_OR_DL1r_85
+  Type: VALIDATION
+  Label: "nJets_OR_DL1r_85"
+  TexLabel: "nJets OR DL1r 85"
+  VariableTitle: "nJets OR DL1r 85"
+  Variable: "nJets_OR_DL1r_85",30,0,5
+
+Region: nJets_OR_DL1r_60
+  Type: VALIDATION
+  Label: "nJets_OR_DL1r_60"
+  TexLabel: "nJets OR DL1r 60"
+  VariableTitle: "nJets OR DL1r 60"
+  Variable: "nJets_OR_DL1r_60",30,0,5
+
