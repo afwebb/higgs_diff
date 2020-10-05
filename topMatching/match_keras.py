@@ -5,7 +5,7 @@ import sklearn as sk
 from sklearn.model_selection import train_test_split
 import tensorflow as tf
 from tensorflow.keras.models import Sequential # feed-forward neural network (sequential layers)                         
-from tensorflow.keras.layers import Dense, Dropout, LeakyReLU # fully interconnected layers  
+from tensorflow.keras.layers import Dense, Dropout, LeakyReLU, BatchNormalization # fully interconnected layers  
 from tensorflow.keras.wrappers.scikit_learn import KerasClassifier, KerasRegressor
 #import keras
 from sklearn.metrics import confusion_matrix
@@ -26,10 +26,10 @@ outDir = sys.argv[2]
 
 #Use optimal parameters obtained from grid search
 if outDir=='top2lSS' or outDir=='all2lSS':
-    best_params = {"epochs": 40, "layers": 5, "nodes": 50}
+    best_params = {"epochs": 50, "layers": 5, "nodes": 60}
 elif outDir=='top3l' or outDir=='all3l':
     #best_params = {'epochs': 40, 'layers': 6, 'nodes': 50}
-    best_params = {'epochs': 40, 'layers': 5, 'nodes': 40}
+    best_params = {'epochs': 50, 'layers': 6, 'nodes': 50}
 #elif outDir=='higgsTop2lSS':
 #    best_params = {'epochs': 80, 'layers': 7, 'nodes': 50}
 elif outDir=='higgsTop3lF':
@@ -69,11 +69,13 @@ def create_model(layers=best_params['layers'], nodes=best_params['nodes'], activ
     model = Sequential()
     model.add(Dense(nodes, input_dim = nFeatures, kernel_regularizer=regularizer))
     model.add(LeakyReLU(alpha=0.05))
+    model.add(BatchNormalization())
     # hidden layer: 5 nodes by default
     for l in range(layers):
         #model.add(Dense(l, activation=activation, kernel_regularizer=regularizer))
         model.add(Dense(nodes, kernel_regularizer=regularizer))
         model.add(LeakyReLU(alpha=0.05))
+        model.add(BatchNormalization())
         #model.add(Dropout(0.2))
     model.add(Dense(1, activation='sigmoid'))
     #model.add(Dense(1, activation=activation))

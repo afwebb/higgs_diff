@@ -4,6 +4,7 @@ import sklearn
 import sklearn as sk
 from sklearn.model_selection import train_test_split
 import tensorflow as tf
+from tensorflow.keras import regularizers
 from tensorflow.keras.models import Sequential # feed-forward neural network (sequential layers)                         
 from tensorflow.keras.layers import Dense, Dropout, LeakyReLU, BatchNormalization # fully interconnected layers  
 from tensorflow.keras.wrappers.scikit_learn import KerasClassifier, KerasRegressor
@@ -26,7 +27,7 @@ inFile = sys.argv[1]
 outDir = sys.argv[2]
 
 #Use optimal parameters obtained from grid search
-best_params = {"epochs": 100, "layers": 6, "nodes": 120}
+best_params = {"epochs": 10, "layers": 10, "nodes": 128}
 
 print(best_params)
 
@@ -68,7 +69,7 @@ test, train = test.values, train.values
 layers=best_params['layers']
 nodes=best_params['nodes']
 activation='LeakyReLU'
-regularizer=None
+regularizer=None#regularizers.l2(1e-5)#None
 #def create_model(layers=best_params['layers'], nodes=best_params['nodes'], activation='LeakyReLU', regularizer=None):
  
 model = Sequential()
@@ -79,8 +80,9 @@ for l in range(layers):
     #model.add(Dense(l, activation=activation, kernel_regularizer=regularizer))
     model.add(Dense(nodes, kernel_regularizer=regularizer))
     model.add(LeakyReLU(alpha=0.05))
-    #model.add(Dropout(0.2))
-model.add(Dense(outDim, activation='softmax'))
+    model.add(BatchNormalization())
+    #model.add(Dropout(0.1))
+model.add(Dense(outDim, activation='sigmoid'))
 #model.add(Dense(1, activation=activation))
 model.compile(loss="categorical_crossentropy", optimizer='adam')
 #model.compile(loss="mean_squared_error", optimizer='adam') 
@@ -103,9 +105,9 @@ print(y_train_pred.shape, y_test_pred.shape)
 print(y_train.shape, y_test.shape)
 print(y_train_pred_best[:10], y_train_best[:10])
 
-nCorrect1 = [x[0]==y[0] for x, y in zip(y_train_best, y_train_pred_best)]
-nCorrect2 = [x[0]==y[0] for x, y in zip(y_train_best, y_train_pred_best)]
-print('Correct', sum(nCorrect)/len(y_train) )
+#nCorrect1 = [x[0]==y[0] for x, y in zip(y_train_best, y_train_pred_best)]
+#nCorrect2 = [x[0]==y[0] for x, y in zip(y_train_best, y_train_pred_best)]
+#print('Correct', sum(nCorrect1)/len(y_train),  )
 '''
 confMat = sklearn.metrics.confusion_matrix(y_train, y_train_pred)                                    
 plt.figure()                                                                                                                

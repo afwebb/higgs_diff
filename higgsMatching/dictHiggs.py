@@ -284,9 +284,16 @@ def higgsTopDict2lSS(nom, jetIdx0, jetIdx1, lepIdx, topIdx0, topIdx1, topScore, 
 
     k['top_Pt_0'] = top0.Pt()   
     k['top_Pt_1'] = top1.Pt()  
+    k['top_Eta_0'] = top0.Eta() #might remove
+    k['top_Eta_1'] = top1.Eta() # might remove
 
     k['jet_Eta_0'] = jet0.Eta()
     k['jet_Eta_1'] = jet1.Eta()
+    k['jet_Phi_0'] = jet0.Phi()-met.Phi()                                                                            
+    k['jet_Phi_1'] = jet1.Phi()-met.Phi()
+
+    k['lep_Eta_H'] = lepH.Eta()                                                                                           
+    k['lep_Eta_T'] = lepT.Eta()
 
     k['dR_j0_j1'] = jet0.DeltaR(jet1)
     k['dR_lH_j0'] = lepH.DeltaR(jet0)
@@ -296,12 +303,13 @@ def higgsTopDict2lSS(nom, jetIdx0, jetIdx1, lepIdx, topIdx0, topIdx1, topScore, 
     k['MlHj0'] = (lepH+jet0).M()
     k['MlHj1'] = (lepH+jet1).M()
 
-    k['MlHt0'] = (lepH+top0).M()
-    k['MlHt1'] = (lepH+top1).M()
-    k['Mt0lT'] = (top0+lepT).M() 
-    k['Mt1lT'] = (top1+lepT).M()
-    k['Mj0j1t0'] = (jet0+jet1+top0).M() 
-    k['Mj0j1t1'] = (jet0+jet1+top1).M()
+    #possibly reinclude
+    #k['MlHt0'] = (lepH+top0).M()
+    #k['MlHt1'] = (lepH+top1).M()
+    #k['Mt0lT'] = (top0+lepT).M() 
+    #k['Mt1lT'] = (top1+lepT).M()
+    #k['Mj0j1t0'] = (jet0+jet1+top0).M() 
+    #k['Mj0j1t1'] = (jet0+jet1+top1).M()
 
     k['dR_lH_t0'] = lepH.DeltaR(top0)
     k['dR_lH_t1'] = lepH.DeltaR(top1)
@@ -309,16 +317,24 @@ def higgsTopDict2lSS(nom, jetIdx0, jetIdx1, lepIdx, topIdx0, topIdx1, topScore, 
     k['dR_lT_t1'] = lepT.DeltaR(top1)
     k['dR_j0j1_lH'] = (jet0 + jet1).DeltaR(lepH)
     k['dR_j0j1_lT'] = (jet0 + jet1).DeltaR(lepT)
+    k['dR_j0j1_t0'] = (jet0 + jet1).DeltaR(top0)
+    k['dR_j0j1_t1'] = (jet0 + jet1).DeltaR(top1)
+
+    #possibly to remove
+    k['dR_j0_t0'] = (jet0).DeltaR(top0)
+    k['dR_j0_t1'] = (jet0).DeltaR(top1)
+    k['dR_j1_t0'] = (jet1).DeltaR(top0)                                                                                     
+    k['dR_j1_t1'] = (jet1).DeltaR(top1)
 
     higgsCand = jet0+jet1+lepH
     k['Mj0j1lH'] = higgsCand.M()
-    k['dR_j0j1lH_t0'] = higgsCand.DeltaR(top0)
-    k['dR_j0j1lH_t1'] = higgsCand.DeltaR(top1)
-    k['dR_j0j1lH_lT'] = higgsCand.DeltaR(lepT)
-    k['dPhi_j0j1lH_met'] = higgsCand.Phi() - met.Phi()
+    #k['dR_j0j1lH_t0'] = higgsCand.DeltaR(top0)
+    #k['dR_j0j1lH_t1'] = higgsCand.DeltaR(top1)
+    #k['dR_j0j1lH_lT'] = higgsCand.DeltaR(lepT)
+    #k['dPhi_j0j1lH_met'] = higgsCand.Phi() - met.Phi()
 
     k['Ptj0j1lHlTt0t1met'] = (top0+top1+jet0+jet1+lepT+lepH+met).Pt() 
-    k['Ptj0j1lHlTt0t1met'] = (top0+top1+jet0+jet1+lepT+lepH+met).M() 
+    #k['Mj0j1lHlTt0t1met'] = (top0+top1+jet0+jet1+lepT+lepH+met).M() 
 
     k['topScore'] = topScore
     k['met'] = met.Pt()

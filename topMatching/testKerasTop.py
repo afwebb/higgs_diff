@@ -120,7 +120,7 @@ outRes.write(f"{channel} Top Matching Tested on {inf}, {nEvents} events\n")
 outRes.write(f"model used: {sys.argv[2]}\n")
 outRes.write(f"Correct: {str(round(nCorrect/nEvents, 3))}\n")                                                                
 outRes.write(f"One Jet Correct: {str(round(oneCorrect/nEvents, 3))}\n\n")
-'''
+
 outRes.write(f"{channel} Top Score > 0.6, {nGood} events\n")
 outRes.write(f"Correct: {str(round(nGoodCorrect/nGood, 3))}\n")
 outRes.write(f"One Jet Correct: {str(round(nGoodOne/nGood, 3))}\n\n")
@@ -132,4 +132,4 @@ outRes.write(f"One Jet Correct: {str(round(nBadOne/nBad, 3))}\n\n\n")
 outRes.write(f"1b Correct: {str(round(n1bCorrect/n1b, 3))}\n")
 outRes.write(f"2b Correct: {str(round(n2bCorrect/n2b, 3))}\n")
 outRes.write(f">=3b Correct: {str(round(n3bCorrect/n3b, 3))}\n")
-'''
+
