@@ -162,13 +162,15 @@ def higgsTopCombos(channel, nom, topIdx0, topIdx1, topScore, withMatch):
         print(f'Channel {channel} not recognized')
         return
 
-    combosHiggs = {'higgsDicts':[],'pairIdx':[],'truthComb':[]}
+    combosHiggs = {'higgsDicts':{},'pairIdx':[],'truthComb':[]}
 
     if channel=='2lSS' or channel=='3lS':
         for l in lepRange:
             for i in range(len(nom.jet_pt)-1):
+                if nom.jet_jvt[i]<0.59 or abs(nom.jet_eta[i])>3: continue
                 if i in [topIdx0, topIdx1]: continue
                 for j in range(i+1, len(nom.jet_pt)):
+                    if nom.jet_jvt[j]<0.59 or abs(nom.jet_eta[j])>3: continue
                     if j in [topIdx0, topIdx1]: continue
                     combosHiggs['pairIdx'].append([l, i,j])
                     isHiggs = 0
@@ -176,10 +178,16 @@ def higgsTopCombos(channel, nom, topIdx0, topIdx1, topScore, withMatch):
                         if (l==0 and nom.lep_Parent_0==25) or (l==1 and nom.lep_Parent_1==25) or (l==2 and nom.lep_Parent_2==25):
                             isHiggs = 1
                             combosHiggs['truthComb'] = [l, i, j]
-                    if withMatch:                                                                                          
-                        combosHiggs['higgsDicts'].append( flatDict( nom, i, j, l, topIdx0, topIdx1, topScore, isHiggs) )
-                    else:                                                                                                 
-                        combosHiggs['higgsDicts'].append( flatDict( nom, i, j, l, topIdx0, topIdx1, topScore) )
+                    if withMatch:    
+                        fd = flatDict( nom, i, j, l, topIdx0, topIdx1, topScore, isHiggs)
+                    else:
+                        fd = flatDict( nom, i, j, l, topIdx0, topIdx1, topScore)
+                    if combosHiggs['higgsDicts']=={}:
+                        for k in fd:
+                            combosHiggs['higgsDicts'][k]=[(fd[k])]
+                    else:
+                        for k in fd:
+                            combosHiggs['higgsDicts'][k]+=[(fd[k])]
     else:                                                                                                             
         for l in lepRange:                                                                                       
             combosHiggs['pairIdx'].append([l])                                                                     

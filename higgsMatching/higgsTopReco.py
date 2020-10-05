@@ -14,7 +14,7 @@ import numpy as np
 import sys
 import random
 from dictHiggs import higgsTopDict2lSS, higgsTopDict3lS, higgsTopDict3lF
-from functionsMatch import jetCombosTop, findBestTopKeras
+from functionsMatch import jetCombosTop, findBestTopKeras, higgsTopCombos
 from joblib import Parallel, delayed
 import multiprocessing
 
@@ -49,7 +49,7 @@ def runReco(inf):
     nom = f.Get('nominal')
     
     #initialize output dicts
-    events = []
+    events = {}
     events3lF = []
     
     #Loop over all entries
@@ -60,84 +60,51 @@ def runReco(inf):
             
         nom.GetEntry(idx)
 
+        #Check if the Higgs decay products are reconstructed - first leptons
+        if channel=='2lSS' and nom.lep_Parent_0!=25 and nom.lep_Parent_1!=25:
+            continue
+        if is3l: # Check for lepton, decide if event is 3lF or 3lS
+            if nom.lep_Parent_1!=25 and nom.lep_Parent_2!=25:
+                continue
+            if nom.lep_Parent_0 == 25: 
+                channel=='3lF'
+            else: 
+                channel=='3lS'
+
+        #Check if Higgs jets are reconstructed
+        if sum([x==25 for x in nom.jet_parents])!=2: continue
+
+        #Find the b-jets from tops
         topRes = findBestTopKeras(nom, channel, topModel, topNormFactors)
-        topIdx0, topIdx1 = topRes['bestComb']
+        topIdx0, topIdx1 = topRes['bestComb']                                                                         
         topScore = topRes['topScore']
 
-        #identify which lepton came from the Higgs
-        lepIdx = -1
-        if nom.lep_Parent_0 == 25: 
-            if is3l: 
-                isF = True
-            else: 
-                lepIdx = 0 #lep0 is always from the Higgs in 3l case
-                isF = False
+        #Get all possible combinations
+        combos = higgsTopCombos(channel, nom, topIdx0, topIdx1, topScore, 1)
+        if len(combos['higgsDicts'])==0:
+            continue
+
+        if channel=='3lF':
+            for d in combos['higgsDicts']:
+                events3lF.append(d)
         else:
-            isF = False
-        if nom.lep_Parent_1 == 25: lepIdx = 1
-        if is3l and nom.lep_Parent_2 == 25: lepIdx = 2
-
-        if lepIdx == -1: continue
-
-        #Get index of the non-higgs decay lepton
-        if is3l: wrongLep = (lepIdx)%2+1
-        else: wrongLep = (lepIdx+1)%2
-
-        if isF:
-            #events3lF.append( higgsTopDict3lF(nom, lepIdx, topIdx0, topIdx1, topScore, lepIdx-1) ) #Correct combination
-            events3lF.append( higgsTopDict3lF(nom, lepIdx, topIdx0, topIdx1, topScore, 1) )
-            events3lF.append( higgsTopDict3lF(nom, wrongLep, topIdx0, topIdx1, topScore, 0) ) #Incorrect combination - swaps 2 and 1
-        else:
-            higgsJets = []
-            badJets = []
-
-            #Get indices of jets from Higgs
-            for i in range(len(nom.jet_pt)):
-                if i == topIdx0 or i == topIdx1: continue
-                if nom.jet_jvt[i]<0.59: continue
-                if abs(nom.jet_parents[i])==25:
-                    higgsJets.append(i)
-                else:
-                    badJets.append(i)
-        
-            if len(higgsJets)!=2: continue #Only include events where both jets are truth matched to the Higgs
-            
-            events.append( flatDict( nom, higgsJets[0], higgsJets[1], lepIdx, topIdx0, topIdx1, topScore, 1 ) ) #Correct combination
-            events.append( flatDict( nom, higgsJets[0], higgsJets[1], wrongLep, topIdx0, topIdx1, topScore, 0 ) ) #Wrong lepton, right jets
-            
-            #for l in range(min([1, len(badJets)]) ):
-            if len(badJets)>1:
-                #right lepton, one correct jet
-                events.append( flatDict( nom, higgsJets[0], random.sample(badJets,1)[0], lepIdx, topIdx0, topIdx1, topScore, 0 ) ) 
-                events.append( flatDict( nom, random.sample(badJets,1)[0], higgsJets[1], lepIdx, topIdx0, topIdx1, topScore, 0 ) )
-                
-                #wrong lepton, one correct jet
-                events.append( flatDict( nom, higgsJets[0], random.sample(badJets,1)[0], wrongLep, topIdx0, topIdx1, topScore, 0 ) ) 
-                events.append( flatDict( nom, random.sample(badJets,1)[0], higgsJets[1], wrongLep, topIdx0, topIdx1, topScore, 0 ) )
-
-            #Right lepton, wrong jets
-            for l in range(min([2, len(badJets)]) ):
-                if len(badJets)>2:
-                    i,j = random.sample(badJets,2)
-                    events.append( flatDict( nom, i, j, lepIdx, topIdx0, topIdx1, topScore, 0 ) )
-
-            #Wrong leptons, wrong jets
-            for l in range(min([4, len(badJets)]) ):
-                if len(badJets)>2:
-                    i,j = random.sample(badJets,2)
-                    events.append( flatDict( nom, i, j, wrongLep, topIdx0, topIdx1, topScore, 0 ) )
+            if events=={}:                                                                                               
+                events=combos['higgsDicts']                                                                     
+            else:                                                                                                   
+                for k in events:
+                    events[k].extend(combos['higgsDicts'][k])
 
     dfFlat = pd.DataFrame.from_dict(events)
     dfFlat = shuffle(dfFlat)
 
     outF = '/'.join(inf.split("/")[-2:]).replace('.root','.csv')
     if channel=='2lSS':
-        dfFlat.to_csv('csvFiles/higgsTop2lSS/'+outF, index=False)
+        dfFlat.to_csv('csvFiles/higgsTop2lSS/'+outF, index=False, float_format='%.3f')
     elif channel=='3l':
-        dfFlat.to_csv('csvFiles/higgsTop3lS/'+outF, index=False)
+        dfFlat.to_csv('csvFiles/higgsTop3lS/'+outF, index=False, float_format='%.3f')
         df3lF = pd.DataFrame.from_dict(events3lF)
         df3lF = shuffle(df3lF)
-        df3lF.to_csv('csvFiles/higgsTop3lF/'+outF, index=False)
+        df3lF.to_csv('csvFiles/higgsTop3lF/'+outF, index=False, float_format='%.3f')
 
 linelist = [line.rstrip() for line in open(sys.argv[1])]
-Parallel(n_jobs=15)(delayed(runReco)(inf) for inf in linelist)
+Parallel(n_jobs=8)(delayed(runReco)(inf) for inf in linelist)

@@ -20,7 +20,7 @@ from namePlot import name
 inFile = sys.argv[1]
 outDir = sys.argv[2]
 
-inDF = pd.read_csv(inFile, nrows=1e5)
+inDF = pd.read_csv(inFile, nrows=5e6)
 inDF = inDF.dropna()
 
 good = inDF[inDF['match']==1]
