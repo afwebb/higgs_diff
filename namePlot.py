@@ -27,7 +27,7 @@ def name(c):
         r = (0,5)
     elif c=='HT': 
         r = (0,1500)
-    elif c=='HT_jets':
+    elif c=='HT_jets' or c=='Ptj0j1lHlTt0t1met':
         r = (0,800)
     elif c[0]=='M' and c[-3:]=='met':
         r = (0, 1200)
