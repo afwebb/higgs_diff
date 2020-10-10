@@ -85,8 +85,8 @@ def create_model(layers=layers, nodes=nodes, regularizer=None, activation='relu'
     # one output, mapped to [0,1] by sigmoid function
     model.add(Dense(1, activation='sigmoid'))
     # assemble the model (Translate to TensorFlow)
-    #model.compile(loss="mean_squared_error", optimizer='adam')
-    model.compile(loss="mean_absolute_error", optimizer='adam')
+    model.compile(loss="mean_squared_error", optimizer='adam')
+    #model.compile(loss="mean_absolute_error", optimizer='adam')
     return model
 
 from keras.wrappers.scikit_learn import KerasClassifier, KerasRegressor
