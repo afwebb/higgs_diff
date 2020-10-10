@@ -67,26 +67,31 @@ def runReco(inf):
             if nom.lep_Parent_1!=25 and nom.lep_Parent_2!=25:
                 continue
             if nom.lep_Parent_0 == 25: 
-                channel=='3lF'
+                channel='3lF'
             else: 
-                channel=='3lS'
+                channel='3lS'
 
         #Check if Higgs jets are reconstructed
         if sum([x==25 for x in nom.jet_parents])!=2: continue
 
         #Find the b-jets from tops
         topRes = findBestTopKeras(nom, channel, topModel, topNormFactors)
+        if not topRes:
+            continue
         topIdx0, topIdx1 = topRes['bestComb']                                                                         
         topScore = topRes['topScore']
 
         #Get all possible combinations
         combos = higgsTopCombos(channel, nom, topIdx0, topIdx1, topScore, 1)
-        if len(combos['higgsDicts'])==0:
+        if not combos or len(combos['higgsDicts'])==0:
             continue
 
         if channel=='3lF':
-            for d in combos['higgsDicts']:
-                events3lF.append(d)
+            if events3lF=={}:                                                                            
+                events3lF=combos['higgsDicts']
+            else:
+                for k in events3lF:                                                                                   
+                    events3lF[k].extend(combos['higgsDicts'][k])
         else:
             if events=={}:                                                                                               
                 events=combos['higgsDicts']                                                                     
@@ -100,7 +105,7 @@ def runReco(inf):
     outF = '/'.join(inf.split("/")[-2:]).replace('.root','.csv')
     if channel=='2lSS':
         dfFlat.to_csv('csvFiles/higgsTop2lSS/'+outF, index=False, float_format='%.3f')
-    elif channel=='3l':
+    else:# channel=='3l':
         dfFlat.to_csv('csvFiles/higgsTop3lS/'+outF, index=False, float_format='%.3f')
         df3lF = pd.DataFrame.from_dict(events3lF)
         df3lF = shuffle(df3lF)

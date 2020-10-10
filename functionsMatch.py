@@ -42,7 +42,7 @@ def jetCombosTop(channel, nom, withMatch):
     if channel=='2lSS': 
         flatDict = topDict2lSS
         fourVecDict = topDictFourVec2lSS
-    elif channel=='3l':
+    elif channel=='3l' or channel=='3lS' or channel=='3lF':
         flatDict = topDict3l
         fourVecDict = topDictFourVec3l
 
@@ -196,10 +196,16 @@ def higgsTopCombos(channel, nom, topIdx0, topIdx1, topScore, withMatch):
                 combosHiggs['truthComb'] = [l]
             else:                                                                   
                 isHiggs = 0                                                                                     
-            if withMatch:                                                                       
-                combosHiggs['higgsDicts'].append( flatDict( nom, l, topIdx0, topIdx1, topScore, isHiggs) )
+            if withMatch:
+                fd = flatDict( nom, l, topIdx0, topIdx1, topScore, isHiggs)
             else:
-                combosHiggs['higgsDicts'].append( flatDict( nom, l, topIdx0, topIdx1, topScore) )
+                fd = flatDict( nom, l, topIdx0, topIdx1, topScore)
+            if combosHiggs['higgsDicts']=={}:
+                for k in fd:
+                    combosHiggs['higgsDicts'][k]=[(fd[k])]
+            else:
+                for k in fd:
+                    combosHiggs['higgsDicts'][k]+=[(fd[k])]
 
     return combosHiggs
 

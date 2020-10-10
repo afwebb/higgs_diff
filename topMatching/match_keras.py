@@ -33,6 +33,8 @@ elif outDir=='top3l' or outDir=='all3l':
 #elif outDir=='higgsTop2lSS':
 elif 'higgsTop2lSS' in outDir: 
     best_params = {'epochs': 80, 'layers': 7, 'nodes': 60}
+elif outDir=='higgsTop3lS':
+    best_params = {'epochs': 100, 'layers': 7, 'nodes': 70}
 elif outDir=='higgsTop3lF':
     best_params = {'epochs': 120, 'layers': 5, 'nodes': 60}
 else:
