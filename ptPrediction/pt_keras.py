@@ -1,3 +1,12 @@
+'''                                                                                                                         
+Builds a model to distinguish between correct and incorrect combinations of decay products                             
+Performs regressing of the Higgs Pt spectrum using a Deep Neural Network                                                  
+Takes a csv of training data and an identifying outStr. Outputs a .h5 model and plots of the performance               \
+Usage:                                                                                                                   
+python3.6 pt_keras.py <input csv file> <outStr>                                                                      
+'''
+
+#load relevant modules
 import pandas as pd
 import numpy as np
 import sklearn
@@ -18,10 +27,7 @@ from pt_plots import makePlots
 inFile = sys.argv[1]
 outDir = sys.argv[2]
 
-#epochs = 120
-#nodes = 75
-#layers = 6
-
+##Use optimal parameters obtained from grid search 
 if '2lSS' in outDir:
     epochs = 150
     layers = 7
@@ -39,23 +45,21 @@ else:
     layers = 5
     nodes=50
 
+#load in the training data 
 inDF = pd.read_csv(inFile, index_col=False)
 inDF = sk.utils.shuffle(inDF)
+
+#normalize input data. save norm parameters for future use of the model
 maxVals = inDF.max()
 minVals = inDF.min()
-#inDF=(inDF-inDF.min())/(inDF.max()-inDF.min())                                                                            
-    
 yMax = inDF['higgs_pt'].max() 
-
 inDF = (inDF-minVals)/(maxVals-minVals)
-
 normFactors = [maxVals.drop(['higgs_pt']), minVals.drop(['higgs_pt']), yMax]
-#normFactors = np.asarray(maxVals.drop(['match']))                                                                       
-     
 np.save('models/'+outDir+'_normFactors.npy', normFactors)
 
 nFeatures = len(list(inDF))-1
 
+#use 10% test split
 train, test = train_test_split(inDF, test_size=0.1)
 
 y_train = train['higgs_pt']
@@ -66,9 +70,11 @@ test = test.drop(['higgs_pt'],axis=1)
 
 test, train = test.values, train.values
 
-#layers = (125,125,75,75,50,50,50,25,25)
-#layers = (125,125,125,50,50,50,50,50)
 def create_model(layers=layers, nodes=nodes, regularizer=None, activation='relu'):
+    '''                                                                                                                     
+    builds a keras models using the hyperparameters provided. Layers are fully connected, and Adam is used for the optimizer
+    '''  
+
     from keras.models import Sequential # feed-forward neural network (sequential layers)
     from keras.layers import Dense, Dropout, LeakyReLU, BatchNormalization  # fully interconnected layers
     model = Sequential()
@@ -89,18 +95,21 @@ def create_model(layers=layers, nodes=nodes, regularizer=None, activation='relu'
     #model.compile(loss="mean_absolute_error", optimizer='adam')
     return model
 
+#load up the model
 from keras.wrappers.scikit_learn import KerasClassifier, KerasRegressor
 model=KerasRegressor(build_fn=create_model, verbose=1)
-result=model.fit(train, y_train, epochs=epochs)
+result=model.fit(train, y_train, epochs=epochs) # fit the model to data
 
-model.model.save("models/keras_model_"+outDir+".h5")
+model.model.save("models/keras_model_"+outDir+".h5") # save the model
 
-y_pred_train = model.predict(train)
+y_pred_train = model.predict(train) # run model predictions on test and training set
 y_pred_test = model.predict(test)
 
+#rescale outputs
 y_train = y_train*yMax
 y_test = y_test*yMax
 y_train_pred = y_pred_train*yMax
 y_test_pred = y_pred_test*yMax
 
+#plot the performance of the model
 makePlots('keras', model, outDir, y_train, y_test, y_train_pred, y_test_pred)

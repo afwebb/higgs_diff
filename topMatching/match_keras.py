@@ -1,3 +1,12 @@
+'''
+Builds a model to distinguish between correct and incorrect combinations of decay products
+Performs binary classification using a Deep Neural Network
+Takes a csv of training data and an identifying outStr. Outputs a .h5 model and plots of the performance
+Usage: 
+   python3.6 match_keras.py <input csv file> <outStr>
+'''
+
+#import relevant modules
 import pandas as pd
 import numpy as np
 import sklearn
@@ -19,8 +28,9 @@ import sys
 import scipy
 from matchPlots import make_plots
 
-tf.keras.backend.set_floatx('float32')
+tf.keras.backend.set_floatx('float32') #reduce tensorflow precision, runs faster
 
+#load in command line arguments
 inFile = sys.argv[1]
 outDir = sys.argv[2]
 
@@ -43,23 +53,25 @@ else:
 
 print(best_params)
 
+#load in the training data
 inDF = pd.read_csv(inFile, index_col=False)
-inDF = sk.utils.shuffle(inDF)
+inDF = sk.utils.shuffle(inDF) #shuffle data 
+
+#normalize input data
 maxVals = inDF.max()
 minVals = inDF.min()
-#min_max_scaler = sk.preprocessing.MinMaxScaler()
-
 inDF=(inDF-inDF.min())/(inDF.max()-inDF.min())
-#inDF = pd.DataFrame(min_max_scaler.fit_transform(inDF.values))#(inDF-minVals)/(maxVals-minVals)
 
+#save normalizations for future use
 normFactors = [maxVals.drop(['match']), minVals.drop(['match'])]
 #normFactors = np.asarray(maxVals.drop(['match']))
 np.save('models/'+outDir+'_normFactors.npy', normFactors)
 
-nFeatures = len(list(inDF))-1
+nFeatures = len(list(inDF))-1 # track the dimention of the input
 print(list(inDF))
-train, test = train_test_split(inDF, test_size=0.1)
+train, test = train_test_split(inDF, test_size=0.1) #split to train and test. Large train set means 10% is good enough
  
+#separate the labels from the training set
 y_train = train['match']
 y_test = test['match']
 
@@ -69,6 +81,10 @@ test = test.drop(['match'],axis=1)
 test, train = test.values, train.values
 
 def create_model(layers=best_params['layers'], nodes=best_params['nodes'], activation='LeakyReLU', regularizer=None):
+    '''
+    builds a keras models using the hyperparameters provided. Layers are fully connected, and Adam is used for the optimizer
+    '''
+
     model = Sequential()
     model.add(Dense(nodes, input_dim = nFeatures, kernel_regularizer=regularizer))
     model.add(LeakyReLU(alpha=0.05))
@@ -86,11 +102,12 @@ def create_model(layers=best_params['layers'], nodes=best_params['nodes'], activ
     return model
 
 #model=KerasClassifier(build_fn=create_model, verbose=1)
-model=KerasRegressor(build_fn=create_model, verbose=1)
-result=model.fit(train, y_train, validation_split=0.1, epochs=best_params['epochs'])
+model=KerasRegressor(build_fn=create_model, verbose=1) #build the model
+result=model.fit(train, y_train, validation_split=0.1, epochs=best_params['epochs']) # train the model
 
-model.model.save("models/keras_model_"+outDir+".h5")
+model.model.save("models/keras_model_"+outDir+".h5") # save the output
 
+#plot the performance of the mode
 y_train_pred = model.predict(train)
 y_test_pred = model.predict(test)
 
