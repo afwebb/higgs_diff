@@ -44,27 +44,27 @@ Here are a few plots summarizing the performance of the models used.
 
 In the 2lSS channel, the model identifies the b-jets correctly 74% of the time, and at leasy one correctly 99% of the time. The ROC curve and the output score for the model can be found below.
 
-![](topMatching/plots/top2lSS/keras_roc.png )  |  ![](topMatching/plots/top2lSS/keras_score.png )
+![](topMatching/plots/top2lSS/keras_roc.png | width=100)  |  ![](topMatching/plots/top2lSS/keras_score.png | width=100)
 
-![](topMatching/plots/top3l/keras_roc.png )  |  ![](topMatching/plots/top3l/keras_score.png )
+![](topMatching/plots/top3l/keras_roc.png | width=100)  |  ![](topMatching/plots/top3l/keras_score.png | width=100)
 
 ### Higgs Reconstruction - 
 
-![](higgsMatching/plots/higgsTop3lF/keras_roc.png )  |  ![](higgsMatching/plots/higgsTop3lF/keras_score.png )
+![](higgsMatching/plots/higgsTop3lF/keras_roc.png | width=100)  |  ![](higgsMatching/plots/higgsTop3lF/keras_score.png | width=100)
 
-![](higgsMatching/plots/higgsTop3lS/keras_roc.png )  |  ![](higgsMatching/plots/higgsTop3lS/keras_score.png )
+![](higgsMatching/plots/higgsTop3lS/keras_roc.png | width=100)  |  ![](higgsMatching/plots/higgsTop3lS/keras_score.png | width=100)
 
-![](higgsMatching/plots/higgsTop2lSS/keras_roc.png )  |  ![](higgsMatching/plots/higgsTop2lSS/keras_score.png )
+![](higgsMatching/plots/higgsTop2lSS/keras_roc.png | width=100)  |  ![](higgsMatching/plots/higgsTop2lSS/keras_score.png | width=100)
 
 ### 3l Decay Channel
 
-![](decay3l/plots/decay3l/keras_roc.png )  |  ![](decay3l/plots/decay3l/keras_score.png )
+![](decay3l/plots/decay3l/keras_roc.png | width=100)  |  ![](decay3l/plots/decay3l/keras_score.png | width=100)
 
 ### pT Prediction - 
 
-![](ptPrediction/plots/higgsTop3lF/keras_test_pt_scatter.png )  |  ![](ptPrediction/plots/higgsTop3lF/keras_roc.png )
+![](ptPrediction/plots/higgsTop3lF/keras_test_pt_scatter.png | width=100)  |  ![](ptPrediction/plots/higgsTop3lF/keras_roc.png | width=100)
 
-![](ptPrediction/plots/higgsTop3lS/keras_test_pt_scatter.png )  |  ![](ptPrediction/plots/higgsTop3lS/keras_roc.png )
+![](ptPrediction/plots/higgsTop3lS/keras_test_pt_scatter.png | width=100)  |  ![](ptPrediction/plots/higgsTop3lS/keras_roc.png | width=100)
 
-![](ptPrediction/plots/higgsTop2lSS/keras_test_pt_scatter.png )  |  ![](ptPrediction/plots/higgsTop2lSS/keras_roc.png )
+![](ptPrediction/plots/higgsTop2lSS/keras_test_pt_scatter.png | width=100)  |  ![](ptPrediction/plots/higgsTop2lSS/keras_roc.png | width=100)
 
