@@ -29,7 +29,7 @@ outDir = sys.argv[2]
 
 ##Use optimal parameters obtained from grid search 
 if '2lSS' in outDir:
-    epochs = 10
+    epochs = 120
     layers = 7
     nodes = 60
 elif outDir=='higgs3lS' or outDir=='higgsTop3lS' or outDir=='testHiggsTop3lS':
@@ -112,4 +112,4 @@ y_train_pred = y_pred_train*yMax
 y_test_pred = y_pred_test*yMax
 
 #plot the performance of the model
-makePlots('keras', model, outDir, y_train, y_test, y_train_pred, y_test_pred)
+makePlots('keras', result, outDir, y_train, y_test, y_train_pred, y_test_pred)

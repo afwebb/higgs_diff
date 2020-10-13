@@ -55,12 +55,15 @@ This get the pairing correct 78% of the time.
 ### Higgs Reconstruction - 
 
 3l Fully leptonic channel:
+
 <img src="higgsMatching/plots/higgsTop3lF/keras_roc.png" width="400"> <img src="higgsMatching/plots/higgsTop3lF/keras_score.png" width="400">
 
 3l Semi-leptonic channel:
+
 <img src="higgsMatching/plots/higgsTop3lS/keras_roc.png" width="400"> <img src="higgsMatching/plots/higgsTop3lS/keras_score.png" width="400">
 
 2lSS channel:
+
 <img src="higgsMatching/plots/higgsTop2lSS/keras_roc.png" width="400"> <img src="higgsMatching/plots/higgsTop2lSS/keras_score.png" width="400">
 
 ### 3l Decay Channel
@@ -74,11 +77,14 @@ A separate model is used in the 3l channel to determine whether the Higgs decaye
 The regressed Higgs Pt is shown below, along with how well the model does at distinguishing high Pt (>150 GeV) and low Pt (<150 GeV) Higgs.
 
 3l Fully Leptonic Channel:
+
 <img src="ptPrediction/plots/higgsTop3lF/keras_test_pt_scatter.png" width="400"> <img src="ptPrediction/plots/higgsTop3lF/keras_roc.png" width="400">
 
 3l Semi-leptonic Channel:
+
 <img src="ptPrediction/plots/higgsTop3lS/keras_test_pt_scatter.png" width="400"> <img src="ptPrediction/plots/higgsTop3lS/keras_roc.png" width="400">
 
 2lSS Channel:
+
 <img src="ptPrediction/plots/higgsTop2lSS/keras_test_pt_scatter.png" width="400"> <img src="ptPrediction/plots/higgsTop2lSS/keras_roc.png" width="400">
 

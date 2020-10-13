@@ -73,7 +73,7 @@ def makePlots(alg, model, outDir, y_train, y_test, y_train_pred, y_test_pred):
         
         plt.figure()
         plt.scatter(y_test[:scatterSize]/1000, y_test_pred[:scatterSize]/1000, c=np.log(z_test), edgecolor='')
-        plt.title("Keras Test Data, MSE=%f" %(test_loss))
+        plt.title("Keras Test Data, MSE=%0.1f" %(test_loss))
         plt.xlabel('Truth $p_T$ [GeV]')
         plt.ylabel('Predicted $p_T$ [GeV]')
         plt.xlim(1,1000)
@@ -87,7 +87,7 @@ def makePlots(alg, model, outDir, y_train, y_test, y_train_pred, y_test_pred):
         
         plt.figure()
         plt.scatter(y_train[:scatterSize]/1000, y_train_pred[:scatterSize]/1000, c=np.log(z_train), edgecolor='')
-        plt.title("Keras Train Data, MSE=%f" %(train_loss))
+        plt.title("Keras Train Data, MSE=%0.1f" %(train_loss))
         plt.xlabel('Truth $p_T$ [GeV]')
         plt.ylabel('Predicted $p_T$ [GeV]')
         plt.xlim(0,1000)
