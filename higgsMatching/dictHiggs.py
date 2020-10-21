@@ -475,6 +475,14 @@ def higgsTopDict3lF(nom, lepIdx, topIdx0, topIdx1, topScore, match=-1):
     k['top_Pt_0'] = top0.Pt()   
     k['top_Pt_1'] = top1.Pt()  
  
+    #k['lep_Eta_H1'] = lepH1.Eta()
+    #k['lep_Eta_H0'] = lepH0.Eta()                                                                                           
+    #k['lep_Eta_T'] = lepT.Eta()
+
+    #k['lep_Phi_H1'] = lepH1.Phi() - met.Phi()
+    #k['lep_Phi_H0'] = lepH0.Phi() - met.Phi()                                                                        
+    #k['lep_Phi_T'] = lepT.Phi() - met.Phi()
+
     k['dPhi_lH1_met'] = lepH1.Phi() - met.Phi()
     k['dPhi_lT_met'] = lepT.Phi() - met.Phi()
    

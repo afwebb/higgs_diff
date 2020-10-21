@@ -25,6 +25,10 @@ def decayDict(nom, score3lF, score3lS, topIdx0, topIdx1, topScore, match=-1):
     k['lep_Eta_1'] = lep1.Eta()
     k['lep_Eta_2'] = lep2.Eta()
 
+    k['lep_Phi_0'] = lep0.Phi() - met.Phi()   
+    k['lep_Phi_1'] = lep1.Phi() - met.Phi()                                                                          
+    k['lep_Phi_2'] = lep2.Phi() - met.Phi()
+
     k['Mll01'] = (lep0+lep1).M()
     k['Mll02'] = (lep0+lep2).M()
     k['Mll12'] = (lep1+lep2).M()
@@ -55,6 +59,8 @@ def decayDict(nom, score3lF, score3lS, topIdx0, topIdx1, topScore, match=-1):
  
     k['HT_jets'] = nom.HT_jets
     k['nJets_OR'] = nom.nJets_OR
+    k['nJets_OR_DL1r_85'] = nom.nJets_OR_DL1r_85
+    k['nJets_OR_DL1r_60'] = nom.nJets_OR_DL1r_60
     k['total_charge'] = nom.total_charge
     k['trilep_type'] = nom.trilep_type
     

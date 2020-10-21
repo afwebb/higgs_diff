@@ -32,6 +32,7 @@ print("%         REGIONS           ", file=texfile)
 print("%---------------------------\n", file=texfile)
 
 for c in inDF:
+    if c=='match': continue
     print(f'"{c}"')
 
     xName, r = name(c)

@@ -30,16 +30,16 @@ outDir = sys.argv[2]
 ##Use optimal parameters obtained from grid search 
 if '2lSS' in outDir:
     epochs = 120
-    layers = 7
-    nodes = 60
+    layers = 8
+    nodes = 75
 elif outDir=='higgs3lS' or outDir=='higgsTop3lS' or outDir=='testHiggsTop3lS':
     epochs = 120
-    layers = 6
-    nodes = 70
+    layers = 9
+    nodes = 75
 elif outDir=='higgs3lF' or outDir=='higgsTop3lF':
     epochs = 120
-    layers = 7
-    nodes = 50
+    layers = 5
+    nodes = 60
 else:
     epochs = 120
     layers = 5
@@ -87,7 +87,7 @@ def create_model(layers=layers, nodes=nodes, regularizer=None, activation='relu'
         #model.add(Dropout(0.2))
         model.add(Dense(nodes, activation=activation, kernel_regularizer=regularizer))
         model.add(LeakyReLU(alpha=0.05))
-        #model.add(BatchNormalization())
+        model.add(BatchNormalization())
     # one output, mapped to [0,1] by sigmoid function
     model.add(Dense(1, activation='sigmoid'))
     # assemble the model (Translate to TensorFlow)
