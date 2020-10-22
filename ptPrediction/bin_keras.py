@@ -25,11 +25,11 @@ if outDir=='higgsTop2lSS' or outDir=='higgsTop2lSSBin':
     nodes = 75
 elif outDir=='higgsTop3lF' or outDir=='higgsTop3lFBin':
     epochs = 120
-    layers = 8
-    nodes = 75
+    layers = 5
+    nodes = 60
 elif outDir=='higgsTop3lS' or outDir=='higgsTop3lSBin':
     epochs = 120
-    layers = 8
+    layers = 7
     nodes = 75
 else:
     epochs = 6

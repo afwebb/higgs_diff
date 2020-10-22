@@ -29,15 +29,15 @@ outDir = sys.argv[2]
 
 ##Use optimal parameters obtained from grid search 
 if '2lSS' in outDir:
-    epochs = 120
-    layers = 8
+    epochs = 150
+    layers = 6
     nodes = 75
 elif outDir=='higgs3lS' or outDir=='higgsTop3lS' or outDir=='testHiggsTop3lS':
-    epochs = 120
-    layers = 9
+    epochs = 150
+    layers = 6
     nodes = 75
 elif outDir=='higgs3lF' or outDir=='higgsTop3lF':
-    epochs = 120
+    epochs = 150
     layers = 5
     nodes = 60
 else:
@@ -87,7 +87,7 @@ def create_model(layers=layers, nodes=nodes, regularizer=None, activation='relu'
         #model.add(Dropout(0.2))
         model.add(Dense(nodes, activation=activation, kernel_regularizer=regularizer))
         model.add(LeakyReLU(alpha=0.05))
-        model.add(BatchNormalization())
+        #model.add(BatchNormalization())
     # one output, mapped to [0,1] by sigmoid function
     model.add(Dense(1, activation='sigmoid'))
     # assemble the model (Translate to TensorFlow)
@@ -110,6 +110,13 @@ y_train = y_train*yMax
 y_test = y_test*yMax
 y_train_pred = y_pred_train*yMax
 y_test_pred = y_pred_test*yMax
+
+if '2lSS' in outDir:
+    y_train_pred = 1.3*(y_train_pred-30e3)
+    y_test_pred = 1.3*(y_test_pred-30e3)
+elif '3lS' in outDir:
+    y_train_pred = 1.2*(y_train_pred-20e3)                                                                             
+    y_test_pred = 1.2*(y_test_pred-20e3)
 
 #plot the performance of the model
 makePlots('keras', result, outDir, y_train, y_test, y_train_pred, y_test_pred)

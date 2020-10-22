@@ -67,8 +67,8 @@ def makePlots(alg, model, outDir, y_train, y_test, y_train_pred, y_test_pred):
         #Pt scatter density plot
 
         #make normalized 2d hist
-        plt.figure()
-        h2d, xedges, yedges = np.histogram2d(y_test, y_test_pred, range=[[0,500e3],[0,500e3]], bins=10)
+        plt.figure(figsize=[8.5,6])
+        h2d, xedges, yedges = np.histogram2d(y_test, y_test_pred, range=[[0,600e3],[0,600e3]], bins=12)
         h2dNorm = h2d/h2d.sum(axis=0, keepdims=True)
         ax = sns.heatmap(h2dNorm, cmap='viridis', annot=True, fmt='0.2f', 
                 xticklabels=xedges[1:].astype(int)//1000, yticklabels=yedges[1:].astype(int)//1000,
