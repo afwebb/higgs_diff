@@ -31,7 +31,7 @@ nameList = []
 
 for c in inDF:
     print(f'"{c}"')
-    if c=='match': continue
+    if c=='match' or c=='higgs_pt': continue
     xName, r = name(c)
     xName = xName.replace(" [GeV]", '')
     nameList.append(xName)

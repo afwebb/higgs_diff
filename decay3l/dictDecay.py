@@ -29,18 +29,18 @@ def decayDict(nom, score3lF, score3lS, topIdx0, topIdx1, topScore, match=-1):
     k['lep_Phi_1'] = lep1.Phi() - met.Phi()                                                                          
     k['lep_Phi_2'] = lep2.Phi() - met.Phi()
 
-    k['Mll01'] = (lep0+lep1).M()
-    k['Mll02'] = (lep0+lep2).M()
-    k['Mll12'] = (lep1+lep2).M()
+    k['Ml0l1'] = (lep0+lep1).M()
+    k['Ml0l2'] = (lep0+lep2).M()
+    k['Ml1l2'] = (lep1+lep2).M()
 
-    k['dRll01'] = lep0.DeltaR(lep1)
-    k['dRll02'] = lep0.DeltaR(lep2)                                                                                 
-    k['dRll12'] = lep1.DeltaR(lep2)
+    k['dRl0l1'] = lep0.DeltaR(lep1)
+    k['dRl0l2'] = lep0.DeltaR(lep2)                                                                                 
+    k['dRl1l2'] = lep1.DeltaR(lep2)
 
     k['met'] = nom.met_met
-    k['Mll01Met'] = (lep0+lep1+met).M()
-    k['Mll02Met'] = (lep0+lep2+met).M()
-    k['Mll12Met'] = (lep1+lep2+met).M()
+    k['Ml0l1met'] = (lep0+lep1+met).M()
+    k['Ml0l2met'] = (lep0+lep2+met).M()
+    k['Ml1l2met'] = (lep1+lep2+met).M()
    
     k['dRl0t0'] = lep0.DeltaR(top0) 
     k['Ml0t0'] = (lep0+top0).M()

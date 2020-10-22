@@ -14,6 +14,7 @@ import pickle
 import sys
 import torch
 import scipy
+from pt_plots import makePlots
 
 inFile = sys.argv[1]
 inDF = pd.read_csv(inFile)
@@ -43,7 +44,7 @@ params = {
     'lambda':0
 }
 
-gbm = xgb.cv(params, xgb_train, num_boost_round=120, verbose_eval=True)
+gbm = xgb.cv(params, xgb_train, num_boost_round=500, verbose_eval=True)
 
 best_nrounds = pd.Series.idxmin(gbm['test-rmse-mean'])
 print( best_nrounds)
@@ -54,6 +55,8 @@ pickle.dump(bst, open("models/xgb_"+outDir+".dat", "wb"))
 y_test_pred = bst.predict(xgb_test)
 y_train_pred = bst.predict(xgb_train)
 
+makePlots('xgb', bst, outDir, y_train, y_test, y_train_pred, y_test_pred)
+'''
 test_loss = np.sqrt(sk.metrics.mean_squared_error(y_test, y_test_pred))
 train_loss = np.sqrt(sk.metrics.mean_squared_error(y_train, y_train_pred))
 
@@ -127,4 +130,4 @@ plt.xlabel('Truth Pt')
 plt.ylabel('Predicted Pt')
 plt.plot([0,1000000],[0,1000000],zorder=10)
 plt.savefig('plots/'+outDir+'/xgb_train_pt_scatter.png')
-
+'''

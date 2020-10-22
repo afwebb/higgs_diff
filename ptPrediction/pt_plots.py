@@ -66,6 +66,18 @@ def makePlots(alg, model, outDir, y_train, y_test, y_train_pred, y_test_pred):
     if not binned:
         #Pt scatter density plot
 
+        #make normalized 2d hist
+        plt.figure()
+        h2d, xedges, yedges = np.histogram2d(y_test, y_test_pred, range=[[0,500e3],[0,500e3]], bins=10)
+        h2dNorm = h2d/h2d.sum(axis=0, keepdims=True)
+        ax = sns.heatmap(h2dNorm, cmap='viridis', annot=True, fmt='0.2f', 
+                xticklabels=xedges[1:].astype(int)//1000, yticklabels=yedges[1:].astype(int)//1000,
+                cbar=False)
+        ax.invert_yaxis()
+        ax.set_xlabel("Truth $p_T$ [GeV]")
+        ax.set_ylabel('Predicted $p_T$ [GeV]')
+        plt.savefig(f'plots/{outDir}/{alg}_test_norm2Dhist.png')
+
         # Calculate the point density                                                                            
         scatterSize = 40000
         xy = np.vstack([y_test[:scatterSize], y_test_pred[:scatterSize]])
