@@ -1,0 +1,158 @@
+3l Top Matching Tested on ../truthMatching/3l/mc16d/345874.root
+Correct: 0.68
+One Jet Correct: 0.99
+
+
+3l Top Matching Tested on ../truthMatching/3l/mc16d/345874.root
+Correct: 0.7
+One Jet Correct: 0.99
+
+
+3l Top Matching Tested on ../truthMatching/3l/mc16d/345874.root, 3832 events
+Correct: 0.701
+One Jet Correct: 0.991
+
+3l Top Score > 0.3, 3708 events
+Correct: 0.715
+One Jet Correct: 0.993
+
+3l Top Score < 0.3, 124 events
+Correct: 0.298
+One Jet Correct: 0.944
+
+
+3l Top Matching Tested on ../truthMatching/3l/mc16d/345874.root, 3832 events
+Correct: 0.701
+One Jet Correct: 0.991
+
+3l Top Score > 0.6, 3123 events
+Correct: 0.781
+One Jet Correct: 0.996
+
+3l Top Score < 0.6, 709 events
+Correct: 0.35
+One Jet Correct: 0.97
+
+
+3l Top Matching Tested on ../truthMatching/3l/mc16d/346345.root, 3812 events
+Correct: 0.742
+One Jet Correct: 0.991
+
+3l Top Score > 0.6, 3608 events
+Correct: 0.764
+One Jet Correct: 0.992
+
+3l Top Score < 0.6, 204 events
+Correct: 0.348
+One Jet Correct: 0.975
+
+
+3l Top Matching Tested on ../truthMatching/3l/mc16d/345874.root, 3777 events
+Correct: 0.701
+One Jet Correct: 0.993
+
+MisId Higgs Jets: 0.019
+
+3l Top Score > 0.6, 3549 events
+Correct: 0.722
+One Jet Correct: 0.995
+
+3l Top Score < 0.6, 228 events
+Correct: 0.382
+One Jet Correct: 0.969
+
+
+3l Top Matching Tested on ../truthMatching/3l/mc16d/346345.root, 3812 events
+Correct: 0.745
+One Jet Correct: 0.991
+
+3l Top Score > 0.6, 3550 events
+Correct: 0.774
+One Jet Correct: 0.993
+
+3l Top Score < 0.6, 262 events
+Correct: 0.347
+One Jet Correct: 0.958
+
+3l Top Matching Tested on ../truthMatching/3l/mc16d/346345.root, 3812 events
+Correct: 0.761
+One Jet Correct: 0.99
+
+3l Top Score > 0.6, 3359 events
+Correct: 0.806
+One Jet Correct: 0.993
+
+3l Top Score < 0.6, 453 events
+Correct: 0.422
+One Jet Correct: 0.971
+
+
+3l Top Matching Tested on ../truthMatching/3l/mc16d/346345.root, 3812 events
+model used: models/keras_model_all3l.h5
+Correct: 0.766
+One Jet Correct: 0.992
+
+3l Top Score > 0.6, 2529 events
+Correct: 0.897
+One Jet Correct: 0.998
+
+3l Top Score < 0.6, 1283 events
+Correct: 0.507
+One Jet Correct: 0.981
+
+
+3l Top Matching Tested on ../truthMatching/3l/mc16e/346345.root, 3837 events
+model used: models/keras_model_all3l.h5
+Correct: 0.786
+One Jet Correct: 0.991
+
+3l Top Score > 0.6, 2625 events
+Correct: 0.896
+One Jet Correct: 0.995
+
+3l Top Score < 0.6, 1212 events
+Correct: 0.549
+One Jet Correct: 0.98
+
+1b Correct: 0.69
+2b Correct: 0.896
+>=3b Correct: 0.527
+3l Top Matching Tested on ../truthMatching/3l/mc16d/346345.root, 3684 events
+model used: models/keras_model_top3l.h5
+Correct: 0.778
+One Jet Correct: 0.993
+
+3l Top Matching Tested on ../truthMatching/3l/mc16d/346345.root, 3684 events
+model used: models/keras_model_top3l.h5
+Correct: 0.775
+One Jet Correct: 0.994
+
+3l Top Score > 0.6, 2881 events
+Correct: 0.863
+One Jet Correct: 0.997
+
+3l Top Score < 0.6, 803 events
+Correct: 0.46
+One Jet Correct: 0.985
+
+
+1b Correct: 0.661
+2b Correct: 0.9
+>=3b Correct: 0.517
+3l Top Matching Tested on ../truthMatching/3l/mc16d/346345.root, 3684 events
+model used: models/keras_model_top3l.h5
+Correct: 0.781
+One Jet Correct: 0.994
+
+3l Top Score > 0.6, 3648 events
+Correct: 0.786
+One Jet Correct: 0.995
+
+3l Top Score < 0.6, 36 events
+Correct: 0.333
+One Jet Correct: 0.944
+
+
+1b Correct: 0.671
+2b Correct: 0.9
+>=3b Correct: 0.552

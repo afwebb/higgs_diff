@@ -1,0 +1,306 @@
+2lSS Top Matching Tested on ../truthMatching/2lSS/mc16d/345874.root
+Correct: 0.65
+One Jet Correct: 0.99
+
+2lSS Top Matching Tested on ../truthMatching/2lSS/mc16d/345874.root
+Correct: 0.67
+One Jet Correct: 0.99
+
+2lSS Top Score > 0.3, 3758 events
+Correct: 0.672
+One Jet Correct: 0.987
+
+2lSS Top Matching Tested on ../truthMatching/2lSS/mc16d/345874.root, 3777 events
+Correct: 0.67
+One Jet Correct: 0.987
+
+2lSS Top Matching Tested on ../truthMatching/2lSS/mc16d/346344.root, 3742 events
+Correct: 0.68
+One Jet Correct: 0.986
+
+2lSS Top Matching Tested on ../truthMatching/2lSS/mc16d/345874.root, 3777 events
+Correct: 0.671
+One Jet Correct: 0.988
+
+2lSS Top Score > 0.6, 3437 events
+Correct: 0.706
+One Jet Correct: 0.99
+
+2lSS Top Score < 0.6, 340 events
+Correct: 0.312
+One Jet Correct: 0.965
+
+2lSS Top Matching Tested on ../truthMatching/2lSS/mc16d/345874.root, 3777 events
+Correct: 0.67
+One Jet Correct: 0.986
+
+2lSS Top Score > 0.6, 3476 events
+Correct: 0.703
+One Jet Correct: 0.99
+
+2lSS Top Score < 0.6, 301 events
+Correct: 0.292
+One Jet Correct: 0.947
+
+
+2lSS Top Matching Tested on ../truthMatching/2lSS/mc16d/346344.root, 3742 events
+Correct: 0.678
+One Jet Correct: 0.987
+
+2lSS Top Score > 0.6, 3449 events
+Correct: 0.711
+One Jet Correct: 0.99
+
+2lSS Top Score < 0.6, 293 events
+Correct: 0.29
+One Jet Correct: 0.949
+
+
+2lSS Top Matching Tested on ../truthMatching/2lSS/mc16d/346344.root, 3742 events
+Correct: 0.68
+One Jet Correct: 0.986
+
+2lSS Top Score > 0.6, 3399 events
+Correct: 0.72
+One Jet Correct: 0.989
+
+2lSS Top Score < 0.6, 343 events
+Correct: 0.286
+One Jet Correct: 0.95
+
+2lSS Top Matching Tested on ../truthMatching/2lSS/mc16d/346344.root, 3742 events
+Correct: 0.707
+One Jet Correct: 0.99
+
+2lSS Top Score > 0.6, 3177 events
+Correct: 0.766
+One Jet Correct: 0.993
+
+2lSS Top Score < 0.6, 565 events
+Correct: 0.375
+One Jet Correct: 0.973
+
+2lSS Top Matching Tested on ../truthMatching/2lSS/mc16d/346344.root, 3742 events - All Events
+Correct: 0.709
+One Jet Correct: 0.989
+
+2lSS Top Score > 0.6, 2066 events
+Correct: 0.874
+One Jet Correct: 0.996
+
+2lSS Top Score < 0.6, 1676 events
+Correct: 0.505
+One Jet Correct: 0.982
+
+
+2lSS Top Matching Tested on ../truthMatching/2lSS/mc16e/346344.root, 3819 events
+Correct: 0.141
+One Jet Correct: 0.707
+
+2lSS Top Matching Tested on ../truthMatching/2lSS/mc16e/346344.root, 37897 events
+Correct: 0.703
+One Jet Correct: 0.987
+
+2lSS Top Score > 0.6, 20295 events
+Correct: 0.88
+One Jet Correct: 0.995
+
+2lSS Top Score < 0.6, 17602 events
+Correct: 0.499
+One Jet Correct: 0.979
+
+2lSS Top Matching Tested on ../truthMatching/2lSS/mc16a/346344.root, 3793 events
+model used: models/keras_model_badAllTop.h5
+Correct: 0.675
+One Jet Correct: 0.985
+
+2lSS Top Score > 0.6, 3793 events
+Correct: 0.675
+One Jet Correct: 0.985
+
+2lSS Top Score < 0.6, 0 events
+2lSS Top Matching Tested on ../truthMatching/2lSS/mc16d/346344.root, 56376 events
+model used: models/keras_model_all2lSS.h5
+Correct: 0.703
+One Jet Correct: 0.987
+
+2lSS Top Score > 0.6, 30242 events
+Correct: 0.881
+One Jet Correct: 0.994
+
+2lSS Top Score < 0.6, 26134 events
+Correct: 0.497
+One Jet Correct: 0.978
+
+2lSS Top Matching Tested on ../truthMatching/2lSS/mc16d/346344.root, 3605 events
+model used: models/keras_model_all2lSS.h5
+Correct: 0.709
+One Jet Correct: 0.988
+2lSS Top Score > 0.6, 2024 events
+Correct: 0.883
+2lSS Top Score < 0.6, 1581 events
+Correct: 0.486
+1b Correct: 0.526
+2b Correct: 0.866
+>=3b Correct: 0.597
+
+2lSS Top Matching Tested on ../truthMatching/2lSS/mc16d/346344.root, 3605 events
+model used: models/keras_model_all2lSS.h5
+Correct: 0.709
+One Jet Correct: 0.988
+2lSS Top Score > 0.6, 2821 events
+Correct: 0.806
+One Jet Correct: 0.991
+2lSS Top Score < 0.6, 784 events
+Correct: 0.358
+One Jet Correct: 0.974
+1b Correct: 0.526
+2b Correct: 0.866
+>=3b Correct: 0.597
+2lSS Top Matching Tested on ../truthMatching/2lSS/mc16d/346344.root, 215 events
+model used: models/keras_model_3b2lSS.h5
+Correct: 0.595
+One Jet Correct: 0.977
+
+2lSS Top Score > 0.6, 117 events
+Correct: 0.735
+One Jet Correct: 0.991
+
+2lSS Top Score < 0.6, 98 events
+Correct: 0.429
+One Jet Correct: 0.959
+
+2lSS Top Matching Tested on ../truthMatching/2lSS/mc16d/346344.root, 1482 events
+model used: models/keras_model_1b2lSS.h5
+Correct: 0.534
+One Jet Correct: 0.982
+
+2lSS Top Matching Tested on ../truthMatching/2lSS/mc16d/346344.root, 1890 events
+model used: models/keras_model_2b2lSS.h5
+Correct: 0.863
+One Jet Correct: 0.995
+
+2lSS Top Matching Tested on ../truthMatching/2lSS/mc16d/346345.root, 3600 events
+model used: models/keras_model_top2lSS.h5
+Correct: 0.725
+One Jet Correct: 0.988
+
+2lSS Top Matching Tested on ../truthMatching/2lSS/mc16d/346345.root, 3600 events
+model used: models/keras_model_top2lSS.h5
+Correct: 0.725
+One Jet Correct: 0.988
+
+2lSS Top Score > 0.6, 2753 events
+Correct: 0.823
+One Jet Correct: 0.993
+
+2lSS Top Score < 0.6, 847 events
+Correct: 0.406
+One Jet Correct: 0.972
+
+
+1b Correct: 0.605
+2b Correct: 0.876
+>=3b Correct: 0.475
+2lSS Top Matching Tested on ../truthMatching/2lSS/mc16d/346344.root, 3605 events
+model used: models/keras_model_top2lSS.h5
+Correct: 0.713
+One Jet Correct: 0.988
+
+2lSS Top Score > 0.6, 2627 events
+Correct: 0.822
+One Jet Correct: 0.995
+
+2lSS Top Score < 0.6, 978 events
+Correct: 0.421
+One Jet Correct: 0.968
+
+
+1b Correct: 0.541
+2b Correct: 0.865
+>=3b Correct: 0.579
+2lSS Top Matching Tested on ../truthMatching/2lSS/mc16d/346345.root, 3600 events
+model used: models/keras_model_top2lSS.h5
+Correct: 0.723
+One Jet Correct: 0.986
+
+2lSS Top Score > 0.6, 2601 events
+Correct: 0.835
+One Jet Correct: 0.992
+
+2lSS Top Score < 0.6, 999 events
+Correct: 0.43
+One Jet Correct: 0.971
+
+
+1b Correct: 0.599
+2b Correct: 0.877
+>=3b Correct: 0.472
+2lSS Top Matching Tested on ../truthMatching/2lSS/mc16d/346344.root, 3605 events
+model used: models/keras_model_top2lSS.h5
+Correct: 0.709
+One Jet Correct: 0.989
+
+2lSS Top Score > 0.6, 2645 events
+Correct: 0.823
+One Jet Correct: 0.994
+
+2lSS Top Score < 0.6, 960 events
+Correct: 0.394
+One Jet Correct: 0.976
+
+
+1b Correct: 0.535
+2b Correct: 0.862
+>=3b Correct: 0.575
+2lSS Top Matching Tested on ../truthMatching/2lSS/mc16d/346344.root, 3605 events
+model used: models/keras_model_all2lSS.h5
+Correct: 0.709
+One Jet Correct: 0.988
+
+2lSS Top Score > 0.6, 2821 events
+Correct: 0.806
+One Jet Correct: 0.991
+
+2lSS Top Score < 0.6, 784 events
+Correct: 0.358
+One Jet Correct: 0.974
+
+
+1b Correct: 0.526
+2b Correct: 0.866
+>=3b Correct: 0.597
+2lSS Top Matching Tested on ../truthMatching/2lSS/mc16d/346344.root, 3605 events
+model used: models/keras_model_top2lSSdownsampled.h5
+Correct: 0.709
+One Jet Correct: 0.988
+
+2lSS Top Score > 0.6, 3552 events
+Correct: 0.716
+One Jet Correct: 0.988
+
+2lSS Top Score < 0.6, 53 events
+Correct: 0.245
+One Jet Correct: 1.0
+
+
+1b Correct: 0.538
+2b Correct: 0.861
+>=3b Correct: 0.571
+2lSS Top Matching Tested on ../truthMatching/2lSS/mc16d/346344.root, 3605 events
+model used: models/keras_model_top2lSS.h5
+Correct: 0.711
+One Jet Correct: 0.989
+
+2lSS Top Score > 0.6, 3586 events
+Correct: 0.714
+One Jet Correct: 0.989
+
+2lSS Top Score < 0.6, 19 events
+Correct: 0.105
+One Jet Correct: 1.0
+
+
+1b Correct: 0.538
+2b Correct: 0.862
+>=3b Correct: 0.584

@@ -1,0 +1,13 @@
+3l:
+Both Correct 0.7032845707976815
+One Correct 0.9953077560033122
+1b Correct: 0.489
+2b Correct: 0.92
+>=3b Correct: 0.57
+
+2lSS:
+Both Correct 0.6772222222222222
+One Correct 0.9880555555555556
+1b Correct: 0.441
+2b Correct: 0.883
+>=3b Correct: 0.563
