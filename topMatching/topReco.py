@@ -68,36 +68,6 @@ def runReco(inf):
             for k in eventsTop:                                                           
                 eventsTop[k].extend(topCombos['flatDicts'][k])
 
-        '''
-        for k in eventsTop:
-            eventsTop[k]+=(x[k] for x in topCombos['floatDicts'])
-
-        for i in range(len(nom.jet_pt)):
-            if nom.jet_jvt[i]<0.59: continue
-            if abs(nom.jet_parents[i])==6 and abs(nom.jet_truthPartonLabel[i])==5:
-                topJets.append(i)
-            else:
-                badJets.append(i)
-            
-        if len(topJets)!=2: continue #Only consider events where both Bs are reconstructed
-        eventsTop.append( topDict( nom, topJets[0], topJets[1], 1 ) ) # Add truth pairing
-
-        # One good jet, one bad
-        for l in range(min([3, len(badJets)]) ):
-            j = random.sample(badJets,1)[0]
-            eventsTop.append( topDict( nom, topJets[0], j, 0 ) )
-
-        # One good, one bad
-        for l in range(min([3, len(badJets)]) ):
-            i = random.sample(badJets,1)[0]
-            eventsTop.append( topDict( nom, i, topJets[1], 0 ) )
-
-        # Both jets bad
-        for l in range(min([6, len(badJets)]) ):
-            if len(badJets)>2:
-                i,j = random.sample(badJets,2)
-                eventsTop.append( topDict( nom, i, j, 0 ) )
-        '''
     # Convert to dataframe, shuffle entries
     dfTop = pd.DataFrame.from_dict(eventsTop)
     dfTop = shuffle(dfTop)
@@ -105,10 +75,10 @@ def runReco(inf):
     #Write output to csv file
     outF = '/'.join(inf.split("/")[-2:]).replace('.root','.csv')
     if channel=='3l':
-        dfTop.to_csv('csvFiles/top3l/'+outF, index=False, float_format='%.3f')
+        dfTop.to_csv('csvFiles/top3l_15/'+outF, index=False, float_format='%.3f')
     else:
-        dfTop.to_csv('csvFiles/top2lSS/'+outF, index=False, float_format='%.3f')        
+        dfTop.to_csv('csvFiles/top2lSS_15/'+outF, index=False, float_format='%.3f')        
 
 #Run in parallel
 linelist = [line.rstrip() for line in open(sys.argv[1])]
-Parallel(n_jobs=10)(delayed(runReco)(inf) for inf in linelist)
+Parallel(n_jobs=12)(delayed(runReco)(inf) for inf in linelist)

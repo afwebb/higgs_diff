@@ -48,11 +48,11 @@ def jetCombosTop(channel, nom, withMatch):
 
     combosTop = {'flatDicts':{},'fourVecDicts':[],'jetIdx':[],'truthComb':[], 'higgsIdx':[]}
     for i in range(len(nom.jet_pt)-1):
-        if nom.jet_jvt[i]<0.59 or abs(nom.jet_eta[i])>4: continue #Only include jets that pass JVT cut
+        if nom.jet_pt[i]<15e3 or nom.jet_jvt[i]<0.59 or abs(nom.jet_eta[i])>4: continue #Only include jets that pass JVT cut
         if nom.jet_parents[i]==25 and i not in combosTop['higgsIdx']:
             combosTop['higgsIdx'].append(i)
         for j in range(i+1, len(nom.jet_pt)):
-            if nom.jet_jvt[j]<0.59 or abs(nom.jet_eta[j])>4: continue 
+            if nom.jet_pt[j]<15e3 or nom.jet_jvt[j]<0.59 or abs(nom.jet_eta[j])>4: continue 
             combosTop['jetIdx'].append([i,j])
             if nom.jet_parents[j]==25 and j not in combosTop['higgsIdx']:
                 combosTop['higgsIdx'].append(j)
@@ -112,9 +112,9 @@ def higgsCombos(channel, nom, withMatch):
     if channel=='2lSS' or channel=='3lS': # for these channel, need 2 jets, 1 lepton
         for l in lepRange:
             for i in range(len(nom.jet_pt)-1):         
-                if nom.jet_jvt[i]<0.59 or abs(nom.jet_eta[i])>3: continue 
+                if nom.jet_pt[i]<15e3 or nom.jet_jvt[i]<0.59 or abs(nom.jet_eta[i])>3: continue 
                 for j in range(i+1, len(nom.jet_pt)): #loop over leptons and jet combos
-                    if nom.jet_jvt[j]<0.59 or abs(nom.jet_eta[j])>3: continue 
+                    if nom.jet_pt[j]<15e3 or nom.jet_jvt[j]<0.59 or abs(nom.jet_eta[j])>3: continue 
                     combosHiggs['pairIdx'].append([l, i, j]) # Keep track of indices of this combo                      
                     isHiggs = 0                                  
                     #Only from Higgs if all three particles are matched to the Higgs
@@ -167,10 +167,10 @@ def higgsTopCombos(channel, nom, topIdx0, topIdx1, topScore, withMatch):
     if channel=='2lSS' or channel=='3lS':
         for l in lepRange:
             for i in range(len(nom.jet_pt)-1):
-                if nom.jet_jvt[i]<0.59 or abs(nom.jet_eta[i])>3: continue
+                if nom.jet_pt[i]<15e3 or nom.jet_jvt[i]<0.59 or abs(nom.jet_eta[i])>3: continue
                 if i in [topIdx0, topIdx1]: continue
                 for j in range(i+1, len(nom.jet_pt)):
-                    if nom.jet_jvt[j]<0.59 or abs(nom.jet_eta[j])>3: continue
+                    if nom.jet_pt[j]<15e3 or nom.jet_jvt[j]<0.59 or abs(nom.jet_eta[j])>3: continue
                     if j in [topIdx0, topIdx1]: continue
                     combosHiggs['pairIdx'].append([l, i,j])
                     isHiggs = 0
