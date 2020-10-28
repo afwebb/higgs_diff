@@ -304,3 +304,20 @@ One Jet Correct: 1.0
 1b Correct: 0.538
 2b Correct: 0.862
 >=3b Correct: 0.584
+2lSS Top Matching Tested on ../truthMatching/2lSS/mc16d/346344.root, 3517 events
+model used: models/keras_model_top2lSS.h5
+Correct: 0.722
+One Jet Correct: 0.991
+
+2lSS Top Score > 0.6, 3441 events
+Correct: 0.73
+One Jet Correct: 0.991
+
+2lSS Top Score < 0.6, 76 events
+Correct: 0.329
+One Jet Correct: 1.0
+
+
+1b Correct: 0.548
+2b Correct: 0.871
+>=3b Correct: 0.604

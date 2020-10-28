@@ -29,17 +29,20 @@ outDir = sys.argv[2]
 
 ##Use optimal parameters obtained from grid search 
 if '2lSS' in outDir:
-    epochs = 150
-    layers = 6
-    nodes = 75
-elif outDir=='higgs3lS' or outDir=='higgsTop3lS' or outDir=='testHiggsTop3lS':
-    epochs = 150
-    layers = 6
-    nodes = 75
-elif outDir=='higgs3lF' or outDir=='higgsTop3lF':
+    #{"epochs": 120, "layers": 5, "nodes": 40}
     epochs = 150
     layers = 5
-    nodes = 60
+    nodes = 40
+elif outDir=='higgs3lS' or outDir=='higgsTop3lS' or outDir=='testHiggsTop3lS':
+    #{'epochs': 120, 'layers': 8, 'nodes': 40}
+    epochs = 150
+    layers = 8
+    nodes = 40
+elif outDir=='higgs3lF' or outDir=='higgsTop3lF':
+    #{"epochs": 120, "layers": 8, "nodes": 40}
+    epochs = 150
+    layers = 8
+    nodes = 40
 else:
     epochs = 120
     layers = 5

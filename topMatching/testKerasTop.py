@@ -64,6 +64,8 @@ for idx in range(nEntries):
     if '3b' in sys.argv[2] and nom.nJets_OR_DL1r_70!=3: continue
 
     topRes = findBestTopKeras(nom, channel, topModel, topNormFactors)
+    if not topRes:
+        continue
     topMatches, truthBs, topScore = topRes['bestComb'], topRes['truthComb'], topRes['topScore']
     #print(topRes['bestComb'], topRes['truthComb'], topRes['topScore'])
     #topMatches, truthBs = findBestTopKeras(nom, channel, topModel, topNormFactors, 1)

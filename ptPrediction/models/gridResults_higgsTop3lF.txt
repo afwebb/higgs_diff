@@ -1,10 +1,17 @@
-Best params: {"epochs": 100, "layers": 7, "nodes": 50}
-Train: -0.001370, Test: -0.001337 for {'epochs': 100, 'layers': 7, 'nodes': 50} 
-Train: -0.001961, Test: -0.001486 for {'epochs': 100, 'layers': 7, 'nodes': 75} 
-Train: -0.001398, Test: -0.001487 for {'epochs': 100, 'layers': 7, 'nodes': 90} 
-Train: -0.001529, Test: -0.001597 for {'epochs': 100, 'layers': 8, 'nodes': 50} 
-Train: -0.001399, Test: -0.001390 for {'epochs': 100, 'layers': 8, 'nodes': 75} 
-Train: -0.001512, Test: -0.001461 for {'epochs': 100, 'layers': 8, 'nodes': 90} 
-Train: -0.001575, Test: -0.001474 for {'epochs': 100, 'layers': 9, 'nodes': 50} 
-Train: -0.001970, Test: -0.001661 for {'epochs': 100, 'layers': 9, 'nodes': 75} 
-Train: -0.011486, Test: -0.003391 for {'epochs': 100, 'layers': 9, 'nodes': 90} 
+Best params: {"epochs": 120, "layers": 8, "nodes": 40}
+Train: -0.001282, Test: -0.001171 for {'epochs': 120, 'layers': 5, 'nodes': 40} 
+Train: -0.001289, Test: -0.001147 for {'epochs': 120, 'layers': 5, 'nodes': 50} 
+Train: -0.001304, Test: -0.001098 for {'epochs': 120, 'layers': 5, 'nodes': 75} 
+Train: -0.001332, Test: -0.001101 for {'epochs': 120, 'layers': 5, 'nodes': 90} 
+Train: -0.001285, Test: -0.001167 for {'epochs': 120, 'layers': 6, 'nodes': 40} 
+Train: -0.001302, Test: -0.001154 for {'epochs': 120, 'layers': 6, 'nodes': 50} 
+Train: -0.001328, Test: -0.001105 for {'epochs': 120, 'layers': 6, 'nodes': 75} 
+Train: -0.001337, Test: -0.001087 for {'epochs': 120, 'layers': 6, 'nodes': 90} 
+Train: -0.001289, Test: -0.001168 for {'epochs': 120, 'layers': 7, 'nodes': 40} 
+Train: -0.001290, Test: -0.001145 for {'epochs': 120, 'layers': 7, 'nodes': 50} 
+Train: -0.001320, Test: -0.001113 for {'epochs': 120, 'layers': 7, 'nodes': 75} 
+Train: -0.001319, Test: -0.001104 for {'epochs': 120, 'layers': 7, 'nodes': 90} 
+Train: -0.001280, Test: -0.001174 for {'epochs': 120, 'layers': 8, 'nodes': 40} 
+Train: -0.001308, Test: -0.001159 for {'epochs': 120, 'layers': 8, 'nodes': 50} 
+Train: -0.001324, Test: -0.001120 for {'epochs': 120, 'layers': 8, 'nodes': 75} 
+Train: -0.011238, Test: -0.011238 for {'epochs': 120, 'layers': 8, 'nodes': 90} 

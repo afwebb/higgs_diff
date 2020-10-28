@@ -59,3 +59,17 @@ Correct: 0.2
 Lepton Correct: 0.65
 Lepton, One Jet Correct: 0.5
 
+
+
+3lS Higgs Top Matching Tested on ../truthMatching/3l/mc16d/346345.root
+Correct: 0.63
+Lepton Correct: 0.84
+Lepton, One Jet Correct: 0.82
+
+
+
+3lS Higgs Top Matching Tested on ../truthMatching/3l/mc16d/346344.root
+Correct: 0.25
+Lepton Correct: 0.81
+Lepton, One Jet Correct: 0.75
+
