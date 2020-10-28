@@ -31,13 +31,13 @@ outDir = sys.argv[2]
 if '2lSS' in outDir:
     #{"epochs": 120, "layers": 5, "nodes": 40}
     epochs = 150
-    layers = 5
-    nodes = 40
+    layers = 8
+    nodes = 75
 elif outDir=='higgs3lS' or outDir=='higgsTop3lS' or outDir=='testHiggsTop3lS':
     #{'epochs': 120, 'layers': 8, 'nodes': 40}
     epochs = 150
     layers = 8
-    nodes = 40
+    nodes = 75
 elif outDir=='higgs3lF' or outDir=='higgsTop3lF':
     #{"epochs": 120, "layers": 8, "nodes": 40}
     epochs = 150
