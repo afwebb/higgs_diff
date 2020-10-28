@@ -42,11 +42,11 @@ elif outDir=='top3l' or outDir=='all3l':
     best_params = {'epochs': 80, 'layers': 6, 'nodes': 70}
 #elif outDir=='higgsTop2lSS':
 elif 'higgsTop2lSS' in outDir: 
-    best_params = {'epochs': 80, 'layers': 7, 'nodes': 60}
+    best_params = {'epochs': 150, 'layers': 7, 'nodes': 60}
 elif outDir=='higgsTop3lS':
-    best_params = {'epochs': 100, 'layers': 7, 'nodes': 70}
+    best_params = {'epochs': 150, 'layers': 7, 'nodes': 70}
 elif outDir=='higgsTop3lF':
-    best_params = {'epochs': 120, 'layers': 5, 'nodes': 60}
+    best_params = {'epochs': 150, 'layers': 5, 'nodes': 60}
 else:
     best_params = {"epochs": 80, "layers": 5, "nodes": 50}
     #best_params = {"epochs": 120, "layers": 6, "nodes": 90}
@@ -103,7 +103,8 @@ def create_model(layers=best_params['layers'], nodes=best_params['nodes'], activ
 
 #model=KerasClassifier(build_fn=create_model, verbose=1)
 model=KerasRegressor(build_fn=create_model, verbose=1) #build the model
-result=model.fit(train, y_train, validation_split=0.1, epochs=best_params['epochs']) # train the model
+#result=model.fit(train, y_train, validation_split=0.1, epochs=best_params['epochs']) # train the model
+result=model.fit(train, y_train, epochs=best_params['epochs'])
 
 model.model.save("models/keras_model_"+outDir+".h5") # save the output
 

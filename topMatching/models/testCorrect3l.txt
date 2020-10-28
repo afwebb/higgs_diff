@@ -156,3 +156,20 @@ One Jet Correct: 0.944
 1b Correct: 0.671
 2b Correct: 0.9
 >=3b Correct: 0.552
+3l Top Matching Tested on ../truthMatching/3l/mc16d/346345.root, 3609 events
+model used: models/keras_model_top3l.h5
+Correct: 0.796
+One Jet Correct: 0.993
+
+3l Top Score > 0.6, 3531 events
+Correct: 0.803
+One Jet Correct: 0.994
+
+3l Top Score < 0.6, 78 events
+Correct: 0.436
+One Jet Correct: 0.962
+
+
+1b Correct: 0.698
+2b Correct: 0.906
+>=3b Correct: 0.535

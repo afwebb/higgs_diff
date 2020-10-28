@@ -93,4 +93,4 @@ def runReco(inf):
     dfFlat.to_csv('csvFiles/'+outF, index=False)
     
 linelist = [line.rstrip() for line in open(sys.argv[1])]
-Parallel(n_jobs=10)(delayed(runReco)(inf) for inf in linelist)
+Parallel(n_jobs=12)(delayed(runReco)(inf) for inf in linelist)

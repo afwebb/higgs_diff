@@ -1,0 +1,17 @@
+Best params: {"epochs": 120, "layers": 8, "nodes": 40}
+Train: -0.002034, Test: -0.001921 for {'epochs': 120, 'layers': 5, 'nodes': 40} 
+Train: -0.002044, Test: -0.001897 for {'epochs': 120, 'layers': 5, 'nodes': 50} 
+Train: -0.002058, Test: -0.001852 for {'epochs': 120, 'layers': 5, 'nodes': 75} 
+Train: -0.002070, Test: -0.001813 for {'epochs': 120, 'layers': 5, 'nodes': 90} 
+Train: -0.002027, Test: -0.001912 for {'epochs': 120, 'layers': 6, 'nodes': 40} 
+Train: -0.002044, Test: -0.001879 for {'epochs': 120, 'layers': 6, 'nodes': 50} 
+Train: -0.002045, Test: -0.001847 for {'epochs': 120, 'layers': 6, 'nodes': 75} 
+Train: -0.002067, Test: -0.001835 for {'epochs': 120, 'layers': 6, 'nodes': 90} 
+Train: -0.002045, Test: -0.001934 for {'epochs': 120, 'layers': 7, 'nodes': 40} 
+Train: -0.002031, Test: -0.001892 for {'epochs': 120, 'layers': 7, 'nodes': 50} 
+Train: -0.002055, Test: -0.001863 for {'epochs': 120, 'layers': 7, 'nodes': 75} 
+Train: -0.007018, Test: -0.006931 for {'epochs': 120, 'layers': 7, 'nodes': 90} 
+Train: -0.002024, Test: -0.001912 for {'epochs': 120, 'layers': 8, 'nodes': 40} 
+Train: -0.002043, Test: -0.001908 for {'epochs': 120, 'layers': 8, 'nodes': 50} 
+Train: -0.003756, Test: -0.003604 for {'epochs': 120, 'layers': 8, 'nodes': 75} 
+Train: -0.007024, Test: -0.006934 for {'epochs': 120, 'layers': 8, 'nodes': 90} 

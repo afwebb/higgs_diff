@@ -72,7 +72,8 @@ def runReco(inf):
                 channel='3lS'
 
         #Check if Higgs jets are reconstructed
-        if sum([x==25 for x in nom.jet_parents])!=2: continue
+        if channel!='3lF' and sum([x==25 for x in nom.jet_parents])!=2: continue
+        #if sum([x==25 for x in nom.jet_parents])!=2: continue
 
         #Find the b-jets from tops
         topRes = findBestTopKeras(nom, channel, topModel, topNormFactors)
@@ -112,4 +113,4 @@ def runReco(inf):
         df3lF.to_csv('csvFiles/higgsTop3lF/'+outF, index=False, float_format='%.3f')
 
 linelist = [line.rstrip() for line in open(sys.argv[1])]
-Parallel(n_jobs=8)(delayed(runReco)(inf) for inf in linelist)
+Parallel(n_jobs=10)(delayed(runReco)(inf) for inf in linelist)

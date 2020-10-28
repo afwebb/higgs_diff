@@ -66,16 +66,32 @@ def makePlots(alg, model, outDir, y_train, y_test, y_train_pred, y_test_pred):
     if not binned:
         #Pt scatter density plot
 
-        #make normalized 2d hist
+        #make normalized 2d hist  - train data                                                                          
+        plt.figure(figsize=[8.5,6])
+        h2d, xedges, yedges = np.histogram2d(y_train, y_train_pred, range=[[0,600e3],[0,600e3]], bins=12)                   
+        h2dNorm = h2d/h2d.sum(axis=0, keepdims=True)                                                          
+        ax = sns.heatmap(h2dNorm, cmap='viridis', annot=True, fmt='0.2f',
+                         xticklabels=xedges.astype(int)//1000, yticklabels=yedges.astype(int)//1000,
+                         cbar=False, linewidths=0.05)                                                                
+        ax.invert_yaxis()                                                                                            
+        ax.set_xlabel("Truth $p_T$ [GeV]")                                                                     
+        ax.set_ylabel('Predicted $p_T$ [GeV]')
+        ax.set_yticks(np.arange(len(yedges)))
+        ax.set_xticks(np.arange(len(xedges)))                                                                  
+        plt.savefig(f'plots/{outDir}/{alg}_train_norm2Dhist.png')
+
+        #make normalized 2d hist - test data
         plt.figure(figsize=[8.5,6])
         h2d, xedges, yedges = np.histogram2d(y_test, y_test_pred, range=[[0,600e3],[0,600e3]], bins=12)
         h2dNorm = h2d/h2d.sum(axis=0, keepdims=True)
         ax = sns.heatmap(h2dNorm, cmap='viridis', annot=True, fmt='0.2f', 
-                xticklabels=xedges[1:].astype(int)//1000, yticklabels=yedges[1:].astype(int)//1000,
-                cbar=False)
+                xticklabels=xedges.astype(int)//1000, yticklabels=yedges.astype(int)//1000,
+                         cbar=False, linewidths=0.05)
         ax.invert_yaxis()
         ax.set_xlabel("Truth $p_T$ [GeV]")
         ax.set_ylabel('Predicted $p_T$ [GeV]')
+        ax.set_yticks(np.arange(len(yedges)))
+        ax.set_xticks(np.arange(len(xedges)))
         plt.savefig(f'plots/{outDir}/{alg}_test_norm2Dhist.png')
 
         # Calculate the point density                                                                            

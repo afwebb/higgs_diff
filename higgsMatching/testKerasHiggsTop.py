@@ -73,6 +73,9 @@ for idx in range(nEntries):
     else:
         topRes = findBestTopKeras(nom, '2lSS', topModel, topNormFactors)
 
+    if not topRes:
+        continue 
+
     topIdx0, topIdx1 = topRes['bestComb']
     topScore = topRes['topScore']
     #Get dict of all possible jet combinations
