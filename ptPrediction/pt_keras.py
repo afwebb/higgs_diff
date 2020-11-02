@@ -28,25 +28,25 @@ inFile = sys.argv[1]
 outDir = sys.argv[2]
 
 ##Use optimal parameters obtained from grid search 
-if '2lSS' in outDir:
+if outDir=='higgsTop2lSS' or outDir=='testHiggsTop2lSS':
     #{"epochs": 120, "layers": 5, "nodes": 40}
     epochs = 150
-    layers = 8
-    nodes = 75
+    layers = 7
+    nodes = 60
 elif outDir=='higgs3lS' or outDir=='higgsTop3lS' or outDir=='testHiggsTop3lS':
     #{'epochs': 120, 'layers': 8, 'nodes': 40}
     epochs = 150
-    layers = 8
-    nodes = 75
+    layers = 7
+    nodes = 80
 elif outDir=='higgs3lF' or outDir=='higgsTop3lF':
     #{"epochs": 120, "layers": 8, "nodes": 40}
     epochs = 150
     layers = 8
-    nodes = 40
+    nodes = 50
 else:
-    epochs = 120
-    layers = 5
-    nodes=50
+    epochs = 150
+    layers = 7
+    nodes=60
 
 #load in the training data 
 inDF = pd.read_csv(inFile, index_col=False)
@@ -115,8 +115,8 @@ y_train_pred = y_pred_train*yMax
 y_test_pred = y_pred_test*yMax
 
 if '2lSS' in outDir:
-    y_train_pred = 1.3*(y_train_pred-30e3)
-    y_test_pred = 1.3*(y_test_pred-30e3)
+    y_train_pred = 1.4*(y_train_pred-40e3)
+    y_test_pred = 1.4*(y_test_pred-40e3)
 elif '3lS' in outDir:
     y_train_pred = 1.2*(y_train_pred-20e3)                                                                             
     y_test_pred = 1.2*(y_test_pred-20e3)

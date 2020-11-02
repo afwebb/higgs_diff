@@ -47,7 +47,7 @@ def makePlots(alg, model, outDir, y_train, y_test, y_train_pred, y_test_pred):
     fpr, tpr, _ = sk.metrics.roc_curve(yTest,ypTest)
     plt.plot(fpr, tpr, label='test AUC = %.3f' %(auc))
     
-    plt.title("Keras ROC")
+    #plt.title("Keras ROC")
     plt.legend(loc='lower right')
     plt.savefig(f'plots/{outDir}/{alg}_roc.png')
 
@@ -60,7 +60,7 @@ def makePlots(alg, model, outDir, y_train, y_test, y_train_pred, y_test_pred):
     sns.heatmap(confMat, annot=True, robust=True)
     ax.set_xlabel("Predicted")
     ax.set_ylabel("Truth")
-    ax.set_title(f"{alg.capitalize()} Confusion Matrix")
+    #ax.set_title(f"{alg.capitalize()} Confusion Matrix")
     plt.savefig(f'plots/{outDir}/{alg}_conf_matrix.png')
     
     if not binned:
@@ -101,7 +101,7 @@ def makePlots(alg, model, outDir, y_train, y_test, y_train_pred, y_test_pred):
         
         plt.figure()
         plt.scatter(y_test[:scatterSize]/1000, y_test_pred[:scatterSize]/1000, c=np.log(z_test), edgecolor='')
-        plt.title("Keras Test Data, MSE=%0.1f" %(test_loss))
+        #plt.title("Keras Test Data, MSE=%0.1f" %(test_loss))
         plt.xlabel('Truth $p_T$ [GeV]')
         plt.ylabel('Predicted $p_T$ [GeV]')
         plt.xlim(1,1000)
@@ -115,7 +115,7 @@ def makePlots(alg, model, outDir, y_train, y_test, y_train_pred, y_test_pred):
         
         plt.figure()
         plt.scatter(y_train[:scatterSize]/1000, y_train_pred[:scatterSize]/1000, c=np.log(z_train), edgecolor='')
-        plt.title("Keras Train Data, MSE=%0.1f" %(train_loss))
+        #plt.title("Keras Train Data, MSE=%0.1f" %(train_loss))
         plt.xlabel('Truth $p_T$ [GeV]')
         plt.ylabel('Predicted $p_T$ [GeV]')
         plt.xlim(0,1000)
@@ -145,7 +145,7 @@ def makePlots(alg, model, outDir, y_train, y_test, y_train_pred, y_test_pred):
         plt.figure()
         plt.errorbar( errBins[1:], y_pred_bins, yerr=y_err_bins)
         plt.plot([0,1200],[0,1200])#, zorder=10)
-        plt.title('Prediction Error')
+        #plt.title('Prediction Error')
         plt.xlabel('Truth Higgs $p_T$ [GeV]')
         plt.ylabel('RMSE')
         plt.savefig(f'plots/{outDir}/{alg}_err.png')
@@ -183,7 +183,7 @@ def makePlots(alg, model, outDir, y_train, y_test, y_train_pred, y_test_pred):
         plt.hist(y_test_pred_low[:nHL]/1000, 30, range=(0, 500), log=False, alpha=0.5, label='Low Pt - Test')
         plt.hist(y_train_pred_high[:nHL]/1000, 30, range=(0, 500), log=False, histtype='step', alpha=0.5, label='High Pt - Train')
         plt.hist(y_train_pred_low[:nHL]/1000, 30, range=(0, 500), log=False, histtype='step', alpha=0.5, label='Low Pt - Train')
-        plt.title("Keras Output")
+        #plt.title("Keras Output")
         plt.xlabel('Predicted Higgs $p_T$ [GeV]')
         plt.ylabel('NEvents')
         plt.legend(loc='upper right')                                                                  
@@ -193,7 +193,7 @@ def makePlots(alg, model, outDir, y_train, y_test, y_train_pred, y_test_pred):
             plt.figure()
             plt.plot(model.history['loss'], label='Train Loss')
             #plt.plot(model.history['val_loss'], label='Test Loss')                                                          
-            plt.title(f"{alg} Loss")                                                                                
+            #plt.title(f"{alg} Loss")                                                                                
             plt.xlabel('Epoch')
             plt.ylabel('MSE')
             plt.legend()
@@ -212,7 +212,7 @@ def makePlots(alg, model, outDir, y_train, y_test, y_train_pred, y_test_pred):
         plt.hist(testPredFalse[:len(testPredTrue)], 30, range=(-0.1,1.1), log=False, alpha=0.5, label='Low Pt - Test')
         plt.hist(trainPredTrue[:len(testPredTrue)], 30, range=(-0.1,1.1), log=False, histtype='step', alpha=0.5, label='High Pt - Train')
         plt.hist(trainPredFalse[:len(testPredTrue)], 30, range=(-0.1,1.1), log=False, histtype='step', alpha=0.5, label='Low Pt - Train')
-        plt.title("Keras Output")
+        #plt.title("Keras Output")
         plt.xlabel('Keras Score')
         plt.ylabel('NEvents')
         plt.legend(loc='upper right')

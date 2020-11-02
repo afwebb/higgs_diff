@@ -85,7 +85,7 @@ def runReco(inf):
         topRes = findBestTopKeras(nom, channel, topModel, topNormFactors)
         if not topRes:
             topIdx0, topIdx1 = 0,0
-            topScore = -10
+            topScore = np.float32(-10)
         else:
             topIdx0, topIdx1 = topRes['bestComb']
             topScore = topRes['topScore']
@@ -109,8 +109,8 @@ def runReco(inf):
             res = findBestHiggsTop(nom, '2lSS', model2lSS, normFactors2lSS, topIdx0, topIdx1, topScore)
             
         if not res: 
-            higgsTopScore = -10
-            lepIdx, jetIdx0, jetIdx1 = 0,0,0
+            higgsTopScore = np.float32(-10)
+            lepIdx, jetIdx0, jetIdx1 = 1,0,0
         else:
             higgsTopScore = res['higgsTopScore']
             lepIdx, jetIdx0, jetIdx1 = res['bestComb']
@@ -202,7 +202,11 @@ def addPred(inf):
         pt_predF = makePrediction(events3lF, ptModelF, ptNormFactorsF)
         bin_predF = makePrediction(events3lF, binModelF, binNormFactorsF)
         decay_pred = makePrediction(eventsDecay, decayModel, decayNormFactors)
-    
+
+        addToFile(inf, higgsRecoScores, "higgsRecoScore3lS")
+        addToFile(inf, higgsRecoScoresF, "higgsRecoScore3lF")
+        addToFile(inf, topRecoScores, "topRecoScore")
+
         addToFile(inf, pt_pred, 'recoHiggsPt_3lS')
         addToFile(inf, bin_pred, 'binHiggsPt_3lS')
         
@@ -212,9 +216,18 @@ def addPred(inf):
         addToFile(inf, decay_pred, 'decayScore')
 
     else:
+        print(f'higgsreco: {len(higgsRecoScores)}')
+        print(f'topRecoScores: {len(topRecoScores)}')
+        print(f'pt_pred: {len(pt_pred)}')
+        print(higgsRecoScores)
+
+        addToFile(inf, higgsRecoScores, "higgsRecoScore2lSS")                                                  
+        addToFile(inf, topRecoScores, "topRecoScore")
+
         addToFile(inf, pt_pred, 'recoHiggsPt_2lSS')                                               
         addToFile(inf, bin_pred, 'binHiggsPt_2lSS')
 
+
 linelist = [line.rstrip() for line in open(sys.argv[1])]
-addPred(linelist[0])
-#Parallel(n_jobs=12)(delayed(addPred)(inf) for inf in linelist)
+#addPred(linelist[0])
+Parallel(n_jobs=12)(delayed(addPred)(inf) for inf in linelist)

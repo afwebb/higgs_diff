@@ -40,7 +40,7 @@ def make_plots(alg, model, outDir, y_train, y_test, y_train_pred, y_test_pred):
     plt.hist(testPredFalse[:minLen], 30, range=(-0.1,1.1), log=False, alpha=0.5, label='Incorrect - Test')
     plt.hist(trainPredTrue[:minLen], 30, range=(-0.1,1.1), log=False, histtype='step', alpha=0.5, label='Correct - Train')
     plt.hist(trainPredFalse[:minLen], 30, range=(-0.1,1.1), log=False, histtype='step', alpha=0.5, label='Incorrect - Train')
-    plt.title(f"{alg} Output")
+    #plt.title(f"{alg} Output")
     plt.xlabel(f'{alg} Score')
     plt.ylabel('NEvents')
     plt.legend()
@@ -56,7 +56,7 @@ def make_plots(alg, model, outDir, y_train, y_test, y_train_pred, y_test_pred):
     fpr, tpr, _ = sk.metrics.roc_curve(y_train, y_train_pred)
     plt.plot(fpr, tpr, label='train AUC = %.3f' %(auc))
     plt.legend()
-    plt.title(f'{alg.capitalize()} Match ROC')
+    #plt.title(f'{alg.capitalize()} Match ROC')
     plt.savefig(f'plots/{outDir}/{alg}_roc.png')
     
     small_pred = np.concatenate((testPredTrue[:minLen], testPredFalse[:minLen]))
@@ -72,7 +72,7 @@ def make_plots(alg, model, outDir, y_train, y_test, y_train_pred, y_test_pred):
     sns.heatmap(confMat, annot=True, robust=True)
     ax.set_xlabel("Predicted")
     ax.set_ylabel("Truth")
-    ax.set_title(f"{alg.capitalize()} Confusion Matrix")
+    #ax.set_title(f"{alg.capitalize()} Confusion Matrix")
     plt.savefig(f'plots/{outDir}/{alg}_conf_matrix.png')
 
     #Loss history - keras 
@@ -80,7 +80,7 @@ def make_plots(alg, model, outDir, y_train, y_test, y_train_pred, y_test_pred):
         plt.figure()
         plt.plot(model.history['loss'], label='Train Loss')
         #plt.plot(model.history['val_loss'], label='Test Loss')
-        plt.title(f"{alg} Loss")
+        #plt.title(f"{alg} Loss")
         plt.xlabel('Epoch')
         plt.ylabel('BCE')                                                                                                
         plt.legend()
@@ -89,7 +89,7 @@ def make_plots(alg, model, outDir, y_train, y_test, y_train_pred, y_test_pred):
         plt.figure()
         plt.plot(model.history['AUC'], label='Train AUC')
         #plt.plot(model.history['val_AUC'], label='Test AUC')
-        plt.title("Keras AUC")
+        #plt.title("Keras AUC")
         plt.xlabel('Epoch')                                                                                                  
         plt.ylabel('AUC')                                                                         
         plt.legend()
@@ -99,7 +99,7 @@ def make_plots(alg, model, outDir, y_train, y_test, y_train_pred, y_test_pred):
     if alg=='xgb':
         plt.figure()
         fip = xgb.plot_importance(model)
-        plt.title("xgboost feature important")
+        #plt.title("xgboost feature important")
         plt.legend(loc='lower right')
         plt.savefig('plots/'+outDir+'/xgb_feature_importance.png')
         
@@ -111,5 +111,5 @@ def make_plots(alg, model, outDir, y_train, y_test, y_train_pred, y_test_pred):
         plt.legend()
         plt.ylabel('AUC')
         plt.xlabel('Epoch')
-        plt.title('XGBoost AUC')
+        #plt.title('XGBoost AUC')
         plt.savefig('plots/'+outDir+'/xgb_auc_history.png')

@@ -39,6 +39,7 @@ def jetCombosTop(channel, nom, withMatch):
     varType should be either flat or fourVec
     '''
 
+    #check which channel to use
     if channel=='2lSS': 
         flatDict = topDict2lSS
         fourVecDict = topDictFourVec2lSS
@@ -46,8 +47,10 @@ def jetCombosTop(channel, nom, withMatch):
         flatDict = topDict3l
         fourVecDict = topDictFourVec3l
 
-    combosTop = {'flatDicts':{},'fourVecDicts':[],'jetIdx':[],'truthComb':[], 'higgsIdx':[]}
-    for i in range(len(nom.jet_pt)-1):
+    combosTop = {'flatDicts':{},'fourVecDicts':[],'jetIdx':[],'truthComb':[], 'higgsIdx':[]} #initialize result
+
+    #loop over combinations of jets, add a dict for each one
+    for i in range(len(nom.jet_pt)-1): 
         if nom.jet_pt[i]<15e3 or nom.jet_jvt[i]<0.59 or abs(nom.jet_eta[i])>4: continue #Only include jets that pass JVT cut
         if nom.jet_parents[i]==25 and i not in combosTop['higgsIdx']:
             combosTop['higgsIdx'].append(i)
@@ -57,7 +60,6 @@ def jetCombosTop(channel, nom, withMatch):
             if nom.jet_parents[j]==25 and j not in combosTop['higgsIdx']:
                 combosTop['higgsIdx'].append(j)
             #Check if this combination of jets are truth Bs
-            #if withMatch:
             isTop = 0
             if abs(nom.jet_parents[i])==6 and abs(nom.jet_truthPartonLabel[i])==5:
                 if abs(nom.jet_parents[j])==6 and abs(nom.jet_truthPartonLabel[j])==5:
@@ -72,8 +74,6 @@ def jetCombosTop(channel, nom, withMatch):
                 else:
                     for k in fd:
                         combosTop['flatDicts'][k]+=[(fd[k])]
-                #combosTop['flatDicts'].append( flatDict( nom, i, j, isTop) )
-                #combosTop['fourVecDicts'].append( fourVecDict( nom, i, j, isTop) )
             else:
                 fd = flatDict(nom, i, j)                                                                         
                 if combosTop['flatDicts']=={}:
@@ -82,8 +82,6 @@ def jetCombosTop(channel, nom, withMatch):
                 else:
                     for k in fd:
                         combosTop['flatDicts'][k]+=[(fd[k])]
-                #combosTop['flatDicts'].append( flatDict( nom, i, j) )
-                #combosTop['fourVecDicts'].append( fourVecDict( nom, i, j) )
             
     return combosTop
 

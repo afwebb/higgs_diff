@@ -257,7 +257,7 @@ def ptDictHiggsTop2lSS(nom, jetIdx0, jetIdx1, lepIdx, higgsScore, topIdx0, topId
         lepH = lep1                                                                                              
         lepT = lep0                                                                                        
     else:
-        print(f"{lepIdx} is not a valid lep index. Must be 0 or 1")
+        print(f"{lepIdx} is not a valid lep index for ptHiggsTop2lSS. Must be 0 or 1")
         return 0
 
     k = {}
@@ -333,7 +333,7 @@ def ptDictHiggsTop3lS(nom, jetIdx0, jetIdx1, lepIdx, higgsScore, topIdx0, topIdx
         lepT0 = lep0
         lepT1 = lep1
     else:
-        print(f"{lepIdx} is not a valid lep index. Must be 1 or 2")
+        print(f"{lepIdx} is not a valid lep index for ptDictHiggsTop3lS. Must be 1 or 2")
         return 0
 
     k = {}                                                                                                                  
@@ -417,7 +417,7 @@ def ptDictHiggsTop3lF(nom, lepIdx, higgsScore, topIdx0, topIdx1, topScore, higgs
         lepH1 = lep2
         lepT = lep1
     else:
-        print(f"{lepIdx} is not a valid lep index. Must be 1 or 2")
+        print(f"{lepIdx} is not a valid lep index for ptHiggsTop3lF. Must be 1 or 2")
         return 0
         
     k = {}
