@@ -1,11 +1,12 @@
 #import rootpy.io
 #from rootpy.tree import Tree
 import ROOT
+from ROOT import TFile
 import sys
 import pandas as pd
 from joblib import Parallel, delayed
 import multiprocessing
-from dict_sigBkdBDT import sigBkgDict2l, sigBkgDict3l
+from dict_sigBkgBDT import sigBkgDict2l, sigBkgDict3l
 
 import math
 
@@ -22,18 +23,25 @@ def run_csv(inFile):
     dsid = inFile.split('/')[-1]
     dsid = dsid.replace('.root', '')
 
-    f = ROOT.TFile(inFile)#rootpy.io.root_open(inFile)
-    outFile = '/'.join(inFile.split("/")[-2:]).replace('.root','.csv')
-    print(dsid, outFile)
+    f = TFile.Open(inFile)#rootpy.io.root_open(inFile)
+    outFile = '/'.join(inFile.split("/")[-3:]).replace('.root','.csv')
+    #print(dsid, outFile)
     nom = f.Get('nominal')
+    if not (hasattr(nom, "higgsRecoScore2lSS") or hasattr(nom, "higgsRecoScore3lF")):
+        print(f'no score: {inFile}')
+        return 
+
+    if not hasattr(nom, "weight"):
+        print(f'no weight: {inFile}')
+        return
     
     events = []
 
     current = 0
     for idx in range(nom.GetEntries()):
         current+=1
-        if current%10000==0:
-            print(current)
+        #if current%10000==0:
+        #    print(current, nom.GetEntries())
 
         nom.GetEntry(idx)
        
@@ -51,5 +59,4 @@ def run_csv(inFile):
     dFrame.to_csv('csvFiles/'+outFile, index=False)
 
 linelist = [line.rstrip() for line in open(inf)]
-print(linelist)
-Parallel(n_jobs=30)(delayed(run_csv)(inFile) for inFile in linelist)
+Parallel(n_jobs=15)(delayed(run_csv)(inFile) for inFile in linelist)
