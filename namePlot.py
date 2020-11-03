@@ -7,7 +7,7 @@ Usage: <display name> <range> = name(<variable>)
 def name(c):
     
     #Give the correct range for the input variable
-    if c =='match':                                                                                            
+    if c =='match' or c=='signal':         
         r =(0,1)#continue                                                                                                  
     elif 'MV2c10' in c or 'DL1r' in c:
         r = (0, 5) 
