@@ -17,8 +17,8 @@ def name(c):
         r = (-3.5, 3.5)                                                                               
     elif 'Eta' in c or 'eta' in c:                                                                                        
         r = (-3.5, 3.5)
-    elif 'dR' in c or 'DR' in c:                               
-        r = (0,6)        
+    elif 'dR' in c or 'DR' in c or 'DeltaR' in c:                               
+        r = (0,5)        
     elif "score" in c or "Score" in c:
         r = (0,1)                                                                                                        
     elif 'nJets' in c:                                                                                                   
@@ -64,16 +64,20 @@ def name(c):
     if 'DR' in c:
         c = c.replace(' ', ')(')
         c = c.replace('DR', '$\Delta R(').replace('()', '')
+        c = c.replace('min)(', 'min ')
         c = c + ')$'
     if 'dR' in c:
         c = c.replace(' ', ')(')
         c = c.replace('dR', '$\Delta R(').replace('()', '')
+        c = c.replace('min)(', 'min ')
         c = c + ')$'
     if 'Eta' in c:
         c = c.replace('Eta', ' $\eta$')
     if 'dPhi' in c:
         c = c.replace('dPhi', '$\Delta\phi(')
         c = c.replace(' ', ')(').replace('()', '') + ')$'
+    if 'Phi' in c:
+        c = c.replace('Phi', '$\phi$')
     if 'Ml' in c or 'Mt' in c or 'Mj' in c:
         c = c.replace('M', '$M(')
         c = c + ')$ [GeV]'

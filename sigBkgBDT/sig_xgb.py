@@ -28,35 +28,36 @@ outDir = sys.argv[2]
 inDF = pd.read_csv(inFile)
 inDF = inDF.dropna()
 
-if outDir=="2lSS_highPt":
+if outDir=='2lSS':
+    inDF = inDF.drop(['recoHiggsPt_2lSS'],axis=1)
+elif outDir=="2lSS_highPt":
     inDF = inDF[1.4*inDF['recoHiggsPt_2lSS']-40e3>150000]
-    #inDF = inDF.drop(['recoHiggsPt_2lSS'],axis=1)
+    inDF = inDF.drop(['recoHiggsPt_2lSS'],axis=1)
     #inDF = inDF.drop(['bin_score'],axis=1)
 elif outDir=='2lSS_lowPt':
     inDF = inDF[1.4*inDF['recoHiggsPt_2lSS']-40e3<150000]
-    #inDF = inDF.drop(['recoHiggsPt_2lSS'],axis=1)
+    inDF = inDF.drop(['recoHiggsPt_2lSS'],axis=1)
     #inDF = inDF.drop(['bin_score'],axis=1)
 
 if outDir=="3lF":
     inDF = inDF[inDF['decayScore']>0.18]
     inDF = inDF.drop(['recoHiggsPt_3lS'],axis=1)
-    #inDF = inDF.drop(['bin_score_3lS'],axis=1)
+    inDF = inDF.drop(['recoHiggsPt_3lS'],axis=1)
 elif outDir=="3lS":
     inDF = inDF[inDF['decayScore']<0.18]
     inDF = inDF.drop(['recoHiggsPt_3lF'],axis=1)
-    #inDF = inDF.drop(['bin_score_3lF'],axis=1)
+    inDF = inDF.drop(['recoHiggsPt_3lS'],axis=1)
 
 if outDir=="3lF_highPt":
     inDF = inDF[inDF['decayScore']>0.18]
     inDF = inDF[inDF['recoHiggsPt_3lF']>150000]
-    #inDF = inDF.drop(['recoHiggsPt_3lF'],axis=1)
-    #inDF = inDF.drop(['bin_score_3lF'],axis=1)
     inDF = inDF.drop(['recoHiggsPt_3lS'],axis=1)
-    #inDF = inDF.drop(['bin_score_3lS'],axis=1)
+    inDF = inDF.drop(['recoHiggsPt_3lF'],axis=1)
 elif outDir=="3lS_highPt":
     inDF = inDF[inDF['decayScore']<0.18]
     inDF = inDF[1.2*inDF['recoHiggsPt_3lS']-20e3>150000]
     inDF = inDF.drop(['recoHiggsPt_3lF'],axis=1)
+    inDF = inDF.drop(['recoHiggsPt_3lS'],axis=1)
     #inDF = inDF.drop(['bin_score_3lF'],axis=1)
     #inDF = inDF.drop(['recoHiggsPt_3lS'],axis=1)
     #inDF = inDF.drop(['bin_score_3lS'],axis=1)
@@ -67,11 +68,13 @@ if outDir=="3lF_lowPt":
     #inDF = inDF.drop(['recoHiggsPt_3lF'],axis=1)
     #inDF = inDF.drop(['bin_score_3lF'],axis=1)
     inDF = inDF.drop(['recoHiggsPt_3lS'],axis=1)
+    inDF = inDF.drop(['recoHiggsPt_3lF'],axis=1)
     #inDF = inDF.drop(['bin_score_3lS'],axis=1)
 elif outDir=="3lS_lowPt":
     inDF = inDF[inDF['decayScore']<0.18]
     inDF = inDF[1.2*inDF['recoHiggsPt_3lS']-20e3<150000]
     inDF = inDF.drop(['recoHiggsPt_3lF'],axis=1)
+    inDF = inDF.drop(['recoHiggsPt_3lS'],axis=1)
     #inDF = inDF.drop(['bin_score_3lF'],axis=1)
     #inDF = inDF.drop(['recoHiggsPt_3lS'],axis=1)
     #inDF = inDF.drop(['bin_score_3lS'],axis=1)
@@ -88,7 +91,7 @@ inDF['weight'] = weights
 
 print(inDF.shape)
 
-train, test = train_test_split(inDF, test_size=0.2)
+train, test = train_test_split(inDF, test_size=0.1)
 
 y_train = train['signal']
 y_test = test['signal']
@@ -116,7 +119,7 @@ y_train = y_train.float().detach().numpy()
 '''
 params = {
     'learning_rate' : 0.005,
-    'max_depth': 7,
+    'max_depth': 6,
     'min_child_weight': 2,
     'gamma': 0.9,
     'subsample' : 0.8,
@@ -126,7 +129,7 @@ params = {
     'scale_pos_weight':1
 }
 
-gbm = xgb.cv(params, xgb_train, num_boost_round=500, verbose_eval=True)
+gbm = xgb.cv(params, xgb_train, num_boost_round=1200, verbose_eval=True)
 
 best_nrounds = pd.Series.idxmax(gbm['test-auc-mean'])
 print( best_nrounds)
