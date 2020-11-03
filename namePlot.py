@@ -90,6 +90,10 @@ def name(c):
     if c == 'nJets OR T' or c == 'nJets OR':
         c = 'nJets'
     c = c.replace('met', 'E_T^{miss}')
+    if c=='mjjMax_frwdJet':
+        c = 'mjjMax_frwdJet [GeV]'
+    if c=='MLepMet':
+        c = 'M(lep, $E_T^{miss}$) [GeV]'
     #if 'nJets DL1r' in c:
     #    c = 'n b-jets'
 
