@@ -65,7 +65,7 @@ def addToRoot(inputPath, event_dict, model, name, toDrop=None):
 
     inDF = pd.DataFrame(event_dict)                          
     if toDrop:
-        inDF = inDF.drop([toDrop],axis=1)
+        inDF = inDF.drop(toDrop,axis=1)
 
     xgbMat = xgb.DMatrix(inDF, feature_names=list(inDF))
     y_pred = model.predict(xgbMat) 
@@ -89,25 +89,28 @@ def run_pred(inputPath):
     print(dsid)
     
     nom = f.Get('nominal')
-    if nom.GetEntries() == 0:
-        return 0
+    if nom.GetEntries() == 0 or not hasattr(nom, 'Mll01'):
+        return 
+    if hasattr(nom, 'sigBkg_2lSS') or hasattr(nom, 'sigBkg_3lF'):
+        print(f'{inputPath} already has score')
+        return
     
     if '2lSS' in inputPath:
         event_dict = create_dict(nom, sigBkgDict2l)
-        addToRoot(inputPath, event_dict, model_2lSS, 'sigBkg_2lSS', toDrop=None)
-        addToRoot(inputPath, event_dict, model_2lSSHigh, 'sigBkg_2lSS_highPt', toDrop=None) #toDrop='recoHiggsPt_2lSS'
-        addToRoot(inputPath, event_dict, model_2lSSLow, 'sigBkg_2lSS_lowPt', toDrop=None) #toDrop='recoHiggsPt_2lSS'
+        addToRoot(inputPath, event_dict, model_2lSS, 'sigBkg_2lSS', toDrop=['recoHiggsPt_2lSS'])
+        addToRoot(inputPath, event_dict, model_2lSSHigh, 'sigBkg_2lSS_highPt', toDrop=['recoHiggsPt_2lSS'])
+        addToRoot(inputPath, event_dict, model_2lSSLow, 'sigBkg_2lSS_lowPt', toDrop=['recoHiggsPt_2lSS'])
 
     else:
         event_dict = create_dict(nom, sigBkgDict3l)
         
-        addToRoot(inputPath, event_dict, model_3lS, 'sigBkg_3lS', toDrop='recoHiggsPt_3lF')
-        addToRoot(inputPath, event_dict, model_3lSHigh, 'sigBkg_3lS_highPt', toDrop='recoHiggsPt_3lF')
-        addToRoot(inputPath, event_dict, model_3lSLow, 'sigBkg_3lS_lowPt', toDrop='recoHiggsPt_3lF')
+        addToRoot(inputPath, event_dict, model_3lS, 'sigBkg_3lS', toDrop=['recoHiggsPt_3lF','recoHiggsPt_3lS'])
+        addToRoot(inputPath, event_dict, model_3lSHigh, 'sigBkg_3lS_highPt', toDrop=['recoHiggsPt_3lF','recoHiggsPt_3lS'])
+        addToRoot(inputPath, event_dict, model_3lSLow, 'sigBkg_3lS_lowPt', toDrop=['recoHiggsPt_3lF','recoHiggsPt_3lS'])
 
-        addToRoot(inputPath, event_dict, model_3lF, 'sigBkg_3lF', toDrop='recoHiggsPt_3lS')                         
-        addToRoot(inputPath, event_dict, model_3lFHigh, 'sigBkg_3lF_highPt', toDrop='recoHiggsPt_3lS')               
-        addToRoot(inputPath, event_dict, model_3lFLow, 'sigBkg_3lF_lowPt', toDrop='recoHiggsPt_3lS') 
+        addToRoot(inputPath, event_dict, model_3lF, 'sigBkg_3lF', toDrop=['recoHiggsPt_3lF','recoHiggsPt_3lS'])       
+        addToRoot(inputPath, event_dict, model_3lFHigh, 'sigBkg_3lF_highPt', toDrop=['recoHiggsPt_3lF','recoHiggsPt_3lS']) 
+        addToRoot(inputPath, event_dict, model_3lFLow, 'sigBkg_3lF_lowPt', toDrop=['recoHiggsPt_3lF','recoHiggsPt_3lS']) 
 
 linelist = [line.rstrip() for line in open(inf)]
 print(linelist)

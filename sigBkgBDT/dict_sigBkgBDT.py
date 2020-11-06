@@ -43,6 +43,8 @@ def sigBkgDict2l(nom, signal=-1):
     k['HT'] = nom.HT
     k['nJets_OR'] = nom.nJets_OR_fixed
     k['nJets_OR_DL1r_70'] = nom.nJets_OR_DL1r_70_fixed
+    k['nJets_OR_DL1r_85'] = nom.nJets_OR_DL1r_85
+    k['nJets_OR_DL1r_60'] = nom.nJets_OR_DL1r_60
 
     k['met'] = nom.met_met
     k['MLepMet'] = nom.MLepMet
@@ -54,7 +56,7 @@ def sigBkgDict2l(nom, signal=-1):
     k['min_dR_lep_bjet'] = nom.DeltaR_min_lep_bjet
     k['mjjMax_frwdJet'] = nom.mjjMax_frwdJet
 
-    k['recoHiggsPt_2lSS'] = nom.recoHiggsPt_2lSS
+    k['binHiggsPt_2lSS'] = nom.binHiggsPt_2lSS
     k['higgsRecoScore'] = nom.higgsRecoScore2lSS
     k['topRecoScore'] = nom.topRecoScore
 
@@ -100,6 +102,9 @@ def sigBkgDict3l(nom, signal=-1):
     #k['HT'] = nom.HT
     k['nJets_OR'] = nom.nJets_OR_fixed
     k['nJets_OR_DL1r_70'] = nom.nJets_OR_DL1r_70_fixed
+    k['nJets_OR_DL1r_85'] = nom.nJets_OR_DL1r_85
+    k['nJets_OR_DL1r_60'] = nom.nJets_OR_DL1r_60
+
     k['met'] = nom.met_met
     #k['met_phi'] = calc_phi(phi_0, nom.met_phi)
     k['MLepMet'] = nom.MLepMet
@@ -114,8 +119,8 @@ def sigBkgDict3l(nom, signal=-1):
 
     k['Ml0l1l2'] = nom.Mlll012
 
-    k['recoHiggsPt_3lF'] = nom.recoHiggsPt_3lF
-    k['recoHiggsPt_3lS'] = nom.recoHiggsPt_3lS
+    k['binHiggsPt_3lF'] = nom.binHiggsPt_3lF
+    k['binHiggsPt_3lS'] = nom.binHiggsPt_3lS
     k['decayScore'] = nom.decayScore
 
     k['higgsRecoScore3lF'] = nom.higgsRecoScore3lF

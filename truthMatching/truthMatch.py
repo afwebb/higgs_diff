@@ -158,6 +158,6 @@ inFile = sys.argv[1]
 if '2lSS' in inFile:
     run_match(inFile, '2lSS/'+'/'.join(inFile.split("/")[-2:]))
 elif '3l' in inFile:
-    run_match(inFile, '3l/'+'/'.join(inFile.split("/")[-2:]))
+    run_match(inFile, 'test3l/'+'/'.join(inFile.split("/")[-2:]))
 else:
     print("not sure where to put the output file")

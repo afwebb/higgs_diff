@@ -230,4 +230,4 @@ def addPred(inf):
 
 linelist = [line.rstrip() for line in open(sys.argv[1])]
 #addPred(linelist[0])
-Parallel(n_jobs=12)(delayed(addPred)(inf) for inf in linelist)
+Parallel(n_jobs=7)(delayed(addPred)(inf) for inf in linelist)
