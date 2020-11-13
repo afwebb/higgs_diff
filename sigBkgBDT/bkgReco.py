@@ -52,8 +52,8 @@ def run_csv(inFile):
 
         k = sigDict(nom, sig)
 
-        if dsid=='413008':
-            k['weight'] = 1.68407
+        #if dsid=='413008':
+        #    k['weight'] = 1.68407*k['weight']
 
         events.append(k)
 

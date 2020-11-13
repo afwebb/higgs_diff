@@ -1,6 +1,9 @@
-2lSS_highPt: 0.33, 4.4
-2lSS_lowPt: 0.32, 5.46
-3lS_highPt: 0.43, 3.37
-3lS_lowPt: 0.49, 3.71
-3lF_highPt: 0.23, 2.61
-3lF_lowPt: 0.32, 3.39
+2lSS: 0.18, 0.71
+2lSS_highPt: 0.6, 0.68
+2lSS_lowPt: 0.18, 0.58
+3lS: 0.8, 0.95
+3lF: 0.39, 0.77
+3lS_highPt: 0.81, 1.03
+3lS_lowPt: 0.44, 0.37
+3lF_highPt: 0.4, 0.48
+3lF_lowPt: 0.53, 1.17

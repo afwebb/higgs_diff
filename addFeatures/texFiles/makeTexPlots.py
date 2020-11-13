@@ -33,7 +33,7 @@ for c in inDF:
     if c=='match': continue
     if icount % 6 == 1:
         print('\\frame{', file=texfile)
-    print(r'\includegraphics[width=.29\linewidth]{%s}' % ('plots/'+outDir+'/features/'+c+".pdf") + ('%'if (icount % 3 != 0) else r'\\'), file=texfile)
+    print(r'\subfigure[]{\includegraphics[width=.29\linewidth]{%s}}' % ('plots/'+outDir+'/features/'+c+".pdf") + ('%'if (icount % 3 != 0) else r'\\'), file=texfile)
     if icount % 6 == 0:
         print('}\n', file=texfile)
     icount += 1

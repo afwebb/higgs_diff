@@ -64,8 +64,8 @@ def addToRoot(inputPath, event_dict, model, name, toDrop=None):
     '''
 
     inDF = pd.DataFrame(event_dict)                          
-    if toDrop:
-        inDF = inDF.drop(toDrop,axis=1)
+    #if toDrop:
+    #    inDF = inDF.drop(toDrop,axis=1)
 
     xgbMat = xgb.DMatrix(inDF, feature_names=list(inDF))
     y_pred = model.predict(xgbMat) 
@@ -91,6 +91,9 @@ def run_pred(inputPath):
     nom = f.Get('nominal')
     if nom.GetEntries() == 0 or not hasattr(nom, 'Mll01'):
         return 
+    if not hasattr(nom, 'topRecoScore'):
+        print(f'{inputPath} missing pt reco')
+        return
     if hasattr(nom, 'sigBkg_2lSS') or hasattr(nom, 'sigBkg_3lF'):
         print(f'{inputPath} already has score')
         return

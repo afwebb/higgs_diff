@@ -65,6 +65,8 @@ def make_plots(alg, model, outDir, y_train, y_test, y_train_pred, y_test_pred, w
     plt.plot(fpr, tpr, label='train AUC = %.3f' %(auc))
     plt.legend()
     #plt.title(f'{alg.capitalize()} Match ROC')
+    plt.xlabel('Signal Rejection Rate')
+    plt.ylabel('Background Rejection Rate')
     plt.savefig(f'plots/{outDir}/{alg}_roc.png')
     
     small_pred = np.concatenate((testPredTrue[:minLen], testPredFalse[:minLen]))
